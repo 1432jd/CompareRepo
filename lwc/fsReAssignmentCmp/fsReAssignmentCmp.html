@@ -1,0 +1,115 @@
+<template>
+	<lightning-card variant="Narrow" title="Application Reassignment" icon-name="standard:product_transfer_state">
+		<lightning-spinner alternative-text="Loading" size="medium" if:true={showSpinner}></lightning-spinner>
+		<div class="slds-p-horizontal_small">
+			<lightning-layout multiple-rows>
+				<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6" medium-device-size="6"
+					large-device-size="6">
+					<div class="custom-box">
+						<c-l-w-c-lookup object-api-name="Application__c" field-api-name="Name"
+							sub-field-api-name="LMS_Response_Reference__c" object-label="Application"
+							label="Application Number" required onselect={handleSelect}
+							placeholder="Enter Application Number or LMS Reference Number here..." limit="5">
+						</c-l-w-c-lookup>
+					</div>
+				</lightning-layout-item>
+				<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6" medium-device-size="6"
+					large-device-size="6">
+					<div class="custom-box slds-m-top--large">
+						<lightning-button label="Search" variant="brand" title="Toggle content action"
+							icon-name="utility:search" onclick={handleSearch}>
+						</lightning-button>
+					</div>
+				</lightning-layout-item>
+				<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+					medium-device-size="12" large-device-size="12">
+					<hr />
+				</lightning-layout-item>
+
+				<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+					medium-device-size="12" large-device-size="12">
+					<div class="slds-table--header-fixed_container" style="height:450px;">
+						<div class="slds-scrollable_y" style="height:100%;">
+							<table class="slds-table slds-table_bordered slds-table--header-fixed"
+								aria-labelledby="element-with-table-label other-element-with-table-label"
+								if:true={recordList}>
+								<thead>
+									<tr class="slds-text-title_caps">
+										<th class="" scope="col" style="width:10%;">
+											<div class="slds-truncate slds-cell-fixed" style="font-weight: 700;">
+												Application No</div>
+										</th>
+										<th class="" scope="col" style="width:10%;">
+											<div class="slds-truncate slds-cell-fixed" style="font-weight: 700;">Branch
+											</div>
+										</th>
+										<th class="" scope="col" style="width:10%;">
+											<div class="slds-truncate slds-cell-fixed" style="font-weight: 700;">Stage
+											</div>
+										</th>
+										<th class="" scope="col" style="width:10%;">
+											<div class="slds-truncate slds-cell-fixed" style="font-weight: 700;">In Time
+											</div>
+										</th>
+										<th class="" scope="col" style="width:10%;">
+											<div class="slds-truncate slds-cell-fixed" style="font-weight: 700;">Time In
+												Queue</div>
+										</th>
+										<th class="" scope="col" style="width:10%;">
+											<div class="slds-truncate slds-cell-fixed" style="font-weight: 700;">Current
+												User</div>
+										</th>
+										<th class="" scope="col" style="width:10%;">
+											<div class="slds-truncate slds-cell-fixed" style="font-weight: 700;">
+												Modified User</div>
+										</th>
+									</tr>
+								</thead>
+								<tbody if:true={recordList}>
+									<template for:each={recordList} for:item="obj" for:index="idx">
+										<tr class="slds-hint-parent" key={obj.recordId}>
+											<th data-label="Name" scope="row">
+												<div class="slds-truncate">{obj.applicationNumber}</div>
+											</th>
+											<th data-label="Name" scope="row">
+												<div class="slds-truncate">{obj.branchName}</div>
+											</th>
+											<th data-label="Name" scope="row">
+												<div class="slds-truncate">{obj.stage}</div>
+											</th>
+											<th data-label="Name" scope="row">
+												<div class="slds-truncate">
+													<lightning-formatted-date-time value={obj.startDate} year="2-digit"
+														month="short" day="2-digit" hour="2-digit" minute="2-digit"
+														time-zone="IST">
+													</lightning-formatted-date-time>
+												</div>
+											</th>
+											<th data-label="Name" scope="row">
+												<div class="slds-truncate">{obj.timeInQueue}</div>
+											</th>
+											<th data-label="Name" scope="row">
+												<div class="slds-truncate">{obj.ownerName}</div>
+											</th>
+											<th data-label="Name" scope="row">
+												<lightning-combobox name="NewUser" label="Modified User"
+													placeholder="Modified User" options={obj.userList}
+													variant="label-hidden" onchange={handleOwnerChange} data-index={idx}
+													value={obj.ownerId}>
+												</lightning-combobox>
+											</th>
+										</tr>
+									</template>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</lightning-layout-item>
+			</lightning-layout>
+		</div>
+		<p slot="footer" if:true={isDataChanged}>
+			<lightning-button variant="brand" label="Reassign" title="Reassign" onclick={handleReassigning}>
+			</lightning-button>
+		</p>
+	</lightning-card>
+</template>

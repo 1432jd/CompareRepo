@@ -1,0 +1,279 @@
+<template>
+	<lightning-spinner alternative-text="Loading" size="small" if:true={topupSpinner}></lightning-spinner>
+	<template if:true={showTopupDetails}>
+		<lightning-card variant="Narrow">
+			<div class="slds-scrollable" style="overflow:initial">
+				<table class="slds-table slds-table_cell-buffer slds-table_bordered table-topup-detail">
+					<thead>
+						<tr class="th">
+							<th scope="col">
+								<div class="slds-truncate" title="Existing loan A/c No">Existing loan A/c No</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Application No.">Application No.</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Applicant Name">Applicant Name</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Branch">Branch</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Loan Amount">Loan Amount</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="EMI">EMI</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Principal O/S">Principal O/S</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Total Tenor">Total Tenor</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="DPD">DPD</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Considered For Total Exposure">Considered For Total
+									Exposure
+								</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Remarks">Remarks</div>
+							</th>
+						</tr>
+					</thead>
+					<template if:true={topupData}>
+						<tbody class="">
+							<template for:each={topupData} for:item="item" for:index="indexVar">
+								<tr key={item} id={item} class="slds-hint-parent">
+									<td data-id="1">
+										<div class="slds-truncate" title="Existing loan A/c No">{item.ExistingLANNo}
+										</div>
+									</td>
+									<td data-id="2">
+										<div class="slds-truncate" title="Application No.">{item.ApplicationNo}
+										</div>
+									</td>
+									<td data-id="3">
+										<div class="slds-truncate" title="Applicant Name">
+											{item.ApplicantName}
+										</div>
+									</td>
+									<td data-id="4">
+										<div class="slds-truncate" title="Branch">
+											{item.Branch}
+										</div>
+									</td>
+									<td data-id="5">
+										<div class="slds-truncate" title="LoanAmt">
+											{item.LoanAmt}
+										</div>
+									</td>
+									<td data-id="6">
+										<div class="slds-truncate" title="EMI">
+											{item.Emi}
+										</div>
+									</td>
+									<td data-id="2">
+										<div class="slds-truncate" title="Principal O/S">
+											{item.PrincipalOs}
+										</div>
+									</td>
+									<td data-id="2">
+										<div class="slds-truncate" title="Total Tenor">
+											{item.TotalTenor}
+										</div>
+									</td>
+									<td data-id="4">
+										<div class="slds-truncate" title="DPD">
+											{item.DPD}
+										</div>
+									</td>
+									<td data-id="5">
+										<lightning-combobox variant="label-hidden" name="Considered_for__c"
+											dropdown-alignment="auto" label="Considered for Total Exposure"
+											style="overflow:initial" value={item.ConsiderForTotalExposure}
+											data-index={indexVar} options={considerforValues} onchange={handlechange}
+											required="true">
+										</lightning-combobox>
+									</td>
+									<td data-id="9">
+										<div class="td-currency" title="Remarks">
+											<lightning-textarea data-index={indexVar} name="Remarks_Topup__c"
+												required="true" variant="label-hidden" onchange={handlechange}
+												value={item.Remarks}>
+											</lightning-textarea>
+										</div>
+									</td>
+								</tr>
+							</template>
+						</tbody>
+					</template>
+					<template if:false={topupData}>
+						<tr>
+							<td colspan="11">
+								<div align="center">No Topup Details to Display</div>
+							</td>
+						</tr>
+						
+					</template>
+				</table>
+			</div>
+			<p slot="footer">
+				<lightning-button variant="brand" type="submit" label="Save" id="Topup-Detail-btn"
+					onclick={handleTopupSave} disabled={isDisabled}>
+				</lightning-button>
+			</p>
+
+		</lightning-card>
+	</template>
+
+	<template if:true={showCollateralDetails}>
+		<lightning-card variant="Narrow">
+			<div class="slds-scrollable" style="overflow:initial">
+				<table class="slds-table slds-table_cell-buffer slds-table_bordered table-topup-detail">
+					<thead>
+						<tr class="th">
+							<th scope="col">
+								<div class="slds-truncate" title="Sr No">Sr No.</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Collateral Id">Collateral ID</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Loan Id">Loan ID</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Property Address">Collateral Address</div>
+							</th>
+						</tr>
+					</thead>
+					<template if:true={collateralData}>
+						<tbody class="">
+							<template for:each={collateralData} for:item="item" for:index="indexVar">
+								<tr key={item} id={item} class="slds-hint-parent">
+									<td data-id="1">
+										<div class="slds-truncate" title="Sr No">{item.SrNo}
+										</div>
+									</td>
+									<td data-id="2">
+										<div class="slds-truncate" title="Collateral Id">{item.CollateralId}
+										</div>
+									</td>
+									<td data-id="3">
+										<div class="slds-truncate" title="Loan Id">
+											{item.LoanId}
+										</div>
+									</td>
+									<td data-id="4">
+										<div class="slds-truncate" title="Collateral Address">
+											{item.CollateralAddress}
+										</div>
+									</td>
+								</tr>
+							</template>
+						</tbody>
+					</template>
+					<template if:false={collateralData}>
+						<tr>
+							<td colspan="4">
+								<div align="center">No Collateral Details to Display</div>
+							</td>
+						</tr>
+					</template>
+				</table>
+			</div>
+		</lightning-card>
+	</template>
+
+	<template if:true={showOldLoanDetails}>
+		<lightning-card variant="Narrow">
+			<div class="slds-scrollable" style="overflow:initial">
+				<table class="slds-table slds-table_cell-buffer slds-table_bordered table-topup-detail">
+					<thead>
+						<tr class="th">
+							<th scope="col">
+								<div class="slds-truncate" title="Existing loan A/c No">Existing loan A/c No</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Old loan Gross Income">Existing loan Gross Income</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Old loan Obligations">Existing loan Obligations</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Old Loan Net income">Existing Loan Net income</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Old Collateral Value">Existing Collateral Value</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="Lien Marked">Lien Marked</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="LTV">LTV %</div>
+							</th>
+							<th scope="col">
+								<div class="slds-truncate" title="DBR">DBR %</div>
+							</th>
+						</tr>
+					</thead>
+					<template if:true={topupData}>
+						<tbody class="">
+							<template for:each={topupData} for:item="item" for:index="indexVar">
+								<tr key={item} id={item} class="slds-hint-parent">
+									<td data-id="1">
+										<div class="slds-truncate" title="Existing loan A/c No">{item.ExistingLANNo}
+										</div>
+									</td>
+									<td data-id="1">
+										<div class="slds-truncate" title="OldLoanGrossIncome">{item.OldLoanGrossIncome}
+										</div>
+									</td>
+									<td data-id="2">
+										<div class="slds-truncate" title="OldLoanObligations">{item.OldLoanObligations}
+										</div>
+									</td>
+									<td data-id="3">
+										<div class="slds-truncate" title="OldLoanNetIncome">
+											{item.OldLoanNetIncome}
+										</div>
+									</td>
+									<td data-id="4">
+										<div class="slds-truncate" title="OldCollateralValue">
+											{item.OldCollateralValue}
+										</div>
+									</td>
+									<td data-id="5">
+										<div class="slds-truncate" title="LienMarked">
+											{item.LienMarked}
+										</div>
+									</td>
+									<td data-id="6">
+										<div class="slds-truncate" title="LTV">
+											{item.LTV}
+										</div>
+									</td>
+									<td data-id="7">
+										<div class="slds-truncate" title="DBR">
+											{item.DBR}
+										</div>
+									</td>
+								</tr>
+							</template>
+						</tbody>
+					</template>
+					<template if:false={topupData}>
+						<tr>
+							<td colspan="8">
+								<div align="center">No Old Loan Details to Display</div>
+							</td>
+						</tr>
+					</template>
+				</table>
+			</div>
+		</lightning-card>
+	</template>
+
+</template>

@@ -1,0 +1,562 @@
+<!--
+  @author            : 
+  @group             : TechMatrix Consulting
+  @description       : 
+  @created on        : 
+  @last modified on  : 22-08-2022
+  @last modified by  : Karan Singh Soni
+-->
+<template>
+	<template if:true={loadDedupe}>
+		<!--<lightning-spinner alternative-text="Loading" size="small" if:true={showLoader}></lightning-spinner>-->
+		<template if:true={showExceptionUser}>
+			<template if:true={showData}>
+				<!--PAGE HEADER-->
+				<c-fs-page-container-l-w-c headericon="standard:asset_audit" stagename={apptStageName} appno={apptName}
+					businessdate={todaysDate} lastlogindate={lastLoginDate} btns={btns}
+					onrowselectionevent={handleHeaderButton}>
+				</c-fs-page-container-l-w-c>
+			</template>
+		</template>
+		<!--<lightning-card> -->
+
+		<template if:false={showExceptionUser}>
+			<div style="display:flex;justify-content: flex-end; margin-top:-10px; margin-bottom:7px;">
+				<lightning-button variant="brand" label=' Check Dedupe ' name="DedupeAPI" onclick={isDedupeAlreadyDone}>
+
+				</lightning-button>
+			</div>
+		</template>
+
+		<template if:true={showDedupeResult}>
+			<lightning-tabset variant="scoped" active-tab-value={loanApptId}>
+				<template for:each={listLoanApptName} for:item="loanAppt">
+					<lightning-tab key={loanAppt.Applicant_Name__c} label={loanAppt.Applicant_Name__c}
+						value={loanAppt.Id} onactive={handleActive}>
+						<div class="slds slds-scrollable_x" style="width:auto;">
+							<template if:true={activeTab}>
+
+								<template if:true={onchangeExceptionDedupe}>
+
+									<table
+										class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-p-around_large"
+										aria-labelledby="element-with-table-label other-element-with-table-label">
+										<thead>
+											<tr class="slds-line-height_reset">
+												<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+													<div title="Customer Number">
+														<b>Customer Number</b>
+													</div>
+												</th>
+												<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+													<div title="Customer Number">
+														<b>Customer Name</b>
+													</div>
+												</th>
+												<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+													<div title="Source" class="slds-m-right_xx-large">
+														<b>Source</b>
+													</div>
+												</th>
+												<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+													<div title="Loan Details">
+														<b>Loan Details</b>
+													</div>
+												</th>
+												<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+													<div title="Yes or No">
+														<b>Yes or No / Override</b>
+													</div>
+												</th>
+												<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+													<div title="Remarks">
+														<b>Remarks</b>
+													</div>
+												</th>
+												<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+													<div title="Yes or No">
+														<b>Action</b>
+													</div>
+												</th>
+											</tr>
+										</thead>
+
+										<tbody>
+											<template for:each={onchangeExceptionDedupe} for:item="dedupeRec"
+												for:index="index">
+												<tr key={dedupeRec.Id} class="slds-hint-parent">
+													<td style="font-weight: bold">
+														<template if:false={isOverride}>
+															<lightning-button variant="base"
+																label={dedupeRec.CustomerNumber} name="CustomerNumber"
+																data-id={index} onclick={handleLoandDetailBtnClick}
+																data-customerid={dedupeRec.Id}
+																class="slds-m-left_x-small">
+															</lightning-button>
+														</template>
+														<template if:true={isOverride}>
+															<lightning-input name="CustomerNumber" data-index={index}
+																variant="label-hidden" onchange={handleCustIdChange}
+																type="text" value={dedupeRec.CustomerNumber}>
+															</lightning-input>
+														</template>
+													</td>
+													<td>
+														<lightning-input name="CustomerName" data-index={index}
+															variant="label-hidden" type="text"
+															value={dedupeRec.CustomerName} disabled>
+														</lightning-input>
+													</td>
+													<td style="font-weight: bold" class="slds-m-right_xx-large">
+														{dedupeRec.Source}
+													</td>
+													<td style="font-weight: bold">
+														<lightning-button variant="base" label="Loan Details"
+															name="DedupeloanDetails" data-id={index}
+															data-customerid={dedupeRec.Id} data-rec={nondedupeRec}
+															onclick={handleDedupeChild} class="slds-m-left_x-small">
+														</lightning-button>
+													</td>
+
+													<td style="font-weight: bold; margin:0; padding:0;">
+														<template if:false={showExceptionUser}>
+															<!--<template if:true={showdropdown}>-->
+
+															<lightning-combobox name="dedupeYesNo" label=""
+																data-index={index} value={dedupeRec.YesNo}
+																placeholder="None" variant="label-hidden"
+																disabled={isYesNoDisable} options={dedupePicklistValues}
+																onchange={handleCustIdChange}>
+															</lightning-combobox>
+														</template>
+														<template if:true={showExceptionUser}>
+															<lightning-combobox dropdown-alignment="bottom-left"
+																name="dedupeYesNo" label="" variant="label-hidden"
+																data-index={index} value={dedupeRec.YesNo}
+																placeholder="None" disabled={isYesNoDisable}
+																options={dedupeExceptionAnswerOpts}
+																onchange={handleCustIdChange}>
+															</lightning-combobox>
+														</template>
+													</td>
+													<td>
+														<lightning-textarea style="width: 200px;"
+															onchange={handleCustIdChange} name="Remarks"
+															value={dedupeRec.Remarks} data-index={index}
+															maxlength="255">
+														</lightning-textarea>
+													</td>
+													<td>
+														<lightning-button-icon variant="brand" onclick={callSave}
+															if:true={dedupeListSizeFlag} id={contactId}
+															icon-name="utility:save" alternative-text="Save"
+															class="slds-m-left_xx-small" title="Save">
+														</lightning-button-icon>
+													</td>
+												</tr>
+											</template>
+										</tbody>
+									</table>
+								</template>
+								<template if:false={showExceptionUser}>
+									<template if:true={exceptionUserLoanApptName}>
+										<template if:true={hasDedupeRecord}>
+											<span class="slds-align_absolute-center slds-m-top_medium"
+												style="color:red;">{showButtonLabel}</span>
+										</template>
+										<template if:false={hasDedupeRecord}>
+											<template if:true={hasLmsNumber}>
+												<p style="color: red; text-align: center;" if:false={custIdNumber}>
+													<b> No match found from Dedupe API. </b>
+												</p>
+												<table
+													class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-p-around_large"
+													aria-labelledby="element-with-table-label other-element-with-table-label">
+													<thead>
+														<tr class="slds-line-height_reset">
+															<th class="slds-text-heading_small slds-cell-wrap"
+																scope="col">
+																<div title="Customer Number">
+																	<b>Customer Number</b>
+																</div>
+															</th>
+															<th class="slds-text-heading_small slds-cell-wrap"
+																scope="col">
+																<div title="Customer Number">
+																	<b>Customer Name</b>
+																</div>
+															</th>
+															<th class="slds-text-heading_small slds-cell-wrap"
+																scope="col">
+																<div title="Customer Number">
+																	<b>Source</b>
+																</div>
+															</th>
+															<th class="slds-text-heading_small slds-cell-wrap"
+																scope="col">
+																<div title="Loan Details">
+																	<b>Loan Details</b>
+																</div>
+															</th>
+															<th class="slds-text-heading_small slds-cell-wrap"
+																scope="col">
+																<div title="Yes or No">
+																	<b>Override</b>
+																</div>
+															</th>
+															<th class="slds-text-heading_small slds-cell-wrap"
+																scope="col">
+																<div title="Remarks">
+																	<b>Remarks</b>
+																</div>
+															</th>
+															<th class="slds-text-heading_small slds-cell-wrap"
+																scope="col">
+																<div title="Yes or No">
+																	<b>Action</b>
+																</div>
+															</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr class="slds-hint-parent">
+															<td style="font-weight: bold">
+																<template if:false={isOverrideCustId}>
+																	<template if:true={custIdNumber}>
+																		<lightning-button variant="base"
+																			label={custIdNumber} name="CustomerNumber"
+																			data-id={index}
+																			onclick={handleLoandDetailBtnClick}
+																			class="slds-m-left_x-small">
+																		</lightning-button>
+																	</template>
+																</template>
+																<template if:true={isOverrideCustId}>
+																	<lightning-input name="CustomerNumber"
+																		variant="label-hidden"
+																		onchange={handleCustomerChange} type="text"
+																		value={custIdNumber} disabled={disableOverRide}>
+																	</lightning-input>
+																</template>
+															</td>
+															<td>
+																<lightning-input onchange={handleCustomerChange}
+																	name="CustomerName" data-index={index}
+																	variant="label-hidden" type="text" value={custName}
+																	disabled>
+																</lightning-input>
+															</td>
+															<td>
+																<lightning-input name="Source" data-index={index}
+																	variant="label-hidden" type="text"
+																	value={sourceName} disabled>
+																</lightning-input>
+															</td>
+															<td style="font-weight: bold">
+																<lightning-button variant="base" label="Loan Details"
+																	name="DedupeloanDetails" onclick={handleDedupeChild}
+																	class="slds-m-left_x-small"></lightning-button>
+															</td>
+															<td style="font-weight: bold; margin:0; padding:0;">
+																<lightning-combobox name="dedupeYesNo" label=""
+																	value={custOverride} placeholder="None"
+																	variant="label-hidden" options={dedupeAnswerOpts}
+																	onchange={handleCustomerChange}
+																	disabled={disableOverride}>
+																</lightning-combobox>
+															</td>
+															<td>
+																<lightning-textarea style="width: 200px;"
+																	onchange={handleCustomerChange} name="Remarks"
+																	value={custRemarks} maxlength="255">
+																</lightning-textarea>
+															</td>
+															<td>
+																<lightning-button-icon variant="brand"
+																	onclick={saveCustomer} if:true={dedupeListSizeFlag}
+																	id={contactId} icon-name="utility:save"
+																	alternative-text="Save" class="slds-m-left_xx-small"
+																	title="Save">
+																</lightning-button-icon>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+
+											</template>
+										</template>
+									</template>
+								</template>
+							</template>
+							<div></br></br></br></br></br></div>
+						</div>
+					</lightning-tab>
+				</template>
+			</lightning-tabset>
+		</template>
+
+		<template if:false={showExceptionUser}>
+			<template if:true={showDedupeResult}>
+				<div class="slds-text-heading_small slds-m-top--large slds-m-bottom_medium"><b>Salesforce Dedupe</b>
+				</div>
+				<lightning-tabset variant="scoped" active-tab-value={loanApptId2}>
+					<template for:each={listLoanApptName} for:item="loanAppt">
+						<lightning-tab key={loanAppt.Applicant_Name__c} label={loanAppt.Applicant_Name__c}
+							value={loanAppt.Id} onactive={handleActive2}>
+							<c-salesfoce-dedupe-cmp if:true={loanApptId2} loan-applicant-id={loanApptId2}>
+							</c-salesfoce-dedupe-cmp>
+						</lightning-tab>
+					</template>
+				</lightning-tabset>
+			</template>
+		</template>
+
+		<!-- ================================modal popup for the table================================ -->
+		<template if:true={showModal}>
+
+			<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-027"
+				class="slds-modal slds-fade-in-open slds-modal_large">
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+							title="Close" onclick={closeModal}>
+							<lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+								size="small"></lightning-icon>
+							<span class="slds-assistive-text">Close</span>
+						</button>
+						<h2 id="modal-heading-038" class="slds-text-heading_medium slds-hyphenate">Customer Details</h2>
+					</header>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-111">
+						<div class="zui-wrapper">
+							<div class="zui-scroller">
+								<table class="zui-table"
+									aria-labelledby="element-with-table-label other-element-with-table-label">
+									<thead>
+										<th class="zui-sticky-col">S No.</th>
+										<th class="zui-sticky-col-next">Loan Account Number</th>
+										<th class="zui-sticky-col-third">Customer ID</th>
+										<th>Branch Name</th>
+										<th>Application ID</th>
+										<th>First Name</th>
+										<th>Last Name</th>
+										<th>DOB</th>
+										<th>Aadhaar</th>
+										<th>Pan</th>
+										<th>Driving Licence</th>
+										<th>Voter ID</th>
+										<th>Passport ID</th>
+										<th>Ration Card</th>
+										<th>Father Name</th>
+										<th>Spouse Name</th>
+										<th>Applicant Type</th>
+										<th>Residence Address</th>
+										<th>Residence Pincode</th>
+										<th>Land Line</th>
+										<th>Mobile Number</th>
+										<th>Match Source</th>
+										<th>Decision</th>
+										<th>Remarks</th>
+										<th>Match Details</th>
+										<th>CASE ID</th>
+									</thead>
+									<tbody>
+										<template if:true={currentCustomer}>
+											<template for:each={currentCustomer} for:item="current" for:index="idx">
+												<tr key={current.apptId}>
+													<td class="zui-sticky-col"><b>Current Applicant
+															{current.apptSerialNo}</b></td>
+													<td class="zui-sticky-col-next">{current.apptlanNo}</td>
+													<td class="zui-sticky-col-third">{current.apptCustId}</td>
+													<td>{current.apptbranchName}</td>
+													<td>{current.appId}</td>
+													<td>{current.apptName}</td>
+													<td>{current.apptName}</td>
+													<td>{current.apptdob}</td>
+													<td>{current.apptadhar}</td>
+													<td>{current.apptpan}</td>
+													<td>{current.apptdl}</td>
+													<td>{current.apptvoterId}</td>
+													<td>{current.apptpassport}</td>
+													<td></td>
+													<td>{current.apptFatherName}</td>
+													<td>{current.apptSpouseName}</td>
+													<td>{current.applicantType}</td>
+													<td>{current.apptresAddrss}</td>
+													<td>{current.apptpincode}</td>
+													<td>{current.apptmobile}</td>
+													<td>{current.apptmobile}</td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+												</tr>
+											</template>
+										</template>
+										<template if:false={currentCustomer}>
+											<tr>
+												<p style="text-align: left;">No records found</p>
+											</tr>
+										</template>
+
+										<template if:true={ExistingCustomer}>
+											<template for:each={ExistingCustomer} for:item="existing" for:index="idx">
+												<tr key={existing.dedupeId}>
+													<td class="zui-sticky-col"><b>Existing applicant
+															{existing.dedupeSerialNo}</b></td>
+
+													<td class="zui-sticky-col-next">{existing.dedupelanNo}</td>
+													<td class="zui-sticky-col-third">{existing.dedupeCustId}</td>
+													<td>{existing.dedupebranchName}</td>
+													<td>{existing.dedupeAppId}</td>
+													<td>{existing.dedupeName}</td>
+													<td>{existing.dedupelastName}</td>
+													<td>{existing.dedupedob}</td>
+													<td>{existing.dedupeadhar}</td>
+													<td>{existing.dedupepan}</td>
+													<td>{existing.dedupedl}</td>
+													<td>{existing.dedupevoterId}</td>
+													<td>{existing.dedupepassport}</td>
+													<td></td>
+													<td>{existing.dedupeFatherName}</td>
+													<td>{existing.dedupeSpouseName}</td>
+													<td>{existing.dedupeApplicantType}</td>
+													<td>{existing.deduperesAddrss}</td>
+													<td>{existing.dedupepincode}</td>
+													<td>{existing.dedupemobile}</td>
+													<td>{existing.dedupemobile}</td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+												</tr>
+											</template>
+										</template>
+										<template if:false={ExistingCustomer}>
+											<tr>
+												<p style="text-align: left;">No records found</p>
+											</tr>
+										</template>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+		</template>
+		<template if:true={allDedupechild}>
+			<template if:true={showLoanDetailModal}>
+				<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02"
+					class="slds-modal slds-fade-in-open slds-modal_large">
+					<div class="slds-modal__container">
+						<header class="slds-modal__header">
+							<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+								title="Close" onclick={closeModal}>
+								<lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+									size="small"></lightning-icon>
+								<span class="slds-assistive-text">Close</span>
+							</button>
+							<h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Loan Details</h2>
+						</header>
+						<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+							<div class="slds slds-scrollable_x" style="width:auto">
+								<table
+									class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-p-around_large"
+									aria-labelledby="element-with-table-label other-element-with-table-label">
+									<thead>
+										<tr class="slds-line-height_reset">
+											<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+												<div title="Application Number">
+													<b>Application Number</b>
+												</div>
+											</th>
+											<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+												<div title="Application Status">
+													<b>Application Status</b>
+												</div>
+											</th>
+											<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+												<div title="Lan Status">
+													<b>Loan Status</b>
+												</div>
+											</th>
+											<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+												<div title="Lan">
+													<b>Loan No</b>
+												</div>
+											</th>
+											<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+												<div title="Lan">
+													<b>Name</b>
+												</div>
+											</th>
+											<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+												<div title="Lan">
+													<b>Branch Name</b>
+												</div>
+											</th>
+											<th class="slds-text-heading_small slds-cell-wrap" scope="col">
+												<div title="Lan">
+													<b>Applicant Type</b>
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<template for:each={allDedupechild} for:item="dedupeLoanRec" for:index="index">
+											<tr key={dedupeLoanRec.Id} class="slds-hint-parent">
+												<td style="font-weight: bold">
+													{dedupeLoanRec.appNo}
+												</td>
+												<td style="font-weight: bold">
+													{dedupeLoanRec.appStatus}
+												</td>
+												<td style="font-weight: bold">
+													{dedupeLoanRec.lanStatus}
+												</td>
+												<td style="font-weight: bold">
+													{dedupeLoanRec.lan}
+												</td>
+												<td style="font-weight: bold">
+													{dedupeLoanRec.Name}
+												</td>
+												<td style="font-weight: bold">
+													{dedupeLoanRec.BranchName}
+												</td>
+												<td style="font-weight: bold">
+													{dedupeLoanRec.ApplicantType}
+												</td>
+											</tr>
+										</template>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</section>
+				<div class="slds-backdrop slds-backdrop_open"></div>
+			</template>
+		</template>
+		<template if:true={isSpinner}>
+			<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+		</template>
+
+		<!-- Loan Detail Modal End -->
+		<template if:false={showExceptionUser}>
+			<div slot="footer">
+				<lightning-button variant="brand" label="Submit" onclick={submitDedupeData} class="slds-m-left_x-small"
+					id={contactId} if:true={isOptionDisable}></lightning-button>
+			</div>
+		</template>
+		<template if:true={showExceptionUser}>
+			<div class="slds-docked-form-footer">
+				<lightning-button variant="brand" label="Submit" onclick={dedupeUserSubmit} class="slds-m-left_x-small">
+				</lightning-button>
+			</div>
+		</template>
+	</template>
+</template>

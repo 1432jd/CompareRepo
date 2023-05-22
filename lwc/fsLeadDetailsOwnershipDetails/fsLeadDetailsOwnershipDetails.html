@@ -1,0 +1,98 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+<template if:true={showForm}>
+	<template if:true={fieldsContent}>
+		<lightning-card variant="Narrow">
+			<lightning-record-edit-form object-api-name="Property__c" record-id={recordIds}
+				record-type-id={propertyRecordTypeId} onsuccess={handleOwnershipDetailSuccess}
+				onsubmit={handleOwnershipDetailsSubmit}>
+				<lightning-layout multiple-rows>
+
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+                            medium-device-size="2" large-device-size="2">
+                            <label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Ownership Status
+                            </label>
+                            <lightning-input-field field-name="Ownership_Status__c" name='Ownership_Status__c' variant="label-hidden"
+                                onchange={handleOwnershipStatusChange} value={ownershipStatusVal}>
+                            </lightning-input-field>
+                    </lightning-layout-item>
+
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+						medium-device-size="2" large-device-size="2">
+					
+						<lightning-combobox name='Current_Owner_Name__c' label="Current Owner Name"
+							placeholder="Select an Option" options={applicantsOptions} 
+							onchange={handleApplicantChange} value={currentOwnerVal} class="currentApp">
+						</lightning-combobox>
+						<lightning-input-field field-name="Current_Owner_Name__c" name='Current Owner Name' variant="label-stacked"
+									value={currentOwnerVal}  class="property" style="display:none">
+								</lightning-input-field>
+					</lightning-layout-item>
+					<template if:true={isJoint}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+							medium-device-size="2" large-device-size="2">
+
+							<lightning-combobox name="Co_Owner_Name__c" label="Co Owner Name"
+								placeholder="Select an Option" options={applicantsOptions} onchange={handleApplicantChange}
+								class="coApp" value={coOwnerVal}>
+							</lightning-combobox>
+							<lightning-input-field field-name="Co_Owner_Name__c" name='Co Owner Name' variant="label-stacked"
+									value={coOwnerVal} class="property" style="display:none">
+								</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+
+
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+						medium-device-size="2" large-device-size="2">
+
+						<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Percent Share
+                            </label>
+
+						<lightning-input-field field-name="Percent_Share__c" name="Percent_Share__c"
+							variant="label-hidden" value={percentShareVal} onchange={handleApplicantChange}  disabled={disablePercentShare}>
+						</lightning-input-field>
+
+
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+						medium-device-size="2" large-device-size="2">
+						<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Ownership Date
+                            </label>
+						<lightning-input-field type="Date" field-name="Ownership_Date__c" name="Ownership_Date__c"
+							variant="label-hidden" value={ownershipDateVal}  onchange={handleApplicantChange}>
+						</lightning-input-field>
+
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center slds-m-around_x-small">
+							<lightning-button variant="brand" label="Update" title="Save" type="submit">
+							</lightning-button>
+							<lightning-button label="Cancel" title="Cancel" onclick={handleCancel}
+								class="slds-m-left_x-small">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-card>
+	</template>
+	</template>
+	<template if:true={tableData}>
+		<lightning-card variant="Narrow" title="List Of Property">
+			<!--<c-fs-title-section title="List Of Applicants"></c-fs-title-section>-->
+			<c-generic-data-table-l-w-c data-id="cashflow" result={tableData} btns={rowAction}
+				onselected={handleSelectedApplication}></c-generic-data-table-l-w-c>
+		</lightning-card>
+	</template>
+
+</template>

@@ -1,0 +1,22 @@
+.scrollTable {
+    overflow-x: scroll;
+    height: 500px;
+}
+
+.slds-medium-show {
+    display: none !important;
+}
+.td-currency{
+    
+    white-space: normal;
+    min-width: 232px; max-width: 480px; width:auto;
+}
+.statusOption{
+    width : 150px; 
+    height: 33px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+.dropDownOption{
+    font-size:15px;
+}

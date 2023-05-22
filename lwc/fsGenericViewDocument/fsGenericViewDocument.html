@@ -1,0 +1,206 @@
+<template>
+	<lightning-card variant="Narrow" title="Required Documents">
+		<lightning-button variant="brand" label="Download Documents" title="Down Documents" onclick={downLoadDocuments}
+			slot="actions"></lightning-button>
+		<div class="c-container slds-scrollable_x" if:true={uploadedDocData}>
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered table-insurance-detail">
+				<thead>
+					<tr class="th">
+						<th aria-label="Document Name" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Document Name">Document Name</span>
+							</div>
+						</th>
+						<th aria-label="Version" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Vserion">Version</span>
+							</div>
+						</th>
+						<th aria-label="Uploaded By" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Uploaded By">Applicable For</span>
+							</div>
+						</th>
+						<th aria-label="Uploaded By" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Uploaded By">Uploaded By</span>
+							</div>
+						</th>
+						<th aria-label="View Document" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:7rem;">
+								<span class="slds-truncate" title="View Document">View Document</span>
+							</div>
+						</th>
+						<th aria-label="No of Pages" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:7rem;">
+								<span class="slds-truncate" title="No Of Pages">No Of Pages</span>
+							</div>
+						</th>
+						<th aria-label="Remarks" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:9rem;">
+								<span class="slds-truncate" title="Remarks">Remarks</span>
+							</div>
+						</th>
+						<th aria-label="Stage" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Stage">Stage</span>
+							</div>
+						</th>
+						<th aria-label="Select Document" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:5rem;">
+								<lightning-input type="checkbox" variant="label-hidden" name="RequiredDocumentCheckbox"
+									label="Select Documents" title="Select Documents to Download"
+									onclick={handleDownloadCheckbox}>
+								</lightning-input>
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template for:each={uploadedDocData} for:item="item" for:index="indexVar">
+						<tr key={item.key} class="slds-hint-parent">
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Document Name">{item.documentName}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Vserion">{item.versionNumber}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Vserion">{item.applicableFor}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Uploaded By">{item.ownerName}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="td-currency" title="View Document">
+									<lightning-icon if:true={item.isDocumentView} style="cursor: pointer;" data-index={item.contentDocumentId}
+										size="xx-small" icon-name="action:preview" alternative-text="Preview"
+										title="Preview" onclick={viewDocument}></lightning-icon>
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="No Of Pages">{item.numberOfPages}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Remarks">{item.remarks}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Stage">{item.uploadedFrom}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Select Document">
+									<lightning-input type="checkbox" variant="label-hidden" name="RequiredCheckBox"
+										label="" data-row-index={indexVar} data-index={item.contentDocumentId}
+										onclick={handleDownloadCheckbox} disabled={item.isCheckboxDisabled}>
+									</lightning-input>
+								</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+	</lightning-card>
+	<br />
+	<lightning-card variant="Narrow" title="Additional Documents">
+		<div class="c-container slds-scrollable_x" if:true={addtionalDocuments}>
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered table-insurance-detail">
+				<thead>
+					<tr class="th">
+						<th aria-label="Document Name" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Document Name">Document Name</span>
+							</div>
+						</th>
+						<th aria-label="Description" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Description">Description</span>
+							</div>
+						</th>
+						<th aria-label="Owner" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Owner">Owner</span>
+							</div>
+						</th>
+						<th aria-label="View Document" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Document Name">View Document</span>
+							</div>
+						</th>
+						<th aria-label="View Document" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:10rem;">
+								<span class="slds-truncate" title="Document Name">Stage</span>
+							</div>
+						</th>
+						<th aria-label="Select Document" aria-sort="none" scope="col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+								style="width:5rem;">
+								<lightning-input type="checkbox" variant="label-hidden" name="AddtionalDocumentCheckbox"
+									label="Select Documents" title="Select Documents to Download"
+									onclick={handleDownloadCheckbox}>
+								</lightning-input>
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template for:each={addtionalDocuments} for:item="item" for:index="indexVar">
+						<tr key={item.key} class="slds-hint-parent">
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Document Name">{item.title}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Remarks">{item.remarks}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Owner">{item.ownerName}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="View Document">
+									<lightning-icon if:true={item.isDocumentView} style="cursor: pointer;" data-index={item.contentDocumentId}
+										size="xx-small" icon-name="action:preview" alternative-text="Preview"
+										title="Preview" onclick={viewDocument}></lightning-icon>
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Stage">{item.uploadedFrom}
+								</div>
+							</td>
+							<td scope="row" tabindex="0" style="border-collapse: collapse;">
+								<div class="slds-truncate" title="Select Document">
+									<lightning-input type="checkbox" variant="label-hidden" name="AddtionalCheckBox"
+										label="" data-index={item.contentDocumentId} onclick={handleDownloadCheckbox} disabled={item.isCheckboxDisabled}>
+									</lightning-input>
+								</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+	</lightning-card>
+</template>

@@ -1,0 +1,44 @@
+<template>
+	<!--PAGE HEADER-->
+	<c-fs-page-container-l-w-c headericon="standard:asset_audit" stagename="Export Report" appno=""
+		businessdate={todaysDate} lastlogindate={lastLoginDate}>
+	</c-fs-page-container-l-w-c>
+	<!--PAGE HEADER-->
+	<lightning-card>
+		<lightning-layout multiple-rows>
+			<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12" medium-device-size="12"
+				large-device-size="4">
+				<div class="slds-form-element slds-m-left_xx-large">
+					<label class="slds-form-element__label" for="text-input-id-48">
+                            <abbr class="slds-required" title="required">* </abbr>Application</label>
+					<div class="slds-form-element__control ">
+						<c-generic-custom-lookup-l-w-c object-api-name="Application__c" key-field-a-p-i="Id"
+							search-field="Name" class="editMode" onlookupselected={handleOnChangeApp}
+							onlookupvalueremoved={removehandleOnChangeApp}>
+						</c-generic-custom-lookup-l-w-c>
+					</div>
+					<template if:true={showerrorApp}>
+						<div style="color:red;" class="slds-form-element__help" id="error-message-id-501">Complete this
+							field.</div>
+					</template>
+				</div>
+			</lightning-layout-item>
+			<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12" medium-device-size="12"
+				large-device-size="4">
+				<lightning-combobox placeholder="--Select Stage--" required="required" onchange={handleFormValues} value={getStageValue} name="stage"
+					label="Application Stage" options={options}>
+				</lightning-combobox>
+			</lightning-layout-item>
+			<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12" medium-device-size="12"
+				large-device-size="4" class="slds-m-top_medium">
+               
+				<lightning-button  variant="brand" label="Export" onclick={handleSave}>
+				</lightning-button>
+                
+			</lightning-layout-item>
+			<template if:true={isSpinner}>
+					<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+			</template>
+		</lightning-layout>
+	</lightning-card>
+</template>

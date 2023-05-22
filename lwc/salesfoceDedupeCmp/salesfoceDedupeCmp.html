@@ -1,0 +1,431 @@
+<template>
+    <lightning-spinner if:true={showLoader} alternative-text="Loading" size="small"></lightning-spinner>
+    <!-- <lightning-card variant="Narrow" title="Salesforce Dedupe" icon-name="standard:account">
+        <div class="slds-p-horizontal_small"> -->
+    <template if:true={showModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="modal-heading-01"
+            aria-modal="true">
+            <div class="slds-modal__container" style="width:80%">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+                    <lightning-icon icon-name="utility:close" alternative-text="Close" onclick={showHideModal}
+                        variant="inverse"></lightning-icon>
+                    <span class="slds-assistive-text">Cancel and close</span>
+                </button>
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Application Details</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <lightning-spinner if:true={showInnerLoader} alternative-text="Loading"
+                        size="small"></lightning-spinner>
+                    <!-- <lightning-record-edit-form object-api-name="Application__c" record-id={ApplicationId}>
+                        <lightning-layout multiple-rows>
+                            <lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+                                medium-device-size="12" large-device-size="4">
+                                <lightning-input-field field-name="Name" disabled variant="label-stacked">
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+                                medium-device-size="12" large-device-size="4">
+                                <lightning-input-field field-name="Stage__c" disabled variant="label-stacked">
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+                                medium-device-size="12" large-device-size="4">
+                                <lightning-input-field field-name="Sourcing_Branch__c" disabled variant="label-stacked">
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-record-edit-form> -->
+                    <lightning-record-view-form object-api-name="Application__c" record-id={ApplicationId}>
+                        <lightning-layout multiple-rows>
+                            <lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+                                medium-device-size="12" large-device-size="4">
+                                <lightning-output-field field-name="Name"> </lightning-output-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+                                medium-device-size="12" large-device-size="4">
+                                <lightning-output-field field-name="Stage__c"> </lightning-output-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+                                medium-device-size="12" large-device-size="4">
+                                <lightning-output-field field-name="Sourcing_Branch__c"> </lightning-output-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+                                medium-device-size="12" large-device-size="4">
+                                <span>UserId</span>
+                                <lightning-output-field field-name="OwnerId" variant="label-hidden"> </lightning-output-field>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-record-view-form>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+
+    <template if:true={dedupeRecords}>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+            aria-label="Example table of Opportunities with vertical borders">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Customer Number">Customer Number</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Customer Name">Customer Name</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Status">Status</div>
+                    </th>
+                  <!--  <th class="" scope="col">
+                        <div class="slds-truncate" title="User">User</div>
+                    </th>-->
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Loan Details">Application Details</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Rejected By">Rejected By</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Rejection Reason">Rejection Reason</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Rejection Remarks.">Rejection Remarks</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Rejection Date">Rejection Date</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={dedupeRecords} for:item="item" for:index="index">
+                    <tr class="slds-hint-parent" key={item}>
+                        <td data-label="Customer Number">
+                            <lightning-button variant="base" data-id={item.applicant.Id} label={item.applicant.LMS_Customer_Info_File_Number__c} data-customerid={item.applicant.LMS_Customer_Info_File_Number__c} title="Customer Number"
+                            onclick={handleCustomerDetails}></lightning-button>
+                        </td>
+                        <td data-label="Status">
+                            <div class="slds-truncate" title="Status">
+                                {item.applicant.Applicant_Name__c}
+                            </div>
+                        </td>
+                        <td data-label="Status">
+                            <div class="slds-truncate" title="Status">
+                                {item.applicant.Application__r.application_status__c}
+                            </div>
+                        </td>
+                       <!-- <td data-label="User">
+                            <div class="slds-truncate" title="User">
+                                {item.applicant.Application__r.Owner.Name}
+                            </div>
+                        </td>-->
+                        <td data-label="Application Details">
+                            <lightning-button variant="base" label="Application Details" data-id={index} title="Application Details"
+                                onclick={handleLoanDetails}></lightning-button>
+                        </td>
+                        <td data-label="Rejected By">
+                            <div class="slds-truncate" title="Rejected By">
+                                {item.rejectedBy}
+                            </div>
+                        </td>
+                        <td data-label="Rejection Reason">
+                            <div class="slds-truncate" title="Rejection Reason">
+                                N/A
+                            </div>
+                        </td>
+                        <td data-label="Rejection Remarks">
+                            <div class="slds-truncate" title="Rejection Remarks">
+                                {item.rejectionRemark}
+                            </div>
+                        </td>
+                        <td data-label="Rejection Date">
+                            <div class="slds-truncate" title="Rejection Date">
+                                <template if:true={item.rejectionDate}>
+                                    <lightning-formatted-date-time year="numeric" month="short" day="2-digit"
+                                        time-zone="IST" value={item.rejectionDate}></lightning-formatted-date-time>
+                                </template>
+                                <template if:false={item.rejectionDate}>
+                                    N/A
+                                </template>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </template>
+    <template if:false={dedupeRecords}>
+        <span class="slds-align_absolute-center slds-m-top_medium" style="color: red;">No Records Found.</span>
+    </template>
+    <template if:true={isSpinner}>
+        <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+    </template>
+
+
+    <!--Modal for applicant detail start here-->
+
+
+    <template if:true={showDedupeModal}>
+	
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-027"
+            class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-038" class="slds-text-heading_medium slds-hyphenate">Loan Details</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-111">
+                <div class="slds slds-scrollable_x" style="width:auto">
+                    <table
+                        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-p-around_large"
+                        aria-labelledby="element-with-table-label other-element-with-table-label">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="" scope="col">
+
+                                    <div class="slds-truncate" title="Field">
+                                        <b>Field</b>
+                                    </div>
+                                </th>
+                                <th class="" scope="col">
+
+                                    <div class="slds-truncate" title="New Applicant">
+                                        <b>New Applicant</b>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <template for:each={currentCustomer} for:item="Rec">
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>CASE ID</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        
+                                    </td>
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Loan Account Number</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptlanNo}
+                                    </td>
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Customer ID</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptCustId}
+                                    </td>
+                                
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Branch Name</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptbranchName}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Application ID</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.appId}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>First Name</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptName}
+
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Last Name</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptName}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>DOB</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptdob}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Adhar</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptadhar}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Pan</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptpan}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Driving Licence</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptdl}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Voter ID</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptvoterId}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Passport ID</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptpassport}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Ration Card</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Residence Address</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptresAddrss}
+                                    </td>
+                                   
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Residence Pincode</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptpincode}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Land Line</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptmobile}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Mobile Number</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        {Rec.apptmobile}
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Match Source</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        
+                                    </td>
+                                    
+
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Decision</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Remarks</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        
+                                    </td>
+                                    
+                                </tr>
+                                <tr key={Rec.Id} class="slds-hint-parent">
+                                    <td size="4" padding="horizontal-small">
+                                        <b>Match Details</b>
+                                    </td>
+                                    <td size="4" padding="horizontal-small">
+                                        
+                                    </td>
+                                    
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+    <!--Modal for applicant detail ends here-->
+    
+</template>

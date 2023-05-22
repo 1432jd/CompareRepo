@@ -1,0 +1,81 @@
+<template>
+    <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+        <h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+            <span class="slds-truncate" title="Section Title">Enter Application Details</span>
+        </h3>
+        <div aria-hidden="false" class="slds-section__content slds-p-left_small">
+            <lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+                onsuccess={handleSuccessApp} onsubmit={handleSubmitApp}>
+                <lightning-layout multiple-rows="true">
+                    <lightning-input-field field-name="application_status__c" data-name="resetApp" value="Active"
+                        style="display: none;">
+                    </lightning-input-field>
+                    <template if:true={showOldApp}>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <lightning-input-field field-name="Old_Application_Number__c" variant="label-stacked"
+                                data-name="resetApp" value={appName} disabled="true">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                    </template>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                        padding="around-small">
+                        <lightning-input-field field-name="Staff_Loan__c" variant="label-stacked" data-name="resetApp"
+                            data-id="staffLoan" onchange={handleStaffLoan}>
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <template if:true={isStaffLoan}>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <lightning-input-field field-name="Employee_ID__c" variant="label-stacked"
+                                data-name="resetApp" required="true">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                    </template>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                        padding="around-small">
+                        <lightning-input-field field-name="Customer_Visit_date__c" variant="label-stacked"
+                            data-id="visitDate" data-name="resetApp" required="true">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                        padding="around-small">
+                        <lightning-input-field field-name="Field_Officer_Employee_ID__c" variant="label-stacked"
+                            value={fieldOfficerId} data-name="resetApp" required="true">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                        padding="around-small">
+                        <lightning-input-field field-name="Requested_Loan_Amount__c" variant="label-stacked"
+                            data-name="resetApp" required="true">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                        padding="around-small">
+                        <lightning-input-field field-name="Channel__c" variant="label-stacked" data-name="resetApp"
+                            required="true">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                        padding="around-small">
+                        <lightning-input-field field-name="Alternate_Channel_Mode__c" variant="label-stacked"
+                            data-name="resetApp" required="true">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                     <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                        padding="around-small">
+                        <lightning-input-field field-name="Branch__c" value={branchName} variant="label-stacked"
+                            data-name="resetApp" disabled="true">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                </lightning-layout>
+                
+                <div class="slds-var-m-top_medium slds-float_right">
+                    <lightning-button variant="brand" type="submit" label={appSave}>
+                    </lightning-button>
+                </div>
+                <br /><br /><br />
+            </lightning-record-edit-form>
+        </div>
+    </div>
+</template>

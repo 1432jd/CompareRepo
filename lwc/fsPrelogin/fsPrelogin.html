@@ -1,0 +1,123 @@
+<template>
+
+	<template if:true={isLoading}>
+		<lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+	</template>
+
+	<!-- Pending Reasons Grid -->
+	<template if:true={applicationId}>
+		<template if:true={showPendingReason}>
+			<section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium"
+				aria-modal="true">
+				<div class="slds-modal__container">
+					<div class="slds-modal__header">
+						<h1 id="modal-heading-05" class="slds-modal__title slds-hyphenate">Pending Reason</h1>
+					</div>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-5">
+						<c-fs-pending-reason-grid if:true={applicationId} stage-name="Login"
+							application-id={applicationId}></c-fs-pending-reason-grid>
+					</div>
+					<div class="slds-modal__footer">
+						<lightning-button variant="netural" label="Cancel" title="Cancel"
+							onclick={showHidePendingReasonGrid} class="slds-m-left_x-small"></lightning-button>
+					</div>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+		</template>
+	</template>
+
+	<!--PAGE HEADER-->
+	<c-fs-page-container-l-w-c if:true={lastLoginDate} headericon="standard:code_set" stagename={headerLabel}
+		appno={preAppName} businessdate={todaysDate} lastlogindate={lastLoginDate} btns={button}
+		onrowselectionevent={rowselectionevent}>
+	</c-fs-page-container-l-w-c>
+	<!--PAGE HEADER-->
+
+	<!--CONTENT-->
+	<lightning-tabset variant="scoped" active-tab-value={activeError}>
+		<!-- Relogin -->
+		<template if:true={isRelogin}>
+			<lightning-tab label="Relogin" value="Relogin">
+				<c-fs-relogin-application onshownewlogin={showNewLogin}></c-fs-relogin-application>
+			</lightning-tab>
+		</template>
+		<!-- Topup -->
+		<template if:true={isTopup}>
+			<lightning-tab label="Top-Up" value="Top-Up">
+				<c-fs-topup-application onshownewlogin={showNewLogin}></c-fs-topup-application>
+			</lightning-tab>
+		</template>
+		<template if:true={isTranche}>
+			<lightning-tab label="Tranche" value="Tranche">
+				<c-fs-tranche-application onshownewlogin={showNewLogin}></c-fs-tranche-application>
+			</lightning-tab>
+		</template>
+		<template if:true={isNewlogin}>
+			<!-- Customer Information Screen -->
+			<lightning-tab label="Customer Details" value="step-1">
+				<c-fs-customer-details ongetapplicationid={handleApplicationId} ongetpreloginid={handlePreloginId}
+					onappname={handleAppName} onchecksubmit={checkSubmit} ongetowners={getPropertyOwners}
+					application-id={applicationId} prelogin-id={preloginId} ongetownerstype={fillOwner}
+					ongetprimaryapplicantname={getPrimaryApplicantName} rec-type-name={recTypeName}
+					validation={validation}>
+				</c-fs-customer-details>
+			</lightning-tab>
+			<!-- Property Screen -->
+			<lightning-tab label="Property Details" value="step-2" onactive={handleActive}>
+				<c-fs-property-details application-id={applicationId} loan-app-id-list={loanAppIdList}
+					oncheckproperty={checkProperty}>
+				</c-fs-property-details>
+			</lightning-tab>
+			<!-- Application Screen -->
+			<lightning-tab label="Application Details" value="step-3" onactive={handleActive}>
+				<c-fs-pre-login-application-detail application-id={applicationId} prelogin-id={preloginId}
+					oncheckrequired={checkAllRequired} is-newlogin={isNewlogin} old-app-number={oldAppNumber}>
+				</c-fs-pre-login-application-detail>
+			</lightning-tab>
+			<!-- Document Upload Screen -->
+			<lightning-tab label="Document Upload" value="DocumentUpload" onactive={handleActive}>
+				<div if:true={applicationId}>
+					<template if:true={propRecTypeId}>
+						<c-fs-generic-document-upload-l-w-c stage-name="Login" record-type-id={propRecTypeId}
+							application-id={applicationId} onrequireddocument={handleRequiredDocument}
+							onrefresh={refreshDocTab}>
+						</c-fs-generic-document-upload-l-w-c>
+					</template>
+				</div>
+				<template if:false={applicationId}>
+					<div class="slds-align_absolute-center">
+						No Applicant Exist.
+					</div>
+				</template>
+			</lightning-tab>
+			<!-- Receipt Screen -->
+			<lightning-tab label="Fee Details" value="step-4" onactive={handleActive}>
+				<div if:true={applicationId}>
+					<c-fee-creation-parent record-id={applicationId} pre-log-in-id={preloginId} app-name={preAppName}
+						primary-applicant-name={primaryAppName} stage-name="Pre Login"
+						ongetreceiptevent={getReceiptPendingList}></c-fee-creation-parent>
+				</div>
+				<template if:false={applicationId}>
+					<div class="slds-align_absolute-center">
+						No Applicant Exist.
+					</div>
+				</template>
+			</lightning-tab>
+			<lightning-tab label="Dedupe Details" value="step-5" onactive={handleActive}>
+				<c-fsdedupe-details-lwc if:true={applicationId} record-id={applicationId} source="Pre-Login"
+					onfetchdedupedetails={getdedupedetails}></c-fsdedupe-details-lwc>
+			</lightning-tab>
+			<!-- Error Tab-->
+			<lightning-tab label="Error Info" value="Error" show-error-indicator if:true={showErrorTab}
+				style="--sds-c-tabs-scoped-color-text-active: red">
+				<ul class="slds-list_dotted">
+					<template for:each={errorMsgs} for:item="err">
+						<li key={err} class="slds-text-color_destructive">{err}</li>
+					</template>
+				</ul>
+			</lightning-tab>
+		</template>
+	</lightning-tabset>
+	<!--CONTENT-->
+</template>

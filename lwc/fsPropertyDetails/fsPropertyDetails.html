@@ -1,0 +1,33 @@
+<template>
+	<template if:true={applicationId}>
+		<div>
+			<!-- Property Form -->
+			<c-fs-pre-login-property-detail ongetpropertydata={callGetPropertyData} record-type-name={recordTypeName}
+				application-id={applicationId} loan-app-id-list={loanAppIdList} owner-type-option={ownerTypeOption}>
+			</c-fs-pre-login-property-detail>
+
+			<div class="slds-m-top_small">
+			</div>
+
+			<!-- List Of Applicants -->
+			<template if:true={isPropDataArrived}>
+				<lightning-card variant="Narrow" title="List Of Properties">
+					<c-generic-data-table-l-w-c data-id="prop" result={propData} btns={propRowAction}
+						onselected={handleSelectedProperty}>
+					</c-generic-data-table-l-w-c>
+				</lightning-card>
+			</template>
+			<!-- Delete Popup -->
+			<template if:true={showDeletePopup}>
+				<c-fs-delete-l-w-c delete-from="Prelogin" object-api-name="Property__c" rec-id={recordId}
+					show-modal={showDeletePopup} onmodaldelete={handlemodalactions} onmodalcancel={handlemodalactions}>
+				</c-fs-delete-l-w-c>
+			</template>
+		</div>
+	</template>
+	<template if:false={applicationId}>
+		<div class="slds-align_absolute-center">
+			No Applicant Exist.
+		</div>
+	</template>
+</template>

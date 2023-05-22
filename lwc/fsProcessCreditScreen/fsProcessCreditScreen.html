@@ -1,0 +1,664 @@
+<template>
+
+	<template if:true={showPendingReason}>
+		<section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-modal="true">
+			<div class="slds-modal__container">
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-05" class="slds-modal__title slds-hyphenate">Pending Reason</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-5">
+					<c-fs-pending-reason-grid if:true={applicationId} stage-name="Process Credit"
+						application-id={applicationId}></c-fs-pending-reason-grid>
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-button variant="netural" label="Cancel" title="Cancel"
+						onclick={showHidePendingReasonGrid} class="slds-m-left_x-small"></lightning-button>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+
+	<!--PAGE HEADER-->
+
+	<c-fs-page-container-l-w-c headericon="standard:slack" if:true={appName} stagename="PC" appno={appName}
+		businessdate={businessDate} lastlogindate={lastLoginDate} btns={btns} onrowselectionevent={rowselectionevent}>
+	</c-fs-page-container-l-w-c>
+	<!--PAGE HEADER-->
+
+
+	<!-- header Buttons-->
+	<template if:true={isAddApplicant}>
+		<c-pc-add-or-modify-new-applicant stage-name="Process Credit" oncloseapplicantmodal={handleApplicantModal}
+			application-id={applicationId} prelogin-id={loginId} onchecksubmit={checkSubmit}
+			oncheckapplicantvalidation={handleValidation} ongetnewapplicant={handlenewlyaddedApplicant}
+			ongetbureaupendinglist={checkBureau}>
+		</c-pc-add-or-modify-new-applicant>
+	</template>
+	<template if:true={isAddProperty}>
+		<c-fspc-addand-modify-property stage-name="Process Credit" application-id={applicationId}
+			onclosepropertymodal={addpropertyclose} loan-app-id-list={loanApplicantList} oncheckproperty={checkProperty}
+			ongetnewproperty={handlenewlyaddedProperty} oncheckpropertyvalidation={handleValidation}>
+		</c-fspc-addand-modify-property>
+	</template>
+	<template if:true={initiateRetrigger}>
+		<c-fs-retrigger show-modal=true stage-from="Process Credit" application-id={applicationId}
+			oncloseclick={handleRetriggerClose} onchecktriggervalidation={handleValidation}></c-fs-retrigger>
+	</template>
+	<template if:true={openOwnerValidation}>
+		<template if:true={applicationId}>
+			<c-k-y-c_-cmp onclosemodal={handleclose} customer-options={CustomerOptions} record-id={applicationId}>
+			</c-k-y-c_-cmp>
+		</template>
+	</template>
+
+	<!-- CONTENT-->
+	<!-- Tabset Start-->
+	<lightning-tabset variant="scoped" data-id="pcTest" active-tab-value={tabName}>
+		<lightning-spinner alternative-text="Loading" size="small" if:true={pcSpinner}></lightning-spinner>
+
+		<!------------------------------------ Dedupe Check Tab------------------------------------>
+		<lightning-tab label="Dedupe Check" value="Dedupe_Check" onactive={handleTabActivation}>
+			<c-fsdedupe-details-lwc if:true={applicationId} record-id={applicationId} source="PC"
+				onfetchdedupedetails={getdedupedetails} onfetchcustomerdetails={getcustomerdetails}
+				onrefersherroronpcac={handleValidation}>
+			</c-fsdedupe-details-lwc>
+		</lightning-tab>
+
+		<!----------------------------- Document Upload-------------------------------->
+		<lightning-tab label="Document Upload" value="Document_Upload" onactive={handleTabActivation}>
+			<template if:true={applicationId}>
+				<c-fs-generic-document-upload-l-w-c stage-name="Process Credit"
+					record-type-id={propertyRecordTypeId} application-id={applicationId}
+					onrequireddocument={handleRequiredDocument}>
+				</c-fs-generic-document-upload-l-w-c>
+			</template>
+		</lightning-tab>
+
+
+		<!------------------------------ Carousal View ------------------------------------->
+		<lightning-tab label="Image comparison view" value="Carousal_View" onactive={handleTabActivation}>
+			<c-pc-compare-docs if:true={applicationId} application-id={applicationId}
+				customer-options={CustomerOptions}>
+			</c-pc-compare-docs>
+		</lightning-tab>
+
+
+		<!------------------------------ Character Tab----------------------------------------->
+		<lightning-tab label="Character" value="Character_Screen" onactive={handleTabActivation}>
+			<lightning-spinner alternative-text="Loading" size="small" if:true={characterSpinner}>
+			</lightning-spinner>
+			<lightning-layout multiple-rows="true">
+				<template if:true={showPCSubCombo1}>
+					<lightning-layout-item class="slds-size_2-of-12">
+						<lightning-combobox name="PC Sub Sections" label="PC Sub Sections" value=""
+							placeholder="Select Value" options={PCSubOptions} onchange={handlePCSubChange}
+							class="slds-m-bottom_medium mycombobox">
+						</lightning-combobox>
+					</lightning-layout-item>
+				</template>
+			</lightning-layout>
+			<template if:false={isRepaymentBehaviour}>
+				<template if:true={showCharacterForm}>
+					<div class="slds-scrollable_y">
+						<c-pc-character if:true={applicationId} called-from="PC" customer-options={CustomerOptions}
+							loan-amount={loanAmount} show-f-i-v-c-character={showFivCCharacterTable}
+							verification-id={recordId} applicationid={applicationId}
+							fiv-cfamily-table-data={familyTableData} ispc-family={isFamilyDetails}
+							ispc-neighbour={isNeighbour} ispc-affiliation={isAffiliation}
+							ispc-living-standard={isLivingStandard} oncharacterchangeevent={handleValidation}
+							onhandletabvaluechange={handleTabValueChange} onhandletabvalueremove={handleTabValueRemove}>
+						</c-pc-character>
+					</div>
+				</template>
+			</template>
+			<template if:true={isRepaymentBehaviour}>
+				<c-fs-highmark-obligations-screen application-id={applicationId} customer-options={CustomerOptions}
+					verification-id={recordId} stage-name="PC">
+				</c-fs-highmark-obligations-screen>
+			</template>
+		</lightning-tab>
+
+		<!---------------------------- Capability Tab ------------------------------------>
+		<lightning-tab label="Capability" value="Capability_screen" onactive={handleTabActivation}>
+			<lightning-spinner alternative-text="Loading" size="small" if:true={capabilitySpinner}>
+			</lightning-spinner>
+			<lightning-tabset variant="scoped" active-tab-value={childTabName}>
+				<lightning-tab label="Capability Detail" value="Capability_Detail"
+					onactive={handleCapabilityTabActivation}>
+					<template if:true={capabilityTableData}>
+						<div class="slds-m-bottom_small">
+							<lightning-card variant="Narrow" title="FIV-C - List of Capabilities">
+								<template if:true={capabilityTableData}>
+									<c-generic-data-table-l-w-c result={capabilityTableData}
+										onrowselectionevent={handleSelectedRow}>
+									</c-generic-data-table-l-w-c>
+								</template>
+							</lightning-card>
+						</div>
+					</template>
+					<template if:true={showCapability}>
+						<c-pc-capability sectiontitle="FIV-C" capability-record-id={fivCrecordId}
+							nature-of-ownership-proof={natureOfOwnershipProof} other-confirmation={Other_Confirmations}
+							natureofdocument-proof={natureofdocumentProof} proof-remarks={proofRemarks}
+							is-transport-business={isTransportBusiness}
+							other-confirmations-daily-wages={Other_Confirmations_Daily_Wages} fc-enquiry={fcEnquiry}
+							ownership-proof={ownershipProof} is-salaried={isSalaried}
+							ownershipproof-eateries={ownershipproofEateries} is-rental-mortgage={isRentalMortgage}
+							is-rental-other={isRentalOther} income-proof={incomeProof} is-daily-wages={isDailyWages}
+							is-pension={isPension} is-abroad-income={isAbroadIncome} is-other={isOther}
+							is-self-employed-or-business={isSelfEmployedOrBusiness}
+							is-eateries-and-others={isEateriesAndOthers} is-day-basis={isDayBasis}
+							is-margin-basis={isMarginBasis} gross-monthly-income={grossMonthlyIncome}
+							is-disabled="true"></c-pc-capability>
+					</template>
+					<template if:true={showCapability}>
+						<c-pc-capability sectiontitle="PC" onrefreshcapability={handleCapabilityRefresh}
+							capability-record-type-id={capabilityRecordTypeId} relationship-id={capRelationshipId}
+							oncheckcapabilityvalidation={handleValidation} app-id={applicationId}
+							verification-id={recordId} customer-list={CustomerOptions} loan-applicant-id={CustomerName}
+							income-pincode={fivcincomepincode} business-pincode={fivcbusinesspincode}
+							onhandletabvaluechange={handleTabValueChange} onhandletabvalueremove={handleTabValueRemove}>
+						</c-pc-capability>
+					</template>
+				</lightning-tab>
+				<lightning-tab label="Capability Summary" value="Capability_Summary"
+					onactive={handleCapabilityTabActivation}>
+					<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+						aria-labelledby="element-with-table-label other-element-with-table-label">
+						<thead>
+							<tr class="slds-line-height_reset">
+								<th class="" scope="col">
+									<div class="slds-truncate" title="Name">List of Applicants</div>
+								</th>
+								<th class="" scope="col" colspan="3">
+									<div class="slds-truncate" title="Amount" style="text-align:center">
+										Amount</div>
+								</th>
+							</tr>
+							<tr class="slds-line-height_reset">
+								<th class="" scope="col">
+								</th>
+								<th class="" scope="col">
+									<div class="slds-truncate">FIV-B</div>
+								</th>
+								<th class="" scope="col">
+									<div class="slds-truncate">FIV-C</div>
+								</th>
+								<th class="" scope="col">
+									<div class="slds-truncate">PC</div>
+								</th>
+							</tr>
+						</thead>
+						<tbody if:true={IncomeSummary}>
+							<template if:true={IncomeSummary} for:each={IncomeSummary.incomList} for:item="itm"
+								for:index="index">
+								<tr class="slds-hint-parent" key={itm}>
+									<th data-label="Name" scope="row">
+										<div class="slds-truncate" title="Cloudhub">{itm.customerName}</div>
+									</th>
+									<td data-label="Amount">
+										<div class="slds-truncate" title="Cloudhub">&#8377; {itm.fivBIncome}
+										</div>
+									</td>
+									<td data-label="Amount">
+										<div class="slds-truncate" title="Cloudhub">&#8377; {itm.fivCIncome}
+										</div>
+									</td>
+									<td data-label="Amount">
+										<div class="slds-truncate" title="Cloudhub">&#8377; {itm.pcIncome}
+										</div>
+									</td>
+								</tr>
+							</template>
+							<tr class="slds-hint-parent">
+								<th data-label="Opportunity Name" scope="row">
+									<div class="slds-truncate" title="Cloudhub">Gross Income</div>
+								</th>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.totalFivBMonthlyIncome}
+									</div>
+								</td>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.totalFivCMonthlyIncome}
+									</div>
+								</td>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.totalPCMonthlyIncome}
+									</div>
+								</td>
+							</tr>
+							<tr class="slds-hint-parent">
+								<th data-label="Opportunity Name" scope="row">
+									<div class="slds-truncate" title="Cloudhub">Obligations</div>
+								</th>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.allfivBObligations}
+									</div>
+								</td>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.allfivCObligations}
+									</div>
+								</td>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.allpCObligations}
+									</div>
+								</td>
+							</tr>
+							<tr class="slds-hint-parent">
+								<th data-label="Opportunity Name" scope="row">
+									<div class="slds-truncate" title="Cloudhub">Net Income</div>
+								</th>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.fivbnetMonthlyIncome}
+									</div>
+								</td>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.fivcnetMonthlyIncome}
+									</div>
+								</td>
+								<td data-label="Account Name">
+									<div class="slds-truncate" title="Cloudhub">
+										&#8377; {IncomeSummary.pcnetMonthlyIncome}
+									</div>
+								</td>
+							</tr>
+						</tbody>
+						<thead>
+							<tr class="slds-line-height_reset">
+								<th class="" scope="col" colspan="2">
+									<div class="slds-truncate" title="Name">Segment</div>
+								</th>
+								<th class="" scope="col" colspan="2">
+									<div class="slds-truncate" title="Amount" style="text-align:center">
+										Amount</div>
+								</th>
+
+							</tr>
+							<tr class="slds-line-height_reset">
+								<th class="" scope="col" colspan="2">
+								</th>
+								<th class="" scope="col">
+									<div class="slds-truncate">FIV-C</div>
+								</th>
+								<th class="" scope="col">
+									<div class="slds-truncate">PC</div>
+								</th>
+							</tr>
+						</thead>
+						<tbody if:true={IncomeSummary}>
+							<template if:true={IncomeSummary} for:each={IncomeSummary.segmentList} for:item="itm"
+								for:index="index">
+
+								<tr class="slds-hint-parent" key={itm}>
+									<th data-label="Name" scope="row" colspan="2">
+										<div class="slds-truncate" title="Cloudhub">{itm.SegmemtName}</div>
+									</th>
+									<td data-label="Amount">
+										<div class="slds-truncate" title="Cloudhub" if:true={itm.fivCIncome}>&#8377;
+											{itm.fivCIncome}</div>
+									</td>
+									<td data-label="Amount">
+										<div class="slds-truncate" title="Cloudhub" if:true={itm.pcIncome}>
+											&#8377;
+											{itm.pcIncome}
+										</div>
+									</td>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+				</lightning-tab>
+			</lightning-tabset>
+		</lightning-tab>
+
+		<!------------------------- Collateral Tab ----------------------------------->
+		<lightning-tab label="Collateral" value="Collateral_Screen" onactive={handleTabActivation}>
+			<lightning-spinner alternative-text="Loading" size="small" if:true={propertySpinner}>
+			</lightning-spinner>
+			<template if:true={showProperty}>
+				<div class="slds-m-bottom_small">
+					<lightning-card variant="Narrow" title="FIV-C">
+						<template if:true={isGeneralDetails}>
+							<template if:false={isLandAreaAndValuation}>
+								<template if:false={isBuildingAreaAndValuation}>
+									<c-generic-data-table-l-w-c result={propertyDetailsData}
+										onrowselectionevent={handleSelectedPropertyRow} selected-rows={preselectedRow}>
+									</c-generic-data-table-l-w-c>
+								</template>
+							</template>
+						</template>
+						<template if:true={isLandAreaAndValuation}>
+							<c-generic-data-table-l-w-c result={landDetailsData}
+								onrowselectionevent={handleSelectedPropertyRow} selected-rows={preselectedRow}>
+							</c-generic-data-table-l-w-c>
+						</template>
+						<template if:true={isBuildingAreaAndValuation}>
+							<c-generic-data-table-l-w-c result={buildingDetailsData}
+								onrowselectionevent={handleSelectedPropertyRow} selected-rows={preselectedRow}>
+							</c-generic-data-table-l-w-c>
+
+						</template>
+					</lightning-card>
+					<template if:true={isBuildingAreaAndValuation}>
+						<lightning-card variant="Narrow" title="FIV-C - Floor Details">
+							<template if:true={builidngFloorDetails}>
+								Table 4
+								<c-generic-data-table-l-w-c result={builidngFloorDetails}>
+								</c-generic-data-table-l-w-c>
+							</template>
+						</lightning-card>
+					</template>
+				</div>
+			</template>
+			<lightning-layout multiple-rows="true">
+				<template if:true={showPCSubCombo1}>
+					<lightning-layout-item class="slds-size_2-of-12">
+						<lightning-combobox name="PC Sub Sections" label="PC Sub Sections" value=""
+							placeholder="Select Value" options={PCSubOptions} onchange={handlePCSubChange}
+							class="slds-m-bottom_small mycombobox" dropdown-alignment="auto">
+						</lightning-combobox>
+					</lightning-layout-item>
+					<lightning-layout-item class="slds-size_10-of-12">
+						<template if:true={isBuildingAreaAndValuation}>
+							<div class="slds-float_right">
+								<lightning-input type="text" variant="label-stacked" name="Total Building Value"
+									label="Total Building Value" value={totalBuildingValue} disabled="true">
+								</lightning-input>
+							</div>
+						</template>
+					</lightning-layout-item>
+				</template>
+			</lightning-layout>
+			<lightning-layout>
+				<template if:false={isCollateralSummary}>
+					<lightning-layout-item size="12" small-device-size="12" medium-device-size="12"
+						large-device-size="12">
+						<template if:true={showPropertyForm}>
+							<!--typeof-property={typeofProperty}-->
+							<c-pc-property sectiontitle="PC" application-id={applicationId} login-id={loginId}
+								fiv-c-auto-pop-fields={fivCAutoPopFields} is-general-details={isGeneralDetails}
+								record-id={propertyRecordId} parent-property-id={preloginproperty}
+								title-deed-number={fivcTitleDeedNumber}
+								is-land-area-and-valuation={isLandAreaAndValuation} land-values={landAreaValues}
+								oncheckpropertyvalidation={handleValidation}
+								is-building-area-and-valuation={isBuildingAreaAndValuation}
+								onchangetotalvalue={handlegetValue} relationship-id={pcfivcRelationId}
+								onhandletabvaluechange={handleTabValueChange}
+								onhandletabvalueremove={handleTabValueRemove}>
+							</c-pc-property>
+							<!-- building-values={buildingAreaValues} -->
+						</template>
+					</lightning-layout-item>
+				</template>
+				<template if:true={isCollateralSummary}>
+					<lightning-layout-item size="12" small-device-size="12" medium-device-size="12"
+						large-device-size="12" if:true={isCollateralSummary}>
+						<div class="slds-box slds-box_xx-small">
+							<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+								aria-labelledby="element-with-table-label other-element-with-table-label">
+								<thead>
+									<tr class="slds-line-height_reset">
+										<th class="" scope="col">
+											<div class="slds-truncate" style="font-weight: 700;">Particulars
+											</div>
+										</th>
+										<th class="" scope="col" colspan="3">
+											<div class="slds-truncate" style="font-weight: 700; text-align:center;">
+												Land
+											</div>
+										</th>
+										<th class="" scope="col" colspan="3">
+											<div class="slds-truncate" style="font-weight: 700;text-align:center;">
+												Building
+											</div>
+										</th>
+										<th class="" scope="col">
+											<div class="slds-truncate" style="font-weight: 700; text-align:center;">
+												Collateral Value
+											</div>
+										</th>
+									</tr>
+									<tr class="slds-line-height_reset">
+										<th class="" scope="col">
+										</th>
+										<th class="" scope="col">
+											<div class="slds-truncate" style="font-weight: 700;">Area(sq ft)
+											</div>
+										</th>
+										<th class="" scope="col">
+											<div class="slds-truncate" style="font-weight: 700;">Value(sq ft)
+											</div>
+										</th>
+										<th class="" scope="col">
+											<div class="slds-truncate" style="font-weight: 700;">Final Land Value(INR)
+											</div>
+										</th>
+										<th class="" scope="col">
+											<div class="slds-truncate" style="font-weight: 700;">Area(sq ft)
+											</div>
+										</th>
+										<th class="" scope="col">
+											<div class="slds-truncate" style="font-weight: 700;">Value(sq ft)
+											</div>
+										</th>
+										<th class="" scope="col">
+											<div class="slds-truncate" style="font-weight: 700;">Building Value(INR)
+											</div>
+										</th>
+										<th class="" scope="col">
+										</th>
+									</tr>
+								</thead>
+								<tbody if:true={propertySummaryObj}>
+									<template if:true={propertySummaryObj.propertyList}
+										for:each={propertySummaryObj.propertyList} for:item="itm" for:index="index">
+										<tr class="slds-hint-parent" key={itm}>
+											<th data-label="Name" scope="row">
+												<div class="slds-truncate">{itm.Name}</div>
+											</th>
+											<td data-label="Land Area(sq ft)">
+												<div class="slds-truncate">{itm.Land_Area_Sq_Ft__c}
+												</div>
+											</td>
+											<td data-label="Land Value(INR)">
+												<div class="slds-truncate">&#8377;
+													{itm.Valuation_Market_Value_Per_SqFt__c}
+												</div>
+											</td>
+											<td data-label="Final Land Value(INR)">
+												<div class="slds-truncate">&#8377;
+													{itm.Final_Land_Value__c}
+												</div>
+											</td>
+											<td data-label="Building Area(sq ft)">
+												<div class="slds-truncate">{itm.Building_Area_Sq_Ft__c}
+												</div>
+											</td>
+											<td data-label="Building Value(INR)">
+												<div class="slds-truncate" if:true={itm.Building_Value_per_Sq_ft__c}>&#8377;
+													{itm.Building_Value_per_Sq_ft__c}
+												</div>
+											</td>
+											<td data-label="Building Value(INR)">
+												<div class="slds-truncate">&#8377;
+													{itm.Building_Value__c}
+												</div>
+											</td>
+											<td data-label="Amount">
+												<div class="slds-truncate">&#8377;
+													{itm.Total_Collateral_Value}
+												</div>
+											</td>
+										</tr>
+									</template>
+									<tr class="slds-hint-parent" if:true={propertySummaryObj}>
+										<th data-label="Total" scope="row">
+											<div class="slds-truncate" style="font-weight: 700;">Total
+												Collateral
+												Value
+											</div>
+										</th>
+										<th data-label="Blank 1" scope="row"></th>
+										<th data-label="Blank 2" scope="row">
+										</th>
+										<th data-label="Grand Value Land" scope="row">
+											<div class="slds-truncate"
+												if:true={propertySummaryObj.collateralGrandValue}>&#8377;
+												{propertySummaryObj.landGrandValue}
+											</div>
+										</th>
+										<th data-label="Blank 3" scope="row">
+										</th>
+										<th data-label="Blank 4" scope="row">
+										</th>
+										<th data-label="Grand Value Building" scope="row">
+											<div class="slds-truncate"
+												if:true={propertySummaryObj.collateralGrandValue}>&#8377;
+												{propertySummaryObj.buildingGrandValue}
+											</div>
+										</th>
+										<th data-label="Grand Collateral Value" scope="row">
+											<div class="slds-truncate"
+												if:true={propertySummaryObj.collateralGrandValue}>&#8377;
+												{propertySummaryObj.collateralGrandValue}
+											</div>
+										</th>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</lightning-layout-item>
+				</template>
+			</lightning-layout>
+		</lightning-tab>
+
+		<!--------------------------------- Insurance/Fee Tab --------------------------------------->
+		<lightning-tab label="Insurance/Fee" value="Insurance_Fee" onactive={handleTabActivation}>
+			<c-fee-insurance-parent-p-c-screen record-id={applicationId} stage-name="Process Credit"
+				pre-log-in-id={loginId} app-name={appName} primary-applicant-name={primaryAppName}
+				ongetreceiptevent={getReceiptPendingList}>
+			</c-fee-insurance-parent-p-c-screen>
+		</lightning-tab>
+
+		<!---------------------------------- Financial Summary Tab------------------------------------>
+		<lightning-tab label="Financials" value="Financial_screen" onactive={handleTabActivation}>
+			<lightning-spinner alternative-text="Loading" size="small" if:true={finSpinner}>
+			</lightning-spinner>
+			<template if:true={isFinancial}>
+				<c-pc-financial sectiontitle="PC" if:true={applicationId} application-id={applicationId}
+					verf-id={recordId} oncheckfinancialvalidation={handleValidation} application-name={appName}
+					login-id={loginId} record-type-name={preLoginRecordType} customer-options={CustomerOptions}
+					property-summary={propertySummaryObj} ontabchange={handleChildTab} tab-name={childTab}
+					onhandletabvaluechange={handleTabValueChange} onhandletabvalueremove={handleTabValueRemove}>
+				</c-pc-financial>
+
+			</template>
+		</lightning-tab>
+
+
+		<!--------------------------------- Deviations Tab ------------------------------------------->
+		<lightning-tab label="Deviation" value="Deviation" onactive={handleTabActivation}>
+			<c-pc-deviation if:true={applicationId} application-id={applicationId} stage-name="Process Credit">
+			</c-pc-deviation>
+		</lightning-tab>
+
+		<!---------------------------------- Sanction Condition Tab ---------------------------------------------->
+		<lightning-tab label="Sanction Condition" value="Sanction_Condition" onactive={handleTabActivation}>
+			<c-fs-sanction-condition-l-w-c application-id={applicationId} source="Process Credit">
+			</c-fs-sanction-condition-l-w-c>
+		</lightning-tab>
+
+		<!-- --------------------------------Generate Disbursal Memo --------------------------- -->
+		<lightning-tab label="Discussion Memo" value="Discussion_Memo" onactive={handleTabActivation}>
+			<div class="slds-box slds-box_xx-small">
+				<c-fiv_-disb_discussion-memo application-id={applicationId} stage-name="Process Credit">
+				</c-fiv_-disb_discussion-memo>
+			</div>
+		</lightning-tab>
+
+		<lightning-tab label="Send Back Grid" value="Send_Back_Grid">
+			<c-fs-send-back-grid application-id={applicationId}>
+			</c-fs-send-back-grid>
+		</lightning-tab>
+
+		<!------------------------------ Decision Tab----------------------------------->
+		<template if:false={isDeviationRaise}>
+			<lightning-tab label="Decision" value="Decision" onactive={handleTabActivation}>
+				<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+					onsuccess={handleDecisionSuccess} onsubmit={handleDecisionSubmit}>
+					<lightning-layout multiple-rows>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+							medium-device-size="3" large-device-size="3">
+							<label class="slds-form-element__label"><abbr class="slds-required" >*</abbr>Decision</label>
+							<lightning-input-field field-name="PC_Decision__c" variant="label-hidden"
+								onchange={handleChange} value={decisionValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+							medium-device-size="3" large-device-size="3">
+							<label class="slds-form-element__label"><abbr class="slds-required" >*</abbr>Select User</label>
+							<lightning-combobox name="Recommended_AC_User__c" label="Select User"
+								placeholder="Select Value" variant="label-hidden" options={usersList}
+								onchange={handleChange} value={selectedACUser}>
+							</lightning-combobox>
+							<lightning-input-field field-name="Recommended_AC_User__c" variant="label-stacked"
+								value={selectedACUser} style="display:none">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="4"
+							medium-device-size="3" large-device-size="3">
+							<lightning-input-field field-name="PC_Remarks__c" variant="label-stacked"
+								onchange={handleChange}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="4"
+							medium-device-size="3" large-device-size="3" style="display:none">
+							<lightning-input-field field-name="Decision_Date_Time__c" variant="label-stacked"
+								value={dateTimeVal}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="4"
+							medium-device-size="3" large-device-size="3">
+							<lightning-input-field field-name="Verified_UN_sanctions_list_and_no_match__c"
+								variant="label-stacked" onchange={handleChange}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<div class="slds-var-m-top_medium slds-float_right">
+								<lightning-button variant="brand" type="submit" label="Update" id="decision-btn">
+								</lightning-button>
+							</div>
+						</lightning-layout-item>
+					</lightning-layout>
+				</lightning-record-edit-form>
+			</lightning-tab>
+		</template>
+
+		<!--------------------------------------- Error Info Tab -------------------------------------------->
+		<lightning-tab label="Error Info" value="Error" if:true={showErrorTab} onactive={handleTabActivation}
+			show-error-indicator style="--sds-c-tabs-scoped-color-text-active: red">
+			<ul class="slds-list_dotted">
+				<template for:each={errorMsg} for:item="err">
+					<li key={err} class="slds-text-color_destructive">{err}</li>
+				</template>
+			</ul>
+		</lightning-tab>
+	</lightning-tabset>
+
+	<!-- <div style="overflow-x:hidden;overflow-y:hidden">
+		<div class="slds-docked-form-footer">
+			<button type="button" style="position:relative; left:40%;" class="slds-button slds-button_brand"
+                onclick={handlePCSubmit}>Submit</button>
+		</div>
+	</div> -->
+</template>

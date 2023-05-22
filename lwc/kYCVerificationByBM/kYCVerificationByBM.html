@@ -1,0 +1,23 @@
+<template>
+
+    <template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+
+    <!--PAGE HEADER-->
+    <c-fs-page-container-l-w-c if:true={lastLoginDate} headericon="standard:action_list_component" stagename="KYC Verification"
+		appno={applicationName} businessdate={todaysDate} lastlogindate={lastLoginDate} btns={button}
+		onrowselectionevent={rowselectionevent}>
+	</c-fs-page-container-l-w-c>
+    <!--PAGE HEADER-->
+
+    <!-- List Of Applicants -->
+	<template if:true={isAccDataArrived}>
+		<lightning-card variant="Narrow" title="List Of Applicants">
+			<c-generic-data-table-l-w-c data-id="acc" result={accData} btns={accRowAction}
+				onselected={handleSelectedApplicant}>
+			</c-generic-data-table-l-w-c>
+		</lightning-card>
+	</template>
+
+</template>

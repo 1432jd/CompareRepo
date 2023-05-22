@@ -1,0 +1,55 @@
+<template>
+	<template if:true={isLoading}>
+		<lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+	</template>
+	<lightning-card variant="Narrow" title="Enter Customer Details">
+		<lightning-layout multiple-rows>
+			<lightning-layout-item size="12" padding="around-small" small-device-size="12" medium-device-size="12"
+				large-device-size="3" style="display:none;">
+				<lightning-input type="text" variant="standard" name="Customer_Type" label="Customer Type"
+					value="Primary Applicant" disabled required>
+				</lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="12" padding="around-small" small-device-size="12" medium-device-size="12"
+				large-device-size="3">
+				<lightning-combobox name="Salutation" data-id="Salutation" label="Salutation"
+					placeholder="Select Salutation" options={salutationOptions} value={salutationValue}
+					onchange={handleChange} required>
+				</lightning-combobox>
+			</lightning-layout-item>
+			<lightning-layout-item size="12" padding="around-small" small-device-size="12" medium-device-size="12"
+				large-device-size="3">
+				<lightning-input type="text" variant="standard" data-id="FirstName" name="FirstName" label="First Name"
+					placeholder="Enter First Name" pattern="[a-zA-Z ]*" message-when-pattern-mismatch="Only alphabets allowed." onchange={handleChange} required>
+				</lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="12" padding="around-small" small-device-size="12" medium-device-size="12"
+				large-device-size="3">
+				<lightning-input type="text" variant="standard" data-id="LastName" name="LastName" label="Last Name"
+					placeholder="Enter Last Name" pattern="[a-zA-Z ]*" message-when-pattern-mismatch="Only alphabets allowed." onchange={handleChange} required>
+				</lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="12" padding="around-small" small-device-size="12" medium-device-size="12"
+				large-device-size="3">
+				<label class="slds-form-element__label" >
+													<span style="color: red;">*&nbsp;</span>
+													Sourcing Branch
+												</label>
+				<c-generic-custom-lookup-l-w-c object-api-name="Branch_Master__c" key-field-a-p-i="Id"
+					search-field="Name" onlookupselected={handleSelectedBranch}
+					onlookupvalueremoved={handleRemoveSelectedBranch}>
+				</c-generic-custom-lookup-l-w-c>
+				<!-- <c-l-w-c-lookup object-api-name="Branch_Master__c" field-api-name="Name" object-label="Branch"
+					sub-field-api-name="Branch_Code__c" variant="label-hidden" onselect={handleSelectedBranch}
+					criteria="DIR_BR" seleted-record-id={branchId} required>
+				</c-l-w-c-lookup> -->
+			</lightning-layout-item>
+		</lightning-layout>
+		<div class="slds-align_absolute-center" if:false={isButtonsHide} slot="footer">
+			<lightning-button variant="brand" label="Save" title="Save" onclick={handleSave} disabled={saveDisable}>
+			</lightning-button>
+			<lightning-button label="Cancel" title="Cancel" class=" slds-m-left_x-small" onclick={handleDirectCancel}>
+			</lightning-button>
+		</div>
+	</lightning-card>
+</template>

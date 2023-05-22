@@ -1,0 +1,67 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+	<!-- OTP Validation -->
+	<template if:true={isModalOpen}>
+		<div class="slds-modal slds-fade-in-open slds-backdrop">
+			<div class="slds-modal__container">
+				<!-- style="max-width: 7rem !important;"-->
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Mobile Verification</h1>
+					<lightning-button-icon icon-name="utility:close" alternative-text="Close this window" size="large"
+						variant="border-inverse" onclick={closeModal} class=" slds-modal__close">
+						<!--btnPopup-->
+					</lightning-button-icon>
+					<!-- <span>Validate OTP</span>-->
+				</div>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <template if:true={showManualScreen}>
+						<lightning-layout multiple-rows="true">
+							<lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6"
+								padding="around-small">
+								<lightning-combobox name="mobVerify" data-id="mobVerify" label="Select Mobile Verification Type" value={selectedVerType}
+									placeholder="Select Mobile Verification Type" options={options} onchange={handleChange}>
+								</lightning-combobox>
+							</lightning-layout-item>
+							<template if:true={showCheckbox}>
+								<lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6"
+									padding="around-small">
+									<lightning-input type="checkbox" data-id="confirm" variant="standard" name="confirm"
+										label={confirmationText} onchange={handleChange} required>
+									</lightning-input>
+								</lightning-layout-item>
+							</template>
+						</lightning-layout>
+                    </template>
+					<template if:false={showManualScreen}>
+						<lightning-input type="text" label="Enter OTP" name="otp" onchange={handleOTP} class="slds-align_absolute-center">
+						</lightning-input>
+					</template>
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-layout>
+						<lightning-layout-item size="12" small-device-size="9" medium-device-size="3" large-device-size="12">
+							<template if:true={sendOTPButton}>
+								<lightning-button label="Send OTP" variant="brand" onclick={handleSendOTP}>
+								</lightning-button>&nbsp;
+							</template>
+							<template if:true={systemVerifyButton}>
+								<lightning-button label={validate} variant="brand" onclick={validateOTP}>
+								</lightning-button>&nbsp;
+								<lightning-button label="Resend OTP" variant="brand" onclick={resendMobOTP} data-id="resend">
+								</lightning-button>&nbsp;
+							</template>
+                            <template if:true={manualVerifyButton}>
+                                <lightning-button label={validate} variant="brand" onclick={verifyMobManually}>
+								</lightning-button>&nbsp;
+                            </template>
+							<lightning-button variant="brand-outline" type="cancel" label="Cancel" onclick={closeModal}>
+							</lightning-button>
+						</lightning-layout-item>
+					</lightning-layout>
+				</div>
+			</div>
+		</div>
+	</template>
+</template>

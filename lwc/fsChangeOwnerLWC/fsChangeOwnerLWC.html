@@ -1,0 +1,27 @@
+<template>
+    <lightning-quick-action-panel header="Change Owner">
+        <template if:true={toggleSpinner}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+        <template if:true={dataArrived}>
+            <lightning-combobox
+                name="progress"
+                label="Stage"
+                placeholder="Select Stage"
+                options={stageOptions}
+                onchange={handleChange} dropdown-alignment="auto"></lightning-combobox>
+        </template>
+        <template if:true={userArrived}>
+            <lightning-combobox
+                name="progress"
+                label="User"
+                placeholder="Select User"
+                onchange={handleUserChange}
+                options={userOptions} dropdown-alignment="auto"></lightning-combobox>
+        </template>
+        <div slot="footer">
+            <lightning-button variant="neutral" label="Cancel" onclick={handleCancel}></lightning-button>
+            <lightning-button variant="brand" class="slds-m-left_x-small" label="Save" type="submit" onclick={handleSubmit}></lightning-button>
+        </div>
+    </lightning-quick-action-panel>
+</template>

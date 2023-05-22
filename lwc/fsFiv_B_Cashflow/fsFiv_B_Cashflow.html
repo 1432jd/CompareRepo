@@ -1,0 +1,81 @@
+<!--
+  @author            : 
+  @group             : TechMatrix Consulting
+  @description       : 
+  @created on        : 
+  @last modified on  : 14-09-2022
+  @last modified by  : Karan Singh Soni
+-->
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+	<template if:true={isApplicantEdit}>
+		<lightning-card variant="Narrow" title="Select Applicant">
+			<c-generic-data-table-l-w-c if:true={allApplicantData} data-id="cashflow" result={allApplicantData}
+				onrowselectionevent={handleRadtioButton}>
+			</c-generic-data-table-l-w-c>
+		</lightning-card>
+	</template>
+	<template if:true={showForm}>
+		<div class="slds-m-top_small">
+		</div>
+		<lightning-card variant="Narrow" title="Enter Cashflow Details">
+			<c-generic-edit-pages-l-w-c fields-content={fieldsContent} onchanged={changedFromChild}>
+				<div slot="additionalFieldFirst"
+					class="slds-col slds-size_12-of-12 slds-large-size_3-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+					<lightning-input type="text" name="Name__c" label="Name" value={name}
+						onchange={handleFormValidation} required>
+					</lightning-input>
+				</div>
+
+				<div slot="additionalFieldFirst"
+					class="slds-col slds-size_12-of-12 slds-large-size_3-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+					<lightning-combobox name="Seen__c" label="Seen?" placeholder="Select an Option"
+						options={seenChoices} value={seen} onchange={handleFormValidation} required>
+					</lightning-combobox>
+				</div>
+				<div slot="additionalFieldFirst"
+					class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+					<lightning-combobox name="Profile__c" label="Profile" placeholder="Select an Option"
+						value={profile} options={natureOfBusinessChoices} onchange={handleFormValidation} required>
+					</lightning-combobox>
+				</div>
+				<div slot="additionalFieldFirst"
+					class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+					<lightning-combobox name="Customer_Segment__c" label="Customer Segment"
+						placeholder="Select an Option" value={customerSegment} options={customerSegmentChoices}
+						onchange={handleFormValidation} required>
+					</lightning-combobox>
+				</div>
+				<div slot="additionalFieldFirst"
+					class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+					<lightning-combobox name="Customer_Sub_Segment__c" label="Customer Sub Segment"
+						placeholder="Select an Option" value={customerSubSegment} options={customerSubSegmentChoices}
+						onchange={handleFormValidation} required>
+					</lightning-combobox>
+				</div>
+			</c-generic-edit-pages-l-w-c>
+			<div class="slds-align_absolute-center slds-p-bottom_small" slot="footer">
+				<lightning-button variant="brand" label="Save" title="Sace" onclick={handleSave}
+					disabled={verificationStatus}>
+				</lightning-button>
+				<lightning-button label="Cancel" title="Cancel" onclick={handleCancel} class="slds-m-left_x-small">
+				</lightning-button>
+			</div>
+		</lightning-card>
+	</template>
+	<template if:true={tableData}>
+		<div class="slds-m-top_small">
+		</div>
+		<lightning-card variant="Narrow" title="Summary of Cash Flow">
+			<c-generic-data-table-l-w-c data-id="cashflow" result={tableData} btns={rowAction}
+				onselected={handleSelectedApplication}></c-generic-data-table-l-w-c>
+		</lightning-card>
+	</template>
+	<template if:true={showDeletePopup}>
+		<c-fs-delete-l-w-c delete-from="FIV-B Cashflow" object-api-name="Cashflow__c" show-modal={showDeletePopup}
+			rec-id={recordIdForDelete} onmodaldelete={handlemodalactions} onmodalcancel={handlemodalactions}>
+		</c-fs-delete-l-w-c>
+	</template>
+</template>

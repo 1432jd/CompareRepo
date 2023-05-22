@@ -1,0 +1,34 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+	<template if:true={showPropEditForm}>
+		<lightning-card  variant="Narrow"  title="Enter Property Details">
+			<c-generic-edit-pages-l-w-c fields-content={fieldsContent} onchanged={handleFormValueChange}>
+				<div slot="additionalFieldFirst"  class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+					<c-fs-multi-select-picklist-l-w-c options={ownerTypeOption} onvaluechange={handleOwnerChange}
+						label="Select Owners">
+					</c-fs-multi-select-picklist-l-w-c>
+				</div>
+				<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<lightning-combobox name="Nature_Of_Property__c" label="Nature of Property" placeholder="Select an Option"
+							onchange={handleFormValidation} options={natureOfproperties.data.values} value={natureOfProperty} required>
+						</lightning-combobox>
+				</div>
+				<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<lightning-combobox name="Type_Of_Property__c" label="Property Type" placeholder="Select an Option" options={propertyTypeOptions}
+							value={typeofProperty} onchange={handleFormValidation} required>
+						</lightning-combobox>
+					</div>
+			</c-generic-edit-pages-l-w-c>
+			<div class="slds-align_absolute-center slds-m-around_x-small" slot="footer">
+				<lightning-button variant="brand" label={labelSave} title="Save" onclick={handleSave}>
+				</lightning-button>
+				<lightning-button label="Cancel" title="Cancel" onclick={handleCancel} class="slds-m-left_x-small">
+				</lightning-button>
+			</div>
+		</lightning-card>
+	</template>
+</template>

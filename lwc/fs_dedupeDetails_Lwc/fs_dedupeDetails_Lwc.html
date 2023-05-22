@@ -1,0 +1,263 @@
+<!--
+  @author            : 
+  @group             : TechMatrix Consulting
+  @description       : 
+  @created on        : 
+  @last modified on  : 22-08-2022
+  @last modified by  : Karan Singh Soni
+-->
+<template>
+
+    <lightning-spinner alternative-text="Loading" size="small" if:true={showLoader}></lightning-spinner>
+    <template if:true={showData}>
+        <!--PAGE HEADER-->
+        <c-fs-page-container-l-w-c headericon="standard:asset_audit" stagename={apptStageName} appno={apptName}
+            businessdate={todaysDate} lastlogindate={lastLoginDate} btns={btns}
+            onrowselectionevent={handleHeaderButton}>
+        </c-fs-page-container-l-w-c>
+    </template>
+
+    <lightning-card >
+        <template if:true={nonDedupeExecutionUserFlag}>
+            <lightning-layout>
+                <template if:true={isApplicantFlag}>
+                    <lightning-layout-item size="3" padding="horizontal-small" style="overflow: initial;">
+                        <lightning-combobox name="Loan Applicants" label="Select Applicant Name" value={slcdLoanApptName}
+                            placeholder="None" options={listLoanApptName} onchange={handleComboBoxChange}>
+                        </lightning-combobox>
+                    </lightning-layout-item>
+                </template>
+                    <lightning-layout-item  class="slds-align_absolute-center" >
+                        <lightning-button variant="brand" label=' Check Dedupe'
+                        name="DedupeAPI"    onclick={callDedupeApiBtnClick}  disabled={dedupeCriteriaFlag}
+                        ></lightning-button>
+                    </lightning-layout-item>
+ 
+            </lightning-layout>
+            <!--  layout to show dedupe detail when dedupe record assign to Dedupe Exception User. --> 
+            <lightning-layout>
+                <template if:true={isdedupeDone}>
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-p-around_large"
+                        aria-labelledby="element-with-table-label other-element-with-table-label">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                    <div title="Customer Number">
+                                        <b>Customer Number</b>
+                                    </div>
+                                </th>
+                                <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                    <div title="Source">
+                                        <b>Source</b>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={saveDedupeDetailList} for:item="dedupeRec">
+                                <tr key={dedupeRec.Id} class="slds-hint-parent">
+                                    <td style="font-weight: bold" >
+                                        {dedupeRec.CIF_Id__c}
+                                    </td>
+                                    <td style="font-weight: bold">
+                                        {dedupeRec.Source__c}
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+
+            </lightning-layout>
+        </template>
+
+        <!--  Dedupe Record Table-->
+        <template if:true={arrSlcdLoanApptDedupe}>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-p-around_large"
+                aria-labelledby="element-with-table-label other-element-with-table-label">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                            <div title="Customer Number">
+                                <b>Customer Number</b>
+                            </div>
+                        </th>
+                        <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                            <div title="Source">
+                                <b>Source</b>
+                            </div>
+                        </th>
+                        <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                            <div title="Loan Details">
+                                <b>Loan Details</b>
+                            </div>
+                        </th>
+                        <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                            <div title="Yes or No">
+                                <b>Yes or No</b>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template for:each={arrSlcdLoanApptDedupe} for:item="dedupeRec" for:index="index">
+                        <tr key={dedupeRec.Id} class="slds-hint-parent">
+                            <td style="font-weight: bold">
+                                <lightning-button variant="base" label={dedupeRec.CustomerNumber} name="CustomerNumber"
+                                    data-target-id={index} onclick={handleLoandDetailBtnClick}
+                                    class="slds-m-left_x-small"></lightning-button>
+                            </td>
+                            <td style="font-weight: bold">
+                                {dedupeRec.Source}
+                            </td>
+                            <td style="font-weight: bold">
+                                <lightning-button variant="base" label="Loan Details" name="loanDetails"
+                                    data-target-id={index} onclick={handleLoandDetailBtnClick}
+                                    class="slds-m-left_x-small"></lightning-button>
+                            </td>
+                            <td style="font-weight: bold">
+                                <lightning-combobox name="dedupeYesNo" label="" value={dedupeRec.YesNo}
+                                    placeholder="None" options={dedupeAnswerOpts} onchange={handleDedupeComboBoxChange} disabled={isOptionDisable}>
+                                </lightning-combobox>
+                            </td>
+                        </tr>
+                    </template>
+
+                </tbody>
+            </table>
+            <!-- Field Comparison table-->
+            <template if:true={showFieldComparisonTable}>
+
+                <table
+                    class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-p-around_large"
+                    aria-labelledby="element-with-table-label other-element-with-table-label" style="width:60%">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                <div title="Field">
+                                    <b>Field</b>
+                                </div>
+                            </th>
+                            <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                <div title="New Applicant">
+                                    <b>New Applicant</b>
+                                </div>
+                            </th>
+                            <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                <div title="Existing Applicant">
+                                    <b>Existing Applicant</b>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <template for:each={arrSlcdLoanApptFieldComparison} for:item="fieldCompRec" for:index="index">
+                            <!--<tr key={dedupeRec.Id} class="slds-hint-parent">
+                                <td style="font-weight: bold">
+                                    <lightning-button variant="base" label={dedupeRec.CustomerNumber}
+                                        name="CustomerNumber" data-target-id={index} onclick={handleLoandDetailBtnClick}
+                                        class="slds-m-left_x-small"></lightning-button>
+                                </td>
+                                
+                            </tr>-->
+                        </template>
+
+                    </tbody>
+                </table>
+
+            </template>
+            <!-- Field Comparison table END-->
+        </template> <!--  END of Dedupe Record Table-->
+
+        <!--  Loan Details Modal -->
+        <template if:true={showLoanDetailModal}>
+
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01"
+                class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box LWC header here -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Loan Details</h2>
+                    </header>
+                    <!-- Modal/Popup Box LWC body starts here -->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+                        <table
+                            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-p-around_large"
+                            aria-labelledby="element-with-table-label other-element-with-table-label">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+
+                                    <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                        <div title="Application Number">
+                                            <b>Application Number</b>
+                                        </div>
+                                    </th>
+                                    <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                        <div title="Application Status">
+                                            <b>Application Status</b>
+                                        </div>
+                                    </th>
+                                    <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                        <div title="Lan Status">
+                                            <b>Lan Status</b>
+                                        </div>
+                                    </th>
+                                    <th class="slds-text-heading_small slds-cell-wrap" scope="col">
+                                        <div title="Lan">
+                                            <b>Lan</b>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <template for:each={arrSlcdLoanApptDedupeLoans} for:item="dedupeLoanRec"
+                                    for:index="index">
+                                    <tr key={dedupeLoanRec.Id} class="slds-hint-parent">
+                                        <td style="font-weight: bold">
+                                            {dedupeLoanRec.ApplicationNumber}
+                                        </td>
+                                        <td style="font-weight: bold">
+                                            {dedupeLoanRec.ApplicationStatus}
+                                        </td>
+                                        <td style="font-weight: bold">
+                                            {dedupeLoanRec.LanStatus}
+                                        </td>
+                                        <td style="font-weight: bold">
+                                            {dedupeLoanRec.Lan}
+                                        </td>
+                                    </tr>
+                                </template>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+        <!-- Loan Detail Modal End -->
+        <div slot="footer">
+            <lightning-button variant="brand" label="Save" onclick={saveDedupeData} class="slds-m-left_x-small" id={contactId} if:true={dedupeListSizeFlag}></lightning-button>
+            <lightning-button variant="brand" label="Submit" onclick={submitDedupeData} class="slds-m-left_x-small" id={contactId} if:true={isOptionDisable}></lightning-button>
+
+        </div>
+
+    </lightning-card>
+
+    <!--div class="slds-docked-form-footer">
+        <button type="button" style="position:relative; left:40%;" class="slds-button slds-button_brand"
+            onclick={handleDisbSubmit} disabled={disableSubmit}>Submit</button>
+    </div-->
+
+</template>

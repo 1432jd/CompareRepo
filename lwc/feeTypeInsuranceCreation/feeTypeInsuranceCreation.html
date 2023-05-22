@@ -1,0 +1,449 @@
+<template>
+    
+    <div if:true={isLoading}>
+        <lightning-spinner class="slds-spinner_brand" alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+    <template if:true={showFee}>
+    <div class="c-container ">
+        <lightning-card class="slds-card__body slds-card__body_inner slds-m-bottom--xx-large" >
+            <!-- to change position of + button-->
+            <div class="slds-scrollable">
+                <span class="slds-text-heading_small slds-truncate"
+                    style="font-size: var(--slds-c-card-heading-font-size, var(--sds-c-card-heading-font-size, var(--lwc-varFontSize5,1rem))); font-weight: var(--slds-c-card-heading-font-weight, var(--sds-c-card-heading-font-weight, var(--lwc-cardFontWeight,700))); line-height: var(--lwc-lineHeightHeading,1.25);">Insurance Detail
+                </span>
+                    <button class="addbutton slds-button slds-button_icon slds-button_icon-brand slds-float_right"
+                                            name='add' data-row-index={indexVar} onclick={createFeeCreationRecordRow}
+                                            disabled={isnewRow}>
+                                            <svg class="slds-button__icon" focusable="false" data-key="add"
+                                                aria-hidden="true" viewBox="0 0 52 52">
+                                                <g>
+                                                    <path
+                                                        d="M30 29h16.5c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5H30c-.6 0-1-.4-1-1V5.5c0-.8-.7-1.5-1.5-1.5h-3c-.8 0-1.5.7-1.5 1.5V22c0 .6-.4 1-1 1H5.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5H22c.6 0 1 .4 1 1v16.5c0 .8.7 1.5 1.5 1.5h3c.8 0 1.5-.7 1.5-1.5V30c0-.6.4-1 1-1z">
+                                                    </path>
+                                                </g>
+                                            </svg>
+                                        </button>
+            </div>
+            </br>
+
+            <div class="slds-scrollable" style="height:200%; padding-bottom: 10px">
+                
+                <template if:true={data}>
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered table-insurance-detail">
+                        <thead class="th">
+                            <tr >
+                                <th class="slds-size_3-of-10" scope="col">
+                                    <div class="slds-truncate" title="Sr No">Sr No.</div>
+                                </th>
+                                <th class="slds-size_3-of-10" scope="col">
+                                    <div class="slds-truncate" title="Fee Code">Insurance Name</div>
+                                </th>
+                                <!--/*@Description: Ticket-1259 (To Hide Insurance agency column)
+                                    @Dated: 04 jan 2023
+                                <th class="slds-size_3-of-10" scope="col">
+                                    <div class="slds-truncate" title="Insurance Agency">Insurance Agency</div>
+                                </th>-->
+                        <!--        <th class="slds-size_3-of-10" scope="col">
+                                    <div class="slds-truncate" title="Stage Due">Stage Due</div>
+                                </th>-->
+                                <!-- Applicable for changed to Insured Person/ Collateral: Ticket-1260-->
+                                <th class="slds-size_3-of-10" scope="col">
+                                    <div class="slds-truncate" title="Applicable For">Insured Person/ Collateral</div>
+                                </th>
+                                
+                    <!--            <th class="slds-size_3-of-10" scope="col">
+                                    <div class="slds-truncate" title="Applicant/Property">Applicant/Property</div>
+                                </th>-->
+                                <th class="slds-size_3-of-10" scope="col">
+                                    <div class="slds-truncate" title="Premium">Premium Amount</div>
+                                </th>
+                                <th class="slds-size_3-of-10" scope="col">
+                                    <div class="slds-truncate" title="Tax Amount">Tax Amount</div>
+                                </th>
+                                <th class="slds-size_1-of-10" scope="col">
+                                    <div class="slds-truncate" title="Final Amount">Final Amount</div>
+                                </th>
+                                <th class="slds-size_1-of-10" scope="col">
+                                    <div class="slds-truncate" title="Sum Assured">Sum Assured</div>
+                                </th>
+                                <th class="slds-size_1-of-10" scope="col">
+                                    <div class="slds-truncate" title="Mode">Mode</div>
+                                </th>
+                                <th class="slds-size_1-of-10" scope="col">
+                                    <div class="slds-truncate" title="Action">Action</div>
+                                </th>
+                                <th class="slds-size_1-of-10" scope="col"></th>
+                                <th class="slds-size_1-of-10" scope="col"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <template if:true={isData}>
+                            <template for:each={data} for:item="item" for:index="indexVar">
+                                <tr key={item.key} id={item.Id} class="slds-hint-parent">
+
+                                    <td class="slds-size_3-of-10" data-id="1">
+                                        <div class="slds-truncate">{item.rowNumber}</div>
+                                    </td>
+                                    <td class="slds-size_3-of-10" data-id="2">
+                                        <template if:false={item.isNewRow}>
+                                            <!--div class="td-currency" title={item.feeList.Fee_Code__c}>
+                                                {item.feeList.Fee_Code__c}
+                                            </div-->
+                                            <div class="td-currency" title={item.feeList.Description__c}>
+                                                {item.feeList.Description__c}
+                                            </div>
+                                        </template>
+                                        <template if:true={item.isNewRow}>
+                                            <div class="td-currency">
+                                                <select class="slds-select" id={indexVar} data-row-index={indexVar}
+                                                    onchange={updatefeeCodeValue}>
+
+                                                    <option value=none selected disabled hidden>Select an option
+                                                    </option>
+
+                                                    <template for:each={existingfeeOption} for:item="listViewItem">
+                                                        <option key={listViewItem.label} value={listViewItem.value}>
+                                                            {listViewItem.label}
+                                                        </option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                        </template>
+                                    </td>
+
+                                    <!-- /*@Description: Ticket-1259 (To Hide Insurance agency column)(to hide below td)
+                                             @Dated: 04 jan 2023-->
+                                    <!--td class="slds-size_3-of-10" data-id="3">
+                                        <div class="td-currency">
+                                            <template if:false={item.isNewRow}>
+                                            
+                                                <template if:true={item.externalAgencyName}>
+                                                    {item.externalAgencyName}
+                                                </template>
+                                                <template if:false={item.externalAgencyName}>
+                                                    <select class="slds-select" id={indexVar} data-row-index={indexVar}
+                                                    onchange={handleAgencyNameChange}>
+                                                    disabled need to be commented if insurance agency needs to show again
+                                                    disabled={item.feeList.Receipt_Created__c}>
+                                                    
+                                                    <option value=none selected disabled hidden>Select an option</option>
+
+                                                    <template for:each={agencyOptions} for:item="listViewAgency">
+                                                        <option key={listViewAgency.key} value={listViewAgency.key}>
+                                                            {listViewAgency.value}</option>
+                                                    </template>
+                                                </select>
+                                                </template>
+                                            
+                                        </template>
+                                        <template if:true={item.isNewRow}>
+                                            next line need to be commented if insurance agency needs to show again
+                                            <template if:false={item.externalAgencyName}>
+                                                <select class="slds-select" id={indexVar} data-row-index={indexVar}
+                                                    onchange={handleAgencyNameChange}>
+                                                    disabled need to be commented if insurance agency needs to show again
+                                                    disabled={item.feeList.Receipt_Created__c}>
+
+                                                    <option value=none selected disabled hidden>Select an option</option>
+
+                                                    <template for:each={agencyOptions} for:item="listViewAgency">
+                                                        <option key={listViewAgency.key} value={listViewAgency.key}>
+                                                            {listViewAgency.value}</option>
+                                                    </template>
+                                                </select>
+                                                template below need to be commented if insurance agency needs to show again
+                                            </template>
+                                        </template>
+                                        </div>
+                                    </td-->
+                        
+                                    <td class="slds-size_3-of-10" data-id="4">
+                                        <div class="td-currency">
+                                            <template if:false={item.isNewRow}>
+                                                <template if:true={item.feeList.Loan_Applicant__c}>
+                                                    <template if:true={item.applicantOrAssetName}>
+                                                        {item.applicantOrAssetName}
+                                                    </template>
+                                                </template>
+                                                <template if:true={item.feeList.Property__c}>
+                                                    <template if:true={item.applicantOrAssetName}>
+                                                        {item.applicantOrAssetName}
+                                                    </template>
+                                                </template>
+                                                <template if:false={item.feeList.Loan_Applicant__c}>
+                                                    <template if:true={item.applicantAsset}>
+                                                        <select class="slds-select" id={indexVar}
+                                                            data-row-index={indexVar}
+                                                            onchange={applicableForSelectChange}>
+
+                                                            <option value=none selected disabled hidden>Select an
+                                                                option
+                                                            </option>
+                                                            <template for:each={applicantOption}
+                                                                for:item="listViewItem">
+                                                                <option key={listViewItem.label}
+                                                                    value={listViewItem.value}>
+                                                                    {listViewItem.label}
+                                                                </option>
+                                                            </template>
+                                                        </select>
+
+                                                    </template>
+                                                </template>
+                                                <template if:false={item.feeList.Property__c}>
+                                                    <template if:false={item.applicantAsset}>
+                                                        <template if:false={item.isApplication}>
+                                                            <select class="slds-select" id={indexVar}
+                                                                data-row-index={indexVar}
+                                                                onchange={applicableForSelectChange}
+                                                                disabled={isApplication}>
+
+                                                                <option value=none selected disabled hidden>Select
+                                                                    an Option
+                                                                </option>
+
+                                                                <template for:each={assetOption}
+                                                                    for:item="listViewItem">
+                                                                    <option key={listViewItem.label}
+                                                                        value={listViewItem.value}>
+                                                                        {listViewItem.label}
+                                                                    </option>
+                                                                </template>
+
+                                                            </select>
+
+                                                        </template>
+                                                        <template if:true={item.isApplication}>
+
+                                                        </template>
+                                                    </template>
+                                                </template>
+                                            </template>
+                                            <template if:true={item.isNewRow}>
+
+                                                <select class="slds-select" id={indexVar} data-row-index={indexVar}
+                                                    onchange={applicableForSelectChange} disabled={isApplication}>
+
+                                                    <option value=none selected disabled hidden>Select an option
+                                                    </option>
+                                                    <!--         <template if:false={applicant}>
+                                                        <template if:false={asset}>
+
+                                                        </template>
+                                                    </template>-->
+
+                                                    <template if:true={applicant}>
+                                                        <template for:each={applicantOption}
+                                                            for:item="listViewItem">
+                                                            <option key={listViewItem.label}
+                                                                value={listViewItem.value}>
+                                                                {listViewItem.label}
+                                                            </option>
+                                                        </template>
+                                                    </template>
+                                                    <template if:true={asset}>
+                                                        <template for:each={assetOption} for:item="listViewItem">
+                                                            <option key={listViewItem.label}
+                                                                value={listViewItem.value}>
+                                                                {listViewItem.label}
+                                                            </option>
+                                                        </template>
+                                                    </template>
+
+                                                </select>
+
+                                            </template>
+                                        </div>
+                                    </td>
+                                    <td class="slds-size_3-of-10" data-id="5">
+                                    <!--    <template if:true={item.feeList.Fetch_Premium__c}>-->
+                                        <template if:true={isApi}>
+                                            <!--div class="td-currency">₹ {item.feeList.Premium__c}</div-->
+                                            <!-- 10 jan 23: for medical requirement -->
+                                            <template if:true={medicalInsuranceReq}>
+                                                <div class="slds-form-element">
+                                                    <div class="slds-truncate"><span class="curreny-sum-insured">₹</span>
+                                                    
+                                                        <input data-id="7" label="Premium"
+                                                            class="sum-insured-field-premium editable-grid-cell" type="number" required
+                                                            pattern="^[0-9]" min="1" value={item.feeList.Premium__c}
+                                                            data-row-index={indexVar} onclick={handlePremClick}
+                                                            onchange={handlePremChange} disabled={item.feeList.Receipt_Created__c} />
+                                                        <span class="editable-grid-cell2"> &#128393;</span>
+    
+                                                        <!-- <lightning-input type="number" max-length=20 value={item.Sum_Assured__c} onchange={handleChange} label="Sum Assured" min=0 required=true></lightning-input>-->
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <template if:false={medicalInsuranceReq}>
+                                                <div class="td-currency">₹ {item.feeList.Premium__c}</div>
+                                            </template>
+                                        </template>
+                                    <!--    <template if:false={item.feeList.Fetch_Premium__c}>-->
+                                        <template if:false={isApi}>
+                                            <div class="slds-form-element">
+                                                <div class="slds-truncate"><span class="curreny-sum-insured">₹</span>
+                                                    
+                                                    <input data-id="7" label="Premium"
+                                                        class="sum-insured-field-premium editable-grid-cell" type="number" required
+                                                        pattern="^[0-9]" min="1" value={item.feeList.Premium__c}
+                                                        data-row-index={indexVar} onclick={handlePremClick}
+                                                        onchange={handlePremChange} disabled={item.feeList.Receipt_Created__c} />
+                                                    <span class="editable-grid-cell2"> &#128393;</span>
+    
+                                                    <!-- <lightning-input type="number" max-length=20 value={item.Sum_Assured__c} onchange={handleChange} label="Sum Assured" min=0 required=true></lightning-input>-->
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </td>
+                                    <td class="slds-size_3-of-10" data-id="6">
+                                        <template if:true={isApi}>
+                                            <!--div class="td-currency">₹ {item.feeList.Tax_Amount__c}</div-->
+                                            <!-- 10 jan 23: for medical requirement -->
+                                            <template if:true={medicalInsuranceReq}>
+                                                <div class="slds-form-element">
+                                                    <div class="slds-truncate"><span class="curreny-sum-insured">₹</span>
+                                                    
+                                                        <input data-id="7" label="Tax Amount"
+                                                            class="sum-insured-field-premium editable-grid-cell" type="number" required
+                                                            pattern="^[0-9]" min="1" value={item.feeList.Tax_Amount__c}
+                                                            data-row-index={indexVar} onclick={handleTaxClick}
+                                                            onchange={handleTaxChange} disabled={item.feeList.Receipt_Created__c} />
+                                                        <span class="editable-grid-cell2"> &#128393;</span>
+    
+                                                        <!-- <lightning-input type="number" max-length=20 value={item.Sum_Assured__c} onchange={handleChange} label="Sum Assured" min=0 required=true></lightning-input>-->
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <template if:false={medicalInsuranceReq}>
+                                                <div class="td-currency">₹ {item.feeList.Tax_Amount__c}</div>
+                                            </template>
+                                        </template>
+                                        <template if:false={isApi}>
+                                            <div class="slds-form-element">
+                                                <div class="slds-truncate"><span class="curreny-sum-insured">₹</span>
+                                                    
+                                                    <input data-id="7" label="Tax Amount"
+                                                        class="sum-insured-field-premium editable-grid-cell" type="number" required
+                                                        pattern="^[0-9]" min="1" value={item.feeList.Tax_Amount__c}
+                                                        data-row-index={indexVar} onclick={handleTaxClick}
+                                                        onchange={handleTaxChange} disabled={item.feeList.Receipt_Created__c} />
+                                                    <span class="editable-grid-cell2"> &#128393;</span>
+    
+                                                    <!-- <lightning-input type="number" max-length=20 value={item.Sum_Assured__c} onchange={handleChange} label="Sum Assured" min=0 required=true></lightning-input>-->
+                                                </div>
+                                            </div>
+                                        </template>
+                                        
+
+                                    </td>
+                                    <td class="slds-size_3-of-10" data-id="7">
+                                        <div class="td-currency">₹ {item.feeList.Total_Fee__c}</div>
+                                    </td>
+                                  
+                                    <td class="slds-size_3-of-10" data-id="10">
+                                        <div class="slds-form-element">
+                                            <div class="slds-truncate"><span class="curreny-sum-insured">₹</span>
+
+                                                <input data-id="7" label="Sum Assured"
+                                                    class="sum-insured-field editable-grid-cell" type="number" required
+                                                    pattern="^[0-9]" min="1" value={item.feeList.Sum_Assured__c}
+                                                    data-row-index={indexVar} onclick={handleSumAssClick}
+                                                    onchange={handleSumAssuredChange} disabled={item.feeList.Receipt_Created__c} />
+                                                <span class="editable-grid-cell2"> &#128393;</span>
+
+                                                <!-- <lightning-input type="number" max-length=20 value={item.Sum_Assured__c} onchange={handleChange} label="Sum Assured" min=0 required=true></lightning-input>-->
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="slds-size_3-of-10" data-id="11" style="width:auto">
+                                        <div class="td-repayment">
+                                            <!--{item.Repayment_Type__c}-->
+
+                                            <select class="slds-select" id={indexVar} data-row-index={indexVar}
+                                                onchange={handleGetSelectedValue} disabled={item.feeList.Receipt_Created__c}>
+                                                <template if:true={item.feeList.Repayment_Type_2__c}>
+                                                    <option value={item.feeList.Repayment_Type_2__c} selected disabled hidden>
+                                                        {item.feeList.Repayment_Type_2__c}</option>
+                                                </template>
+                                                <template if:false={item.feeList.Repayment_Type_2__c}>
+                                                    <option value=none selected disabled hidden>Select an option
+                                                    </option>
+                                                </template>
+                                                <template for:each={item.repaymentDetail} for:item="listViewItem">
+                                                    <option key={listViewItem.key} value={listViewItem.key}>
+                                                        {listViewItem.value}</option>
+                                                </template>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td class="slds-size_1-of-10" data-id="12">
+
+                                        <!-- <lightning-button label="Fetch Premium"
+                                        title="Fetch Premium" onclick={handleClick}
+                                        class="fetch-btn" slot="action">
+                                    </lightning-button> -->
+                                    <template if:false={item.isChange}>
+                                        <button class="fetch-btn" data-row-index={indexVar} onclick={handleClick}
+                                            disabled={item.feeList.Receipt_Created__c}>Fetch
+                                            Premium</button>
+                                    </template>
+                                    <template if:true={item.isChange}>
+                                        <button class="save-btn" data-row-index={indexVar} onclick={handleSave}
+                                            disabled={item.feeList.Receipt_Created__c}>Save</button>
+                                    </template>
+                                    </td>
+                                    <td class="slds-size_1-of-10" data-id="12">
+
+                                        
+                                        <!--<button class="save-btn" name={indexVar} data-row-index={indexVar} onclick={testclick}
+                                            disabled={item.feeList.Receipt_Created__c} id={indexVar}>
+                                            
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="slds-button__icon" aria-hidden="true" viewBox="0 0 52 52" data-key="delete" focusable="false">
+                                                <g>
+                                                <path  d="M45.5 10H33V6c0-2.2-1.8-4-4-4h-6c-2.2 0-4 1.8-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5zM23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6V7zM41.5 20h-31c-.8 0-1.5.7-1.5 1.5V45c0 2.8 2.2 5 5 5h24c2.8 0 5-2.2 5-5V21.5c0-.8-.7-1.5-1.5-1.5zM23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v14zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v1" /></g>
+                                            </svg>
+                                        </button>-->
+                                        <lightning-button-icon data-row-index={indexVar} size="medium" name={indexVar} icon-name="utility:delete" alternative-text="Delete" title="Delete" onclick={handleDelete} disabled={item.feeList.Receipt_Created__c}></lightning-button-icon>
+                                    </td>
+<!--to change position of add button-->
+                             <!--      <td class="slds-size_1-of-10" data-id="9" if:true={data.length}>
+                                        <button class="addbutton slds-button slds-button_icon slds-button_icon-brand"
+                                            name='add' data-row-index={indexVar} onclick={createFeeCreationRecordRow}
+                                            disabled={isnewRow}>
+                                            <svg class="slds-button__icon" focusable="false" data-key="add"
+                                                aria-hidden="true" viewBox="0 0 52 52">
+                                                <g>
+                                                    <path
+                                                        d="M30 29h16.5c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5H30c-.6 0-1-.4-1-1V5.5c0-.8-.7-1.5-1.5-1.5h-3c-.8 0-1.5.7-1.5 1.5V22c0 .6-.4 1-1 1H5.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5H22c.6 0 1 .4 1 1v16.5c0 .8.7 1.5 1.5 1.5h3c.8 0 1.5-.7 1.5-1.5V30c0-.6.4-1 1-1z">
+                                                    </path>
+                                                </g>
+                                            </svg>
+                                        </button>
+                                    </td>--> 
+
+                                </tr>
+
+
+                            </template>
+                        </template>
+                        <template if:false={isData}>
+                            <tr>
+                                <td colspan="10">
+                                    <div align="center">No Insurance Fee to display</div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+
+                    </table>
+                </template>
+                <template if:false={data}>
+                    No records to display
+                </template>
+            </div>
+        </lightning-card>
+    </div>
+</template>
+</template>

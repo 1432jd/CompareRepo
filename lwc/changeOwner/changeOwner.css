@@ -1,0 +1,9 @@
+.uiModal--medium .modal-container{
+ min-width: 20rem !important;
+ max-width: 20rem !important;
+ width: 20rem !important;
+}
+input[readonly]
+{
+    text-indent:1.2em;
+}

@@ -1,0 +1,964 @@
+<template>
+	<lightning-spinner alternative-text="Loading" size="small" if:true={financialSpinner}></lightning-spinner>
+	<lightning-tabset variant="scoped" active-tab-value={tabName}>
+		<template if:true={topUpSection}>
+			<lightning-tab label="Topup Details" value="Topup_Details" onactive={handleTabActivation}>
+				<template if:true={applicationId}>
+					<c-fs-topup-details application-id={applicationId} show-topup-details={isTopupDetails}
+						source={sectiontitle} onrefreshfinancialcalculation={refreshData}>
+					</c-fs-topup-details>
+				</template>
+			</lightning-tab>
+			<lightning-tab label="Collateral details" title="2nd tab extended title" value="Collateral details"
+				onactive={handleTabActivation}>
+				<template if:true={applicationId}>
+					<c-fs-topup-details application-id={applicationId} show-collateral-details={isCollateraldetails}
+						source={sectiontitle}>
+					</c-fs-topup-details>
+				</template>
+			</lightning-tab>
+			<lightning-tab label="Old loan details" title="2nd tab extended title" value="Old loan details"
+				onactive={handleTabActivation}>
+				<template if:true={applicationId}>
+					<c-fs-topup-details application-id={applicationId} show-old-loan-details={isOldloandetails}
+						source={sectiontitle}>
+					</c-fs-topup-details>
+				</template>
+			</lightning-tab>
+		</template>
+		<lightning-tab label="Application details" title="2nd tab extended title" value="Application_details"
+			onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isApplicationdetails} onsubmit={handleApplicationSubmit}
+				id="appdetail">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Loan_Type__c" value={loanType} disabled="true"
+							variant="label-stacked">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Product_Type__c" value="LAP" variant="label-stacked"
+							disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Customer_Type_PcAc__c" value={customerType}
+							variant="label-stacked" disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required" >*</abbr>
+										Loan Purpose 1
+							</label>
+						<lightning-input-field field-name="Loan_Purpose_1__c" value={loanPuropse} variant="label-hidden"
+							onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Loan Purpose 2
+							</label>
+						<lightning-input-field field-name="Loan_Purpose_2__c" variant="label-hidden"
+							onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Customer_Segment__c" value={maxSegmentIncome} disabled="true"
+							variant="label-stacked" onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Customer_Sub_Segment__c" value={maxSubSegmentIncome}
+							disabled="true" variant="label-stacked" onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Income_Segment_1__c" value={secondMaxSegmentIncome}
+							disabled="true" variant="label-stacked" onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Income_Sub_Segment__c" value={secondMaxSubSegmentIncome}
+							disabled="true" variant="label-stacked" onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="appdetail-btn3">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+
+		<lightning-tab label="Loan details" title="2nd tab extended title" value="Loan details"
+			onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isLoandetails} onsubmit={handleApplicationSubmit}
+				id="loandetail">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Balance Transfer
+						</label>
+						<lightning-input-field field-name="Balance_Transfer__c" variant="label-hidden"
+							onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<template if:true={balanceTransferAmountShow}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="2">
+							<label class="slds-form-element__label">
+										<abbr if:true={balanceTransferAmountShow} class="slds-required">*</abbr>
+										Balance Transfer Amount
+								</label>
+							<lightning-input type="number" step="1" onchange={handleChange} formatter="currency"
+								variant="label-hidden" name="Balance_Transfer_Amount__c" value={btAmount}
+								message-when-range-overflow="Maximum 10 digits are allowed." max="9999999999">
+							</lightning-input>
+							<lightning-input-field field-name="Balance_Transfer_Amount__c" variant="label-hidden"
+								value={btAmount} style="display:none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Tranche Disbursal
+								</label>
+						<lightning-combobox name="Tranche_Disbursal__c" label="Tranche Disbursal" options={disbOptions}
+							onchange={handleChange} value={trancheDisb} variant="label-hidden">
+						</lightning-combobox>
+						<lightning-input-field field-name="Tranche_Disbursal__c" variant="label-stacked"
+							onchange={handleChange} value={trancheDisb} required style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Tenor(In Months)
+								</label>
+						<lightning-input-field field-name="Tenor_In_Months__c" variant="label-hidden"
+							onchange={handleChange} value={tenorValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Customer Communicated Rate(%)
+								</label>
+						<lightning-input-field field-name="Customer_Communicated__c" value={roiRate}
+							variant="label-hidden" onchange={handleChange} disabled={isRoiDisabled}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Margin ROI(%)
+							</label>
+						<lightning-input-field field-name="Margin_ROI__c" onchange={handleChange}
+							variant="label-hidden">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input-field field-name="Total_ROI_percent__c" value={totalROI}
+							variant="label-stacked" onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Number Of Advance EMI
+							</label>
+						<lightning-input-field field-name="Number_of_advance_EMI__c" variant="label-hidden"
+							value={advanceEmi} onchange={handleChange} class="advanceEmi" required>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Effective IRR
+							</label>
+						<lightning-input-field field-name="Effective_IRR__c" variant="label-hidden" value={effIrr}
+							disabled={iseffIrrDisabled} onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+										<abbr class="slds-required">*</abbr>
+										Risk Document
+							</label>
+						<lightning-input-field field-name="Risk_Document__c" variant="label-hidden" value={riskdoc}
+							onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input type="number" step="1" onchange={handleChange} formatter="currency"
+							variant="label-stacked" name="Guarantor_Networth_Choosen__c" value={gNetworth}
+							label="Guarantor Networth">
+						</lightning-input>
+						<lightning-input-field field-name="Guarantor_Networth_Choosen__c" variant="label-stacked"
+							value={gNetworth} style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="loandetail-btn">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+
+		<!------------------------------------ Tranche Tab----------------------------------->
+		<template if:true={Tranche}>
+			<lightning-tab label="Tranche" title="2nd tab extended title" value="Tranche"
+				onactive={handleTabActivation}>
+
+				<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+					onsuccess={handleApplicationSuccess} onsubmit={handleApplicationSubmit} id="Tranche">
+					<lightning-layout multiple-rows>
+						<template if:true={isTrancheI}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label">
+								<abbr  class="slds-required">*</abbr>
+									{netIncomeLabel}
+							</label>
+								<lightning-input type="number" step="1" formatter="currency" variant="label-hidden"
+									name="Total_net_income_after_2nd_tranche__c" value={totalIncome}
+									onchange={handleChange} label="Total_net_income_after_2nd_tranche__c">
+								</lightning-input>
+								<lightning-input-field field-name="Total_net_income_after_2nd_tranche__c"
+									style="display:none" onchange={handleChange} value={totalIncome}
+									variant="label-hidden">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label">
+								<abbr if:true={netIncomeRemarks} class="slds-required">*</abbr>
+									Reason for change in net income for subsequent Tranche
+							</label>
+								<lightning-input-field field-name="Reason_for_change_in_net_income__c"
+									variant="label-hidden" value={incomeReason} onchange={handleChange}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label">
+								<abbr if:true={netIncomeRemarks} class="slds-required">*</abbr>
+									Remarks
+							</label>
+								<lightning-input-field field-name="Remarks_change_in_net_income__c"
+									onchange={handleChange} variant="label-hidden">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									{colValueLabel}
+							</label>
+								<lightning-input type="number" step="1" formatter="currency" variant="label-hidden"
+									name="Final_Collateral_value_for_Tranche_2__c" value={finalCollateralValue}
+									onchange={handleChange} label="Final_Collateral_value_for_Tranche_2__c">
+								</lightning-input>
+								<lightning-input-field field-name="Final_Collateral_value_for_Tranche_2__c"
+									style="display:none;" variant="label-hidden" value={finalCollateralValue}
+									onchange={handleChange}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label">
+								<abbr if:true={colRequired} class="slds-required">*</abbr>
+									Reason for change in collateral Value for subsequent Tranche
+							</label>
+								<lightning-input-field field-name="Reason_for_change_in_collateral_value__c"
+									variant="label-hidden" value={collateralReason} onchange={handleChange}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label">
+								<abbr if:true={colRequired} class="slds-required">*</abbr>
+									Remarks
+							</label>
+								<lightning-input-field field-name="Remarks_for_change_in_collateral_value__c"
+									variant="label-hidden" onchange={handleChange}>
+								</lightning-input-field>
+							</lightning-layout-item>
+						</template>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+								<abbr  class="slds-required">*</abbr>
+									Tranche 1 Loan Amount
+							</label>
+							<lightning-input type="number" step="1" formatter="currency" variant="label-hidden"
+								name="Tranche_1__c" onchange={handleChange} value={tranche1} data-id="t1"
+								label="Tranche 1" disabled={isTrancheII}>
+							</lightning-input>
+							<lightning-input-field field-name="Tranche_1__c" onchange={handleChange} value={tranche1}
+								data-id="t1" variant="label-stacked" disabled={isTrancheII} style="display:none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+								name="Insurance_Premium_Tranche_1__c" value={insuranceamounttranche1}
+								label="Insurance Premium" disabled="true">
+							</lightning-input>
+							<lightning-input-field field-name="Insurance_Premium_Tranche_1__c" variant="label-stacked"
+								value={insuranceamounttranche1} onchange={handleChange} disabled="true"
+								style="display:none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+								name="Final_Tranche_1_Loan_Amount__c" value={totaltranche1amountValue}
+								label="Final Tranche 1 Loan Amount" disabled="true">
+							</lightning-input>
+							<lightning-input-field field-name="Final_Tranche_1_Loan_Amount__c" variant="label-stacked"
+								value={totaltranche1amountValue} style="display:none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+								<abbr  class="slds-required">*</abbr>
+									Tranche 2 Loan Amount
+							</label>
+							<lightning-input type="number" step="1" formatter="currency" variant="label-hidden"
+								name="Tranche_2__c" onchange={handleChange} value={tranche2} data-id="t2"
+								label="Tranche 2">
+							</lightning-input>
+							<lightning-input-field field-name="Tranche_2__c" onchange={handleChange} value={tranche2}
+								data-id="t2" variant="label-stacked" disabled={isTrancheI} style="display:none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+								<abbr  class="slds-required">*</abbr>
+									Total Loan Amount
+							</label>
+							<lightning-input type="number" step="1" formatter="currency" variant="label-hidden"
+								name="Total_Tranche_Income__c" onchange={handleChange} value={totalTranche} data-id="t2"
+								label="Total" disabled="true">
+							</lightning-input>
+							<lightning-input-field field-name="Total_Tranche_Income__c" value={totalTranche}
+								variant="label-stacked" class="total" style="display:none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+								name="EMI_for_Tranche_Amount_2__c" onchange={handleChange} value={emiTrancheValue}
+								label="EMI For Tranche 2" disabled="true">
+							</lightning-input>
+							<lightning-input-field field-name="EMI_for_Tranche_Amount_2__c" variant="label-stacked"
+								value={emiTrancheValue} disabled="true" style="display:none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small"
+							small-device-size={trancheRemarksSize} medium-device-size={trancheRemarksSize}
+							large-device-size={trancheRemarksSize}>
+							<lightning-input-field field-name="Tranche_Remarks__c" variant="label-stacked" required
+								onchange={handleChange}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<!-- <template if:true={isTrancheII}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="2">
+								<lightning-input label="Sanctioned Loan Amount" disabled="true" type="number"
+									value={trancheAppRecord.Loan_Amount_Sanctioned__c} formatter="currency">
+								</lightning-input>
+							</lightning-layout-item>
+						</template> -->
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<div class="slds-align_absolute-center">
+								<lightning-button variant="brand" type="submit" label="Save" id="Tranche-btn">
+								</lightning-button>
+							</div>
+						</lightning-layout-item>
+					</lightning-layout>
+				</lightning-record-edit-form>
+			</lightning-tab>
+		</template>
+
+		<!------------------------------------ Loan Amount Tab----------------------------------->
+		<lightning-tab label="Loan Amount" title="2nd tab extended title" value="Loan Amount"
+			onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isLoanAmount} onsubmit={handleApplicationSubmit}
+				id="LoanAmount">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Amount Sanctioned
+							</label>
+						<lightning-input type="number" step="1" onchange={handleChange} formatter="currency"
+							variant="label-hidden" name="Amount_Recommended__c" value={amountrecomended}
+							disabled={amountDisabled} message-when-range-overflow="Maximum 8 digits are allowed."
+							max="99999999">
+						</lightning-input>
+						<lightning-input-field field-name="Amount_Recommended__c" variant="label-hidden"
+							disabled={amountDisabled} value={amountrecomended} onchange={handleChange}
+							style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+							name="Insurance_Premium__c" onchange={handleChange} value={insuranceamount}
+							label="Insurance Premium" disabled="true">
+						</lightning-input>
+						<lightning-input-field field-name="Insurance_Premium__c" variant="label-stacked"
+							value={insuranceamount} onchange={handleChange} disabled="true" style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+									Final Sanctioned Amount	
+							</label>
+						<lightning-input type="number" step="1" formatter="currency" variant="label-hidden"
+							name="Total_Amount_Recommended_PcAc__c" value={totalamountValue}
+							label="Total Amount Recommended" disabled="true" onchange={handleChange}>
+						</lightning-input>
+						<lightning-input-field field-name="Total_Amount_Recommended_PcAc__c" variant="label-stacked"
+							value={totalamountValue} style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+							name="Group_Total_Exposure_PcAc__c" value={groupTotalExposure} label="Group Total Exposure"
+							disabled="true">
+						</lightning-input>
+						<lightning-input-field field-name="Group_Total_Exposure_PcAc__c" variant="label-stacked"
+							value={groupTotalExposure} disabled="true" style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input-field field-name="Group_Valuation__c" variant="label-stacked"
+							value={grpValuation} disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="loanamt-btn8">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+
+
+
+		<!------------------------------------ Insurance Party Tab----------------------------------->
+		<lightning-tab label="Insurance party" title="2nd tab extended title" value="Insurance party"
+			onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isInsuranceparty} onsubmit={handleInsuranceSubmit}
+				id="insurance6">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Name of Insured
+							</label>
+						<lightning-combobox name="Name__c" options={nomineeOptions} variant="label-hidden"
+							onchange={handleCustomerSelection} value={insuredName} class="insurance">
+						</lightning-combobox>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3" style="display:none;">
+						<lightning-input-field field-name="Name__c" value={insuredPersonName} variant="label-stacked"
+							onchange={handleChange}>
+						</lightning-input-field>
+						<lightning-input-field field-name="Insured_Person__c" value={insurePersonId}
+							variant="label-stacked">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Nominee Party Part Of Agmt
+							</label>
+						<lightning-input-field field-name="Nominee__c" variant="label-hidden" onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<template if:true={fakeNominee}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Nominee party
+							</label>
+							<lightning-combobox name="Nominee_Party__c" options={nomineeOptions} variant="label-hidden"
+								onchange={handleCustomerSelection} value={nomineeValue} class="fakeNominee"
+								data-type="combobox">
+							</lightning-combobox>
+							<lightning-input-field field-name="Nominee_Party__c" value={nomineePersonName}
+								variant="label-hidden" style="display:none">
+							</lightning-input-field>
+							<lightning-input-field style="display:none" field-name="NomineeName__c"
+								value={nomineePersonId} variant="label-stacked">
+							</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+					<template if:true={shownominee}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Nominee party
+							</label>
+							<lightning-input label="Nominee Party" name="Nominee_Party__c" value={nomineePersonName}
+								onchange={handleChange} class="shownominee" variant="label-hidden" data-type="input">
+							</lightning-input>
+							<lightning-input-field field-name="Nominee_Party__c" value={nomineePersonName}
+								variant="label-hidden" style="display:none">
+							</lightning-input-field>
+							<lightning-input-field style="display:none" field-name="NomineeName__c"
+								value={nomineePersonId} variant="label-stacked">
+							</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Nominee Relationship Type
+							</label>
+						<lightning-input-field field-name="Nominee_Relationship_Type__c" onchange={handleChange}
+							variant="label-hidden">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Nominee Relationship with Insured Person
+							</label>
+						<lightning-combobox name="Nominee_Party_Relationship_with_Insured__c" variant="label-hidden"
+							label="Nominee Relationship with Insured Person" options={relationshipOptions}
+							onchange={handleChange} value={relationshipValue}>
+						</lightning-combobox>
+						<lightning-input-field field-name="Nominee_Party_Relationship_with_Insured__c"
+							value={relationshipValue} variant="label-hidden" style="display:none">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Insurance Requirement
+							</label>
+						<lightning-combobox name="Insurance_Requirement__c" label="Insurance Requirement"
+							options={insuranceReqOptions} onchange={handleChange} value={insurancereq}
+							variant="label-hidden">
+						</lightning-combobox>
+						<lightning-input-field field-name="Insurance_Requirement__c" variant="label-hidden"
+							value={insurancereq} style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<!-- <lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Insurance Medical Test Result
+							</label>
+						<lightning-combobox name="Insurance_Medical_Test_Result__c"
+							label="Insurance Medical Test Result" options={insurancemedicalOptions}
+							onchange={handleChange} value={insurancemedicalValue} variant="label-hidden">
+						</lightning-combobox>
+						<lightning-input-field field-name="Insurance_Medical_Test_Result__c" variant="label-hidden"
+							value={insurancemedicalValue} style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item> -->
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="neighbour-btn6">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+
+		<!------------------------------------ Disbursement Detail Tab----------------------------------->
+		<lightning-tab label="Disbursement/Repayment detail" title="2nd tab extended title"
+			value="Disbursement/Repayment detail" onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isDisbursementdetail} onsubmit={handleApplicationSubmit}
+				id="Disbursement7">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+								Nach Party
+							</label>
+						<lightning-combobox name="Nach_Party__c" options={customerOptions} value={nachpartyId1}
+							onchange={handleCustomerSelection} class="nach1" variant="label-hidden">
+						</lightning-combobox>
+						<lightning-input-field field-name="Nach_Party__c" value={nachpartyvalue} variant="label-hidden"
+							style="display:none;">
+						</lightning-input-field>
+						<lightning-input-field field-name="NACH_Party_1_ID__c" value={nachpartyId1}
+							variant="label-stacked" style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Nach Party 2
+							</label>
+						<lightning-combobox name="Nach_Party_2__c" options={customerOptions} variant="label-hidden"
+							value={nachpartyId2} onchange={handleCustomerSelection} class="nach2">
+						</lightning-combobox>
+						<lightning-input-field field-name="Nach_Party_2__c" value={nachpartyvalue2}
+							variant="label-hidden" style="display:none;">
+						</lightning-input-field>
+						<lightning-input-field field-name="NACH_Party_2_ID__c" value={nachpartyId2}
+							variant="label-hidden" style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+						medium-device-size="3" large-device-size="2">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Disbursement Party
+							</label>
+						<lightning-input-field field-name="Disbursement_party__c" variant="label-hidden"
+							onchange={handleCustomerSelection}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<template if:true={showdisbursement}>
+							<label class="slds-form-element__label">
+								<abbr if:true={showdisbursement} class="slds-required">*</abbr>
+									Disbursement Party Name
+							</label>
+							<lightning-combobox name="Disbursement_Party_Name__c" variant="label-hidden"
+								options={customerOptions} value={disbursementpartyId}
+								onchange={handleCustomerSelection}>
+							</lightning-combobox>
+						</template>
+						<template if:true={showThirdPartyName}>
+							<label class="slds-form-element__label">
+								<abbr if:true={showThirdPartyName} class="slds-required">*</abbr>
+									Third Party Name
+							</label>
+							<lightning-input-field field-name="Third_Party_Name__c" onchange={handleChange}
+								variant="label-hidden">
+							</lightning-input-field>
+						</template>
+						<lightning-input-field field-name="Disbursement_Party_Name__c" variant="label-stacked"
+							value={disbursementpartyvalue} style="display:none;">
+						</lightning-input-field>
+						<lightning-input-field field-name="Disbursement_party_Id__c" variant="label-stacked"
+							value={disbursementpartyId} style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="Disbursement-btn7">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+
+		<!------------------------------------ Eligibility Calculations Tab----------------------------------->
+		<lightning-tab label="Eligibility Calculations" title="2nd tab extended title" value="Eligibility Calculations"
+			onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isEligibilityCalculations}
+				onsubmit={handleApplicationSubmit} id="Elg9">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+							name="Total_Net_Income__c" value={netIncome} label="Total Net Income(₹)" disabled="true">
+						</lightning-input>
+						<lightning-input-field field-name="Total_Net_Income__c" value={netIncome}
+							variant="label-stacked" disabled="true" style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3" if:true={showEmi}>
+						<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+							name="Total_net_income_after_2nd_tranche__c" value={tranchenetIncome}
+							label="Total_net_income_after_2nd_tranche__c(₹)" disabled="true">
+						</lightning-input>
+						<lightning-input-field field-name="Total_net_income_after_2nd_tranche__c"
+							value={tranchenetIncome} disabled="true" variant="label-stacked" style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+							name="Mortgage_property_Collateral_Value__c" value={collateralValue}
+							label="Mortgage property Collateral Value(₹)" disabled="true">
+						</lightning-input>
+						<lightning-input-field field-name="Mortgage_property_Collateral_Value__c"
+							value={collateralValue} variant="label-stacked" disabled="true" style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3" if:true={showEmi}>
+						<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+							name="Mortgage_property_after_tranche2__c" value={tranchecollateralValue}
+							label="Mortgage property after tranche2(₹)" disabled="true">
+						</lightning-input>
+						<lightning-input-field field-name="Mortgage_property_after_tranche2__c"
+							value={tranchecollateralValue} variant="label-stacked" disabled="true"
+							style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input type="number" step="1" formatter="currency" variant="label-stacked"
+							name="Emi_PcAc__c" value={emiValue} label="EMI" disabled="true">
+						</lightning-input>
+						<lightning-input-field field-name="Emi_PcAc__c" variant="label-stacked" value={emiValue}
+							disabled="true" style="display:none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Transaction_LTV__c" variant="label-stacked" value={tarnscLTV}
+							disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Transaction_DBR__c" variant="label-stacked" value={transcDBR}
+							disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="DBR_PC__c" variant="label-stacked" value={combinedDBR}
+							disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<lightning-input-field field-name="Combined_LTV__c" variant="label-stacked" value={combinedLTV}
+							disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="eligibility-btn9">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+
+		<!------------------------------------ Risk Rating Tab----------------------------------->
+		<lightning-tab label="Risk Rating" title="2nd tab extended title" value="Risk Rating"
+			onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isRiskRating} onsubmit={handleApplicationSubmit}
+				id="riskRating">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input-field field-name="Borrower_s_Risk_Rating__c" variant="label-stacked"
+							value={brRating} disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input-field field-name="LTV_PCAC__c" variant="label-stacked" value={lTVScore}
+							disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input-field field-name="DBR_PC_AC__c" variant="label-stacked" value={DBRScore}
+							disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input type="text" variant="standard" name="HM__c" label="HM" value={HMScore}
+							pattern="[0-9]{0,3}|[NA|Na|na|nA]{2}" onchange={handleChange}
+							message-when-pattern-mismatch="Only NA or numeric values are allowed.">
+						</lightning-input>
+						<lightning-input-field field-name="HM__c" variant="label-stacked" value={HMScore}
+							onchange={handleChange} style="display:none">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input-field field-name="Living_style__c" variant="label-stacked"
+							value={livingStyleScore} disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<lightning-input-field field-name="Neighbour_feedback__c" variant="label-stacked"
+							value={neighbourFeedBackScore} disabled="true">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="2">
+						<label class="slds-form-element__label">
+								<abbr  class="slds-required">*</abbr>
+									KYC Risk Rating
+							</label>
+						<lightning-input-field field-name="KYC_Risk_Rating__c" variant="label-hidden"
+							onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="riskRating-btn10">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+
+		<!--------------------- Others Tab-------------------->
+		<lightning-tab label="Others" title="2nd tab extended title" value="Others" onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isOthers} onsubmit={handleApplicationSubmit} id="other">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Discussion Done With
+							</label>
+						<lightning-input-field field-name="Discussion_done_with__c" variant="label-hidden"
+							onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>
+									Supervisor recommendation
+							</label>
+						<lightning-input-field field-name="Supervisor_recommendation__c" variant="label-hidden"
+							onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<template if:true={showSupervisor}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<lightning-input-field style="display:none;" field-name="Supervisor_Name__c" value={fieldOfficerEMPId} required>
+							</lightning-input-field>
+							<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Supervisor Name</label>
+							<c-l-w-c-lookup object-api-name="HRMS__c" field-api-name="Name"
+								sub-field-api-name="Employee_Number__c" object-label="Officer" variant="label-hidden"
+								onselect={handleSelectedEMPId} seleted-record-id={fieldOfficerEMPId}
+								application-id={applicationId} criteria="SUP_EMP" required>
+							</c-l-w-c-lookup>							
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+													<abbr class="slds-required">*</abbr>
+														Increased amount
+												</label>
+							<lightning-input-field field-name="Increased_amount__c" variant="label-hidden"
+								onchange={handleChange}>
+							</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="other-btn">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+
+		<!--------------------- Executive Summary Tab-------------------->
+		<lightning-tab label="Executive Summary" title="2nd tab extended title" value="Executive Summary"
+			onactive={handleTabActivation}>
+			<lightning-record-edit-form object-api-name="Application__c" record-id={applicationId}
+				onsuccess={handleApplicationSuccess} if:true={isExecutiveSummary} onsubmit={handleApplicationSubmit}
+				id="ExSummary">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<label class="slds-form-element__label">
+								<abbr  class="slds-required">*</abbr>
+									Comment/Remarks
+							</label>
+						<lightning-input-field field-name="Comment_Remarks__c" variant="label-hidden"
+							onchange={handleChange}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<div class="slds-align_absolute-center">
+							<lightning-button variant="brand" type="submit" label="Save" id="ExSummary-btn12">
+							</lightning-button>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</lightning-record-edit-form>
+		</lightning-tab>
+	</lightning-tabset>
+</template>

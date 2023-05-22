@@ -1,0 +1,47 @@
+<!--
+  @author            : Karan Singh Soni
+  @group             : TechMatrix Consulting
+  @description       : Parent Component - fiv_Disb_Lwc
+  @created on        : 20-07-2022
+  @last modified on  : 29-09-2022
+  @last modified by  : Karan Singh Soni
+-->
+<template>
+    <lightning-spinner alternative-text="Loading" size="small" if:true={showLoader}></lightning-spinner>
+
+    <template if:true={arrLoanAppCkyc}>
+        <lightning-layout multiple-rows="true">
+            <template for:each={arrLoanAppCkyc} for:item="objLoanCkyc" for:index="index">
+
+                <lightning-layout-item padding="around-small" size="12" small-device-size="12" medium-device-size="6"
+                    large-device-size="3" key={objLoanCkyc.Id}>
+                    <lightning-input name={objLoanCkyc.label} type="text" label={objLoanCkyc.label} data-index={index}
+                        data-field='disbCkyc' value={objLoanCkyc.disbCkyc} onchange={handleInputChanges}>
+                    </lightning-input>
+                </lightning-layout-item>
+
+            </template>
+        </lightning-layout>
+        <div class="slds-align_absolute-center slds-m-around_x-small slds-p-bottom_large">
+
+            <lightning-button variant="brand" label="Save" title="Cancel" data-id="saveBtn" onclick={handleSave}
+                disabled={disableSaveEditBtn}>
+            </lightning-button>
+        </div>
+    </template>
+    <!--=====================================================================-->
+    <template if:false={arrLoanAppCkyc}>
+
+        <p class="slds-text-align_center" style="color: red;"> No Loan Applicant found for this Application </p>
+    </template>
+    <!--29/09/2022 CH : commented
+    <div class="slds-box slds-box_xx-small" if:true={objCKYCDetails}>
+        <c-generic-edit-pages-l-w-c fields-content={objCKYCDetails} onchanged={handleFieldChanges}>
+        </c-generic-edit-pages-l-w-c>
+        <div class="slds-align_absolute-center slds-m-around_x-small slds-p-bottom_large">
+            <lightning-button variant="brand" label="Save" title="Sace" onclick={handleSave}>
+            </lightning-button>
+        </div>
+    </div>
+    -->
+</template>

@@ -1,0 +1,62 @@
+<template>
+	<template if:true={isSpinner}>
+		<lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+	</template>
+	<template if:true={showPendingReason}>
+		<section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-modal="true">
+			<div class="slds-modal__container">
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-05" class="slds-modal__title slds-hyphenate">Pending Reason</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-5">
+					<c-fs-pending-reason-grid if:true={recordId} stage-name="Part Disbursal DE"
+						application-id={recordId}></c-fs-pending-reason-grid>
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-button variant="netural" label="Cancel" title="Cancel"
+						onclick={showHidePendingReasonGrid} class="slds-m-left_x-small"></lightning-button>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+	<!--PAGE HEADER-->
+	<c-fs-page-container-l-w-c if:true={lastLoginDate} headericon="standard:action_list_component"
+		stagename="Part Disbursment DE" appno={applicationName} businessdate={todaysDate} lastlogindate={lastLoginDate}
+		btns={button} onrowselectionevent={rowselectionevent}>
+	</c-fs-page-container-l-w-c>
+	<!--PAGE HEADER-->
+
+	<lightning-tabset variant="scoped" active-tab-value={tabName}>
+		<lightning-tab label="Data Entry" value="DataEntry" onactive={handleActive}>
+			<lightning-record-edit-form object-api-name={objectApiName} record-id={recordId} onsuccess={handleRevisitSuccess}>
+				<lightning-input-field field-name="Disbursal_Type__c" value={disbursalType} onchange={handleInputChange}
+					required> </lightning-input-field>
+				<lightning-input-field field-name="Part_Disbursal_Remarks__c" value={disbursalRemark} required
+					onchange={handleInputChange}>
+				</lightning-input-field>
+				<div class="slds-var-m-top_medium">
+					<lightning-button variant="brand" type="submit" label="Save" id="gen-btn">
+					</lightning-button>
+				</div>
+			</lightning-record-edit-form>
+		</lightning-tab>
+		<lightning-tab label="Document Upload" value="Document Upload" onactive={handleActive}>
+			<div class="slds-scrollable_y" style="max-height:400px;">
+				<c-fs-generic-document-upload-l-w-c if:true={recordId} stage-name="Part Disbursal DE"
+					application-id={recordId} onrequireddocument={handleRequiredDocument}>
+				</c-fs-generic-document-upload-l-w-c>
+			</div>
+		</lightning-tab>
+		<lightning-tab label="Error" value="Error" if:true={showErrorTab} onactive={handleActive} show-error-indicator
+			style="--sds-c-tabs-scoped-color-text-active: red">
+			<div class="slds-scrollable_y" style="max-height:400px;">
+				<ul class="slds-list_dotted">
+					<template for:each={errorMsgs} for:item="err">
+						<li key={err} class="slds-text-color_destructive">{err}</li>
+					</template>
+				</ul>
+			</div>
+		</lightning-tab>
+	</lightning-tabset>
+</template>

@@ -1,0 +1,207 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+	<lightning-card variant="Narrow" title="Search Application">
+		<lightning-layout>
+			<lightning-layout-item class="slds-size_12-of-12">
+				<!-- <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+				<h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+					<span class="slds-truncate" title="Section Title">Search Application</span>
+				</h3> -->
+				<lightning-layout multiple-rows="true">
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="2"
+						padding="around-small">
+						<lightning-input type="text" label="Application Number" placeholder="Enter Application No."
+							name="appNo" data-name="topupApp" value={topupApp} onchange={handleTopupApp}>
+						</lightning-input>
+					</lightning-layout-item>
+					<h1 style="padding-top: 40px;">--OR--</h1>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="2"
+						padding="around-small">
+						<lightning-input type="text" label="KYC Number" placeholder="Enter KYC No." value={topupKYC}
+							data-name="topupKYC" name="kyc" onchange={handleTopupKYC}>
+						</lightning-input>
+					</lightning-layout-item>
+					<h1 style="padding-top: 40px;">--OR--</h1>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="2"
+						padding="around-small">
+						<lightning-input type="text" label="Loan App Number" placeholder="Enter Loan App No."
+							value={topupLoanAcc} data-name="loanApp" name="loan app number" onchange={handleLoanApp}>
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="2"
+						padding="around-small">
+						<br>
+						<lightning-button variant="brand" label="Search" title="Search" onclick={searchAllApplication}>
+						</lightning-button>
+					</lightning-layout-item>
+				</lightning-layout>
+				<!-- </div> -->
+			</lightning-layout-item>
+		</lightning-layout>
+	</lightning-card>
+	<!-- List Of Applicants -->
+	<template if:true={hasTopup}>
+		<template if:true={isAppDataArrived}>
+			<div class="slds-m-top_small">
+			</div>
+			<lightning-card variant="Narrow" title="List Of Applications">
+				<lightning-button variant="brand" label="Next" title="Next" hidden={moveNext} onclick={handleNext}
+					slot="actions">
+				</lightning-button>
+				<div class="slds-section slds-border_right slds-border_left slds-is-open">
+					<!-- <div class="slds-theme_shade" style="border-radius: 0.25rem;">
+						<lightning-layout>
+							<lightning-layout-item class="slds-size_11-of-12" padding="around-small">
+							<h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+								<span class="slds-truncate" title="Section Title">List Of Applications</span>
+							</h3>
+						</lightning-layout-item>
+							<lightning-layout-item sclass="slds-size_1-of-12" padding="around-small">
+								<lightning-button variant="brand" label="Next" title="Next" hidden={moveNext}
+									onclick={handleNext} slo>
+								</lightning-button>
+							</lightning-layout-item>
+						</lightning-layout>
+					</div> -->
+					<!----<div aria-hidden="false" class="slds-section__content slds-p-left_small" if:true={appResult}>
+					<c-generic-data-table-l-w-c data-id="app" result={appResult} onrowselectionevent={handleRadioButton}>
+					</c-generic-data-table-l-w-c>
+					</div>--->
+					<div aria-hidden="false" class="slds-section__content slds-p-left_small slds-scrollable_x"
+						style="overflow-x: auto;" if:true={appResult}>
+						<table class="slds-table slds-table_bordered slds-table_fixed-layout slds-m-right_small"
+							role="grid" aria-label="Example advanced table as radio group"
+							style="display:inline-block;">
+							<thead>
+								<tr class="slds-line-height_reset" style="height:1.80rem;">
+									<th class="slds-text-align_right" scope="col" style="width:2.00rem;">
+										<div class="slds-truncate slds-assistive-text" id="column-group-header"
+											style="width:10rem;" title="Choose a row to select">Choose a row to select
+										</div>
+									</th>
+									<th aria-label="Application Number" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:10rem;">
+											<span class="slds-truncate" title="Aplication Number">Aplication Number</span>
+										</div>
+									</th>
+									<th aria-label="Applicant Name" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:10rem;">
+											<span class="slds-truncate" title="Applicant Name">Applicant Name</span>
+										</div>
+									</th>
+									<th aria-label="Loan Account Number" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:12rem;">
+											<span class="slds-truncate" title="Loan Account Number">Loan Account Number</span>
+										</div>
+									</th>
+									<th aria-label="Disbursed Loan Amount" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:12rem;">
+											<span class="slds-truncate" title="Disbursed Loan Amount">Disbursed Loan Amount</span>
+										</div>
+									</th>
+									<th aria-label="Disbursed Loan Amount" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:13rem;">
+											<span class="slds-truncate" title="Sanctioned Loan Amount">Sanctioned Loan Amount</span>
+										</div>
+									</th>
+									<th aria-label="Tranche Number" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:10rem;">
+											<span class="slds-truncate" title="Tranche Number">Tranche Number</span>
+										</div>
+									</th>
+									<th aria-label="Current DPD" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:8rem;">
+											<span class="slds-truncate" title="Current DPD">Current DPD</span>
+										</div>
+									</th>
+									<th aria-label="Current Outstanding" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:11rem;">
+											<span class="slds-truncate" title="Current Outstanding">Current Outstanding</span>
+										</div>
+									</th>
+									<th aria-label="Current Outstanding" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:10rem;">
+											<span class="slds-truncate" title="Stage">Stage</span>
+										</div>
+									</th>
+									<th aria-label="Current Outstanding" aria-sort="none" scope="col">
+										<div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate"
+											style="width:10rem;">
+											<span class="slds-truncate" title="Status">Status</span>
+										</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<template for:each={appResult} for:item="trancheObj">
+									<tr class="slds-hint-parent" key={trancheObj.appId}>
+										<td class="slds-text-align_right" role="gridcell"
+											style="border-collapse: collapse;">
+											<span class="slds-radio">
+											<input key={trancheObj.appId} data-app-id={trancheObj.appId} type="radio" id={trancheObj.appId} name="options" tabindex="-1" aria-labelledby="radio-button-label-01 column-group-header" onchange={handleRadioButton} />
+											<label class="slds-radio__label" for={trancheObj.appId} id={trancheObj.appId}>
+												<span class="slds-radio_faux"></span>
+											</label>
+											</span>
+										</td>
+										<td scope="row" tabindex="0" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Application Number">
+												{trancheObj.applicationNo}
+											</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Applicant Name">{trancheObj.applicantName}
+											</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Loan Account Number">{trancheObj.lan}
+											</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Disbursed Loan Amount">
+												{trancheObj.disbursedLoanAmount}</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Disbursed Loan Amount">
+												{trancheObj.sanctionedLoanAmount}</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Tranche Number">{trancheObj.trancheNumber}
+											</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Current DPD">{trancheObj.currentPDP}</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Current Outstanding">
+												{trancheObj.currentOutstanding}</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Current Outstanding">{trancheObj.stage}
+											</div>
+										</td>
+										<td role="gridcell" style="border-collapse: collapse;">
+											<div class="slds-truncate" title="Current Outstanding">{trancheObj.status}
+											</div>
+										</td>
+									</tr>
+								</template>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</lightning-card>
+		</template>
+	</template>
+</template>

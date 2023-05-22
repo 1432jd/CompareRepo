@@ -1,0 +1,149 @@
+<template>
+    <div class="slds-box slds-box_xx-small">
+		<h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+			<span class="slds-truncate" title="Section Title">Add Property</span>
+		</h3>
+        <lightning-record-edit-form object-api-name="Property__c" record-id={collateralId} onsuccess={handleSuccess}
+            onsubmit={handleSubmit}>
+            <lightning-layout multiple-rows="true">
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                    padding="around-small">
+                    <lightning-combobox name="Applicants" label="Property Owner" value={applicantValue}
+                        options={applicantTypeOption} onchange={handleApplicantChange} required="true">
+                    </lightning-combobox>
+                </lightning-layout-item>
+                <lightning-input-field field-name="Loan_Applicant__c" value={customerId} style="display: none;">
+                </lightning-input-field>
+                <lightning-input-field field-name="Login__c" value={preLogInId} style="display: none;">
+                </lightning-input-field>
+                <lightning-input-field field-name="Application__c" value={applicationId} style="display: none;">
+                </lightning-input-field>
+                <lightning-input-field field-name="RecordTypeId" value={propRecordType} style="display: none;">
+                </lightning-input-field>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                    padding="around-small">
+                    <label class="slds-form-element__label" for="unique-id-of-input"><span
+                            style="color: red;">*&nbsp;</span>Property
+                        Type</label>
+                    <lightning-input-field field-name="Property_Type__c" variant="label-hidden" data-name="reset"
+                        required="true">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                    padding="around-small">
+                    <label class="slds-form-element__label" for="unique-id-of-input"><span
+                            style="color: red;">*&nbsp;</span>Title Deed
+                        Type</label>
+                    <lightning-input-field field-name="Title_Deed_Type__c" variant="label-hidden" data-name="reset"
+                        required="true">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                    padding="around-small">
+                    <label class="slds-form-element__label" for="unique-id-of-input"><span
+                            style="color: red;">*&nbsp;</span>Title Deed
+                        Number</label>
+                    <lightning-input-field field-name="Title_Deed_Number__c" variant="label-hidden" data-name="reset"
+                        required="true">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                    padding="around-small">
+                    <label class="slds-form-element__label" for="unique-id-of-input"><span
+                            style="color: red;">*&nbsp;</span>Title Deed
+                        Date</label>
+                    <lightning-input-field field-name="Title_Deed_Date__c" variant="label-hidden" data-name="reset"
+                        required="true">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                    padding="around-small">
+                    <label class="slds-form-element__label" for="unique-id-of-input"><span
+                            style="color: red;">*&nbsp;</span>Property
+                        Address</label>
+                    <lightning-input-field field-name="Property_Address__c" variant="label-hidden" data-name="reset"
+                        required="true">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+                    padding="around-small">
+                    <label class="slds-form-element__label" for="unique-id-of-input"><span
+                            style="color: red;">*&nbsp;</span>Pincode
+                    </label>
+                    <!-- MS_Pincode__c -->
+                    <lightning-input-field field-name="MS_Pincode__c" variant="label-hidden" data-name="reset"
+                        required="true" onchange={handlePincode}>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="2"
+						padding="around-small">
+                        <!-- Taluka -->
+						<lightning-input type="text" field-name="MS_Pincode__r.Village_Locality_Name__c" variant="standard"
+							 value={taluka} disabled="true" label="Taluka">
+						</lightning-input>
+					</lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="2"
+						padding="around-small">
+                            <!-- District -->
+						<lightning-input type="text" field-name="MS_Pincode__r.DistrictName__c" variant="standard"
+							value={district} disabled="true" label="District">
+						</lightning-input>
+					</lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="2"
+						padding="around-small">
+                        <!-- City -->
+						<lightning-input type="text" field-name="MS_Pincode__r.City__c" variant="standard"
+							value={city} label="City" disabled="true">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="2"
+						padding="around-small">
+                        <!-- State -->
+						<lightning-input type="text" field-name="MS_Pincode__r.StateName__c" variant="standard"
+							value={state} disabled="true" label="State">
+						</lightning-input>
+					</lightning-layout-item>
+            </lightning-layout>
+            <div class="slds-var-m-top_medium slds-float_right">
+                <lightning-button variant="brand" type="submit" label={saveLabel}>
+                </lightning-button>
+            </div>
+            <br /><br /><br />
+        </lightning-record-edit-form>
+    </div>
+
+    <!-- List Of Property -->
+    <template if:true={isDataArrived}>
+        <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+            <h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+                <span class="slds-truncate" title="Section Title">Property List</span>
+            </h3>
+            <div aria-hidden="false" class="slds-section__content slds-p-left_small">
+                <c-generic-data-table-l-w-c data-id="property" result={data} btns={rowAction}
+                    onselected={handleSelectedRecords}></c-generic-data-table-l-w-c>
+            </div>
+        </div>
+    </template>
+
+    <!-- Delete Property Popup-->
+    <template if:true={isModalOpenDelProp}>
+        <div class="slds-modal slds-fade-in-open slds-backdrop">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" alternative-text="Close this window" size="large"
+                        variant="border-inverse" onclick={closeModal} class="slds-modal__close">
+                    </lightning-button-icon>
+                    <span>Do You Really Wants To Delete This Record?</span>
+                </div>
+                <div class="slds-modal__footer">
+                    <div class="slds-align_absolute-center">
+                        <lightning-button label="Delete" variant="destructive" onclick={selectDeleteProp}>
+                        </lightning-button> &nbsp; &nbsp;
+                        <lightning-button variant="brand-outline" type="cancel" label="Cancel" onclick={closeModal}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</template>

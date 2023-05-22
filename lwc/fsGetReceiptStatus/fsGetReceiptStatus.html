@@ -1,0 +1,14 @@
+<template>
+    <lightning-card  variant="Narrow">
+        <template if:true={showApprovalMsg}>
+        <div class="slds-text-align_center ">
+            <span  style="color:green;"><b>{status}</b></span>
+        </div>
+        </template>   
+        <template if:true={showRejectionlMsg}>
+        <div class="slds-text-align_center">
+            <span  style="color:red;"><b>{status}</b></span>
+        </div>
+        </template>    
+    </lightning-card>
+</template>

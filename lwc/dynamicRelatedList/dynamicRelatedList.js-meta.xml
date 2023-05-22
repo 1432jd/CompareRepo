@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>55.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property
+            name="metadataName"
+            type="String"
+            label="Metadata Name"
+            description="Please Specify Metadata Name."
+            default="" />
+            <property
+            name="userQuery"
+            type="String"
+            label="Query"
+            description="Please Specify Query."
+            default="" />
+            <property
+            name="title"
+            type="String"
+            label="Related List Title"
+            description="Please Specify Related List Title."
+            default="" />
+            <property
+            name="queryParameters"
+            type="String"
+            label="Query Parameters"
+            description='Please Pass Query Parameters Seperated By "|".'
+            default="" />
+            <supportedFormFactors>
+                <supportedFormFactor type="Small" />
+                <supportedFormFactor type="Large" />
+            </supportedFormFactors>
+        </targetConfig>
+        <!-- <targetConfig targets="lightning__RecordPage">
+            
+        </targetConfig> -->
+    </targetConfigs>
+</LightningComponentBundle>

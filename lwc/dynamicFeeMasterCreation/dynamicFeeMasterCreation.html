@@ -1,0 +1,97 @@
+<template>
+    <lightning-card>
+        <h3 slot="title">
+            <lightning-icon icon-name="standard:timesheet" alternative-text="Event" size="small"></lightning-icon>
+            &nbsp;&nbsp;Fee Type Master
+        </h3>
+
+        <div style="min-height: 250px; max-height: 250px; overflow: scroll;">
+            <template if:true={FeeTypeMasterList}>
+                 <lightning-datatable
+                         key-field="id"
+                         data={FeeTypeMasterList}
+                         columns={FeeTypecolumns}>
+                 </lightning-datatable>
+            </template>
+        </div>
+
+        <header class="slds-card__header slds-media slds-media_center">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="custom:custom41_120" size="small"></lightning-icon>
+            </div>
+            <div class="slds-media__body slds-card__header-title slds-text-title_bold" style="font-size: 14px">
+                Fee Value Master
+            </div>
+        </header>
+
+        <div style="max-height: 250px; overflow: scroll; padding-bottom: 30px;">
+            <template if:true={FeeValueMasterList}>
+                 <lightning-datatable
+                         key-field="id"
+                         data={FeeValueMasterList}
+                         columns={FeeValuecolumns}>
+                 </lightning-datatable>
+            </template>
+        </div>
+
+        
+
+        <div class="slds-card" style="font-family: 'Open Sans', sans-serif">
+
+            <header class="slds-card__header slds-media slds-media_center">
+                <div class="slds-media__figure">
+                    <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+                </div>
+                <div class="slds-media__body slds-card__header-title slds-text-title_bold" style="font-size: 14px">
+                    Fee Value Creation
+                </div>
+            </header>
+    
+            <table class="slds-table slds-table_bordered slds-no-row-hover slds-table_cell-buffer" role="grid">
+                <thead>
+                <tr>
+                    <th scope="col" height="22" style="width: 3rem">Nr.</th>
+                    <th scope="col" height="22">Name</th>
+                    <th scope="col" height="22">Website</th>
+                    <th scope="col" height="22">Phone</th>
+                    <th scope="col" height="22" style="width: 3rem"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <template for:each={listOfFeeValueMasters} for:item="objFeeValue">
+                    <tr key={objFeeValue} class="slds-hint-parent">
+                        <td style="font-weight: bold">
+                            <lightning-formatted-number value={objFeeValue.index}></lightning-formatted-number>.
+                        </td>
+    
+                        <td>
+                            <lightning-input type="text" variant="label-hidden" label="" data-id={objFeeValue.index} name="Name" value={objFeeValue.Name} onchange={handleInputChange}></lightning-input>
+                        </td>
+    
+                        <td>
+                            <lightning-input type="text" variant="label-hidden" label="" data-id={objFeeValue.index} name="Website" value={objFeeValue.Website} onchange={handleInputChange}></lightning-input>
+                        </td>
+    
+                        <td>
+                            <lightning-input type="text" variant="label-hidden" label="" data-id={objFeeValue.index} name="Phone" value={objFeeValue.Phone} onchange={handleInputChange}></lightning-input>
+                        </td>
+    
+                        <td>
+                            <lightning-button-icon icon-name="utility:delete" alternative-text="Remove" title="Remove" name={objFeeValue.index} onclick={removeRow}></lightning-button-icon>
+                        </td>
+                    </tr>
+                </template>
+                </tbody>
+            </table>
+            <div class="slds-p-left_small slds-p-vertical_small">
+                <lightning-button class="slds-p-right_small" variant="destructive" label="Delete All Fee Value" title="Delete All Fee Value" icon-name="utility:recycle_bin_full" onclick={removeAllRows}></lightning-button>
+                <lightning-button variant="neutral" label="Add Fee Value" title="Add Fee Value" icon-name="utility:add" onclick={addNewRow}></lightning-button>
+            </div>
+    
+            <footer class="slds-modal__footer" style="padding: 0.50rem 1rem;">
+                <lightning-button icon-name="utility:save" variant="brand" label="Create Fee Value" title="Create Fee Value" onclick={createFeeValues}></lightning-button>
+            </footer>
+        </div>
+
+    </lightning-card>
+</template>

@@ -1,0 +1,262 @@
+<template>
+	<template if:false={isLC}>
+		<!-- <div style="height: 300px;"> -->
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-table_striped"
+			aria-label=" Example headless table of Opportunities with cell content wrapped ">
+			<thead title="Land Area Extent" style="text-align: center;">
+				<tr>
+					<th colspan="4" style="text-align: center;">Land Area Extent</th>
+				</tr>
+				<tr>
+					<th>Property Name</th>
+					<th>AC</th>
+					<th>LC</th>
+					<th>Result</th>
+				</tr>
+
+				<template for:each={propertyList} for:item="landArea">
+					<tr key={landArea.propid}>
+						<td>{landArea.propNameLandArea}</td>
+						<td>{landArea.aclandare}</td>
+						<td>{landArea.lclandare}</td>
+						<td>{landArea.resultLandArea}</td>
+					</tr>
+				</template>
+			</thead>
+		</table>
+
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-table_striped"
+			aria-label=" Example headless table of Opportunities with cell content wrapped ">
+			<thead title="Land Area Extent">
+				<tr>
+					<th colspan="4" style="text-align: center;">
+						TItle Deed Number
+					</th>
+				</tr>
+				<tr>
+					<th>Property Name</th>
+					<th>AC</th>
+					<th>LC</th>
+					<th>Result</th>
+				</tr>
+
+				<template for:each={propertyList} for:item="titleDeed">
+					<tr key={titleDeed.key}>
+						<td>{titleDeed.propNameTitleDeedNumber}</td>
+						<td>{titleDeed.actitledeedno}</td>
+						<td>{titleDeed.lctitledeedno}</td>
+						<td>{titleDeed.resultTitleDeedNumber}</td>
+					</tr>
+
+				</template>
+
+			</thead>
+		</table>
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-table_striped"
+			aria-label=" Example headless table of Opportunities with cell content wrapped ">
+			<thead title="Land Area Extent">
+				<tr>
+					<th colspan="4" style="text-align: center;">
+						TItle Deed Type
+					</th>
+				</tr>
+				<tr>
+					<th>Property Name</th>
+					<th>AC</th>
+					<th>LC</th>
+					<th>Result</th>
+				</tr>
+
+				<template for:each={propertyList} for:item="titleDeed">
+					<tr key={titleDeed.key}>
+						<td>{titleDeed.propNameTitledeedtype}</td>
+						<td>{titleDeed.actitledeedtype}</td>
+						<td>{titleDeed.lctitledeedtype}</td>
+						<td>{titleDeed.resultTitledeedtype}</td>
+					</tr>
+
+				</template>
+			</thead>
+		</table>
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-table_striped"
+			aria-label=" Example headless table of Opportunities with cell content wrapped ">
+			<thead title="Land Area Extent">
+				<tr>
+					<th colspan="4" style="text-align: center;">
+						Title Deed Date
+					</th>
+				</tr>
+				<tr>
+					<th>Property Name</th>
+					<th>AC</th>
+					<th>LC</th>
+					<th>Result</th>
+				</tr>
+
+				<template for:each={propertyList} for:item="titleDeed">
+					<tr key={titleDeed.key}>
+						<td>{titleDeed.propNametitledate}</td>
+						<td>{titleDeed.actitledate}</td>
+						<td>{titleDeed.lctitledate}</td>
+						<td>{titleDeed.resultTitleDeeddate}</td>
+					</tr>
+				</template>
+			</thead>
+
+		</table>
+		<!-- </div> -->
+		<div class="slds-box slds-box_xx-small slds-m-bottom--small slds-p-bottom--small">
+			<footer class="slds-modal__footer">
+				<div class="slds-var-m-top_medium slds-text-align--right">
+					<template if:true={showAcButton}>
+						<lightning-button style="margin-right: 16px" variant="brand" label="Send Back to Approval Credit" type="click"
+							onclick={handleChange}>
+						</lightning-button>
+					</template>
+					<template if:true={showLcButton}>
+						<lightning-button style="margin-right: 16px" variant="brand" label="Send Back to Legal Approval" type="click"
+							slot="actions" onclick={handleLC}>
+						</lightning-button>
+					</template>
+					
+					<lightning-button variant="brand" label="Finish" type="click" slot="actions" onclick={handleFinish}>
+					</lightning-button>
+				</div>
+			</footer>
+		</div>
+	</template>
+	<template if:true={isLC}>
+		<!-- <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+					<c-change-Owner record-id={prelogInId} object-api-name={objectApiName}></c-change-Owner>
+				</div> -->
+		<!-- <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+			aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+			<div class="slds-modal__container"> -->
+
+		<!-- <header class="slds-modal__header">
+                        
+                        <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">LC</h2>
+                    </header> -->
+		<!-- <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close"
+                                alternative-text="close"
+                                variant="inverse"
+                                size="small" ></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+						   -->
+
+		<lightning-quick-action-panel>
+			<div if:true={showLcButton} class="slds-form-element "
+				style="margin-bottom:150px; height:100px;width 100px">
+				<div class="slds-form-element__control">
+					<div class="slds-combobox_container">
+						<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open"
+							aria-expanded="true" aria-haspopup="listbox" role="combobox">
+							<template if:true={selectedValue}>
+								<div data-key="pilldiv"
+									class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right slds-m-around_x-large"
+									role="none">
+									<span class="slds-icon_container slds-icon-standard-account slds-combobox__input-entity-icon"
+                  title="object">
+                  <span class="slds-icon slds-icon_small" aria-hidden="true" >
+                    <lightning-icon icon-name="standard:user" size="large"></lightning-icon>
+                  </span>
+									<span class="slds-assistive-text">Record</span>
+									</span>
+									<span>
+                <input type="text" class="slds-input slds-combobox__input slds-has-focus" id="combobox-id-1"
+                  aria-controls="listbox-id-1" role="textbox" placeholder="Select an Option" readonly
+                  value={selectedValue}/>
+                </span>
+									<button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right"
+                  onclick={removeRecordOnLookup} title="Remove selected option">
+                  <span class="slds-button__icon" aria-hidden="true">
+                    <lightning-icon icon-name="utility:close" size="xx-Small"
+                      class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                    </lightning-icon>
+                  </span>
+                  <span class="slds-assistive-text">Remove selected record</span>
+                </button>
+								</div>
+							</template>
+							<!-- <div class="slds-var-m-top_medium slds-text-align--right">
+		    <lightning-button class="slds-m-right--small" variant="brand" size="x-Small" label="Change Owner" onclick={onSeletedRecordUpdate}>
+                  </lightning-button>
+                 </div> -->
+							<template if:false={selectedValue}>
+								<div data-key="searchdiv"
+									class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right slds-m-around_x-large"
+									role="none">
+									<label for="combobox-id-2" >Search Owner</label>
+									<input type="text" size="x-Small" onfocusout={onLeave} value={searchKey} onkeyup={handleKeyChange}
+                  onchange={handleKeyChange} class="slds-input slds-combobox__input slds-has-focus" id="combobox-id-2"
+                  aria-autocomplete="list" aria-controls="listbox-id-2" role="textbox" placeholder="Search..." label= />
+									<span class="slds-m-right--small slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right" style="margin-top:2px;">
+                  <lightning-icon icon-name="utility:search" size="x-Small"
+                    class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                  </lightning-icon>
+				  </span>
+									<template if:true={recordsList}>
+										<div id="listbox-id-2-venu" data-key="dropdownresult"
+											class="slds-show slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid"
+											role="listbox">
+											<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+												<template if:true={message}>
+													<h1>{message}</h1>
+												</template>
+												<template for:each={recordsList} for:item="record">
+													<li id={record.Id} key={record.Id} onclick={onRecordSelection}
+														role="presentation" class="slds-listbox__item">
+														<div data-key={record.Id} data-name={record.Name}
+															class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+															role="option">
+															<span class="slds-media__figure slds-listbox__option-icon">
+                              <span class="slds-icon_container">
+                                <lightning-icon icon-name="standard:user" size="small"></lightning-icon>
+                              </span>
+															</span>
+															<span class="slds-media__body">
+                              <span data-key={record.Id} data-name={record.Name}
+                                class="slds-listbox__option-text slds-listbox__option-text_entity">{record.Name} </span>
+															</span>
+														</div>
+													</li>
+												</template>
+											</ul>
+										</div>
+									</template>
+								</div>
+							</template>
+							<div class="slds-var-m-top_medium slds-text-align--right">
+								<lightning-button class="slds-m-right-xx-small" variant="brand" size="x-Small"
+									label="Change Owner" onclick={onSeletedRecordUpdate}>
+								</lightning-button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- <div slot="footer">
+    <lightning-button variant="neutral" label="Cancel" onclick={OnCancel} >
+      </lightning-button>&nbsp;&nbsp;
+     
+    </div> -->
+
+		</lightning-quick-action-panel>
+
+
+	</template>
+
+	<!--<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+					<c-legal-approval-change-owner record-id={recordId} object-api-name={objectApiName}></c-legal-approval-change-owner>
+				</div>-->
+
+	<!-- <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button>
+                        
+                    </footer> -->
+
+
+
+</template>

@@ -1,0 +1,671 @@
+<template>
+    <lightning-spinner alternative-text="Loading" size="medium" if:true={showSpinner}></lightning-spinner>
+    <!-- Verify OCR  SECTION-->
+    <div class="slds-box slds-box_xx-small">
+        <h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+            <span class="slds-truncate" title="Section Title">Verify OCR</span>
+        </h3>
+        <lightning-layout multiple-rows="true">
+            <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="2"
+                padding="around-small">
+                <lightning-combobox name="Applicant_Type" label="Customer Type" value={applicantTypeValue}
+                    placeholder="Select Customer Type" options={applicantTypePicklistValue} onchange={handleChange}
+                    required="true" disabled={disableAppType}>
+                </lightning-combobox>
+            </lightning-layout-item>
+            <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="2"
+                padding="around-small">
+                <lightning-combobox name="KYC_Type" label="KYC Document Type" value={KYCTypeValue} data-id="kyc"
+                    placeholder="Select KYC Type" options={KYCTypePicklistValue} onchange={handleChangeKYC}>
+                </lightning-combobox>
+            </lightning-layout-item>
+            <template if:true={showFrontUpload}>
+                <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="3"
+                    padding="around-small">
+                    <lightning-input type="file" label="Front" onchange={UploadHadlerFront} data-id="front"
+                        accept="image/png, image/jpg"></lightning-input>
+                    <template if:true={frontImageName}>
+                        <div class="slds-form-element__label popup">
+                            {frontImageName}
+                        </div>
+                        &nbsp;<lightning-icon icon-name="utility:preview" size="small" alternative-text="Preview"
+                            title="Preview" onclick={previewFrontImage} style="cursor: pointer;">
+                        </lightning-icon>
+                    </template>
+                    <template if:true={openFrontImg}>
+                        <div class="slds-modal slds-fade-in-open slds-backdrop" aria-hidden="true">
+                            <div class="slds-modal__container">
+                                <div class="slds-modal__header slds-modal__header_empty">
+                                    <lightning-button-icon icon-name="utility:close"
+                                        alternative-text="Close this window" size="large" variant="border-inverse"
+                                        onclick={closeModal} class="slds-modal__close" aria-hidden="true">
+                                    </lightning-button-icon>
+                                </div>
+                                <div class="slds-modal__content slds-align_absolute-center">
+                                    <img src={frontImageUrl}>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </lightning-layout-item>
+            </template>
+            <template if:true={showRearUpload}>
+                <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="3"
+                    padding="around-small">
+                    <lightning-input type="file" onchange={UploadHadlerRear} label="Rear" data-id="rear"
+                        accept="image/png, image/jpg"></lightning-input>
+                    <template if:true={rearImageName}>
+                        <div class="slds-form-element__label popup">
+                            {rearImageName}
+                        </div>
+                        &nbsp;<lightning-icon icon-name="utility:preview" size="small" alternative-text="Preview"
+                            title="Preview" onclick={previewBackImage} style="cursor: pointer;">
+                        </lightning-icon>
+                    </template>
+                    <template if:true={openBackImg}>
+                        <div class="slds-modal slds-fade-in-open slds-backdrop" aria-hidden="true">
+                            <div class="slds-modal__container">
+                                <div class="slds-modal__header slds-modal__header_empty">
+                                    <lightning-button-icon icon-name="utility:close"
+                                        alternative-text="Close this window" size="large" variant="border-inverse"
+                                        onclick={closeModal} class="slds-modal__close" aria-hidden="true">
+                                    </lightning-button-icon>
+                                </div>
+                                <div class="slds-modal__content slds-align_absolute-center">
+                                    <img src={backImageUrl}>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </lightning-layout-item>
+            </template>
+        </lightning-layout>
+    </div>
+
+    <!-- OCR Result Table -->
+    <template if:true={showKYCTable}>
+        <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+            <h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+                <span class="slds-truncate" title="Section Title">Select OCR Record
+                    &nbsp;
+                    <lightning-helptext content="Select Any KYC Record To Proceed Further"></lightning-helptext>
+                </span>
+            </h3>
+            <div aria-hidden="false" class="slds-section__content slds-p-left_small">
+                <lightning-datatable key-field="id" data={ocrdata} columns={columns} onrowaction={handleRowAction}
+                    hide-checkbox-column="true" class="slds-scrollable_x wrapped-header-datatable">
+                </lightning-datatable>
+            </div>
+        </div>
+    </template>
+
+    <!-- OCR/Self Data Entry Section -->
+    <template if:true={showselfonly}>
+        <!-- form 2 -->
+        <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+            <h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+                <span class="slds-truncate" title="Section Title">Enter Details</span>
+            </h3>
+            <div aria-hidden="false" class="slds-section__content slds-p-left_small">
+                <lightning-record-edit-form object-api-name="Loan_Applicant__c" record-id={loanAppId}
+                    onsubmit={handleSubmitAcc}>
+                    <!-- onsuccess={handleSuccessLA} onsuccess={handleSuccessLA} -->
+                    <!-- <lightning-messages> </lightning-messages> -->
+                    <lightning-layout multiple-rows="true">
+                        <!-- <lightning-input-field field-name="Customer_Information__c" variant="label-stacked" data-name="selfreset">
+					</lightning-input-field>
+					<lightning-input-field field-name="Application__c" variant="label-stacked" data-name="selfreset">
+					</lightning-input-field>
+					<lightning-input-field field-name="Customer_Type__c" variant="label-stacked" data-name="selfreset">
+					</lightning-input-field>
+					<lightning-input-field field-name="Initiate_From__c" variant="label-stacked" data-name="selfreset">
+					</lightning-input-field> -->
+                        <lightning-input-field field-name="Verification_Type__c" variant="label-stacked"
+                            data-name="selfreset" value={verificationDefaultvalue} style="display:none;">
+                        </lightning-input-field>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <lightning-input-field field-name="Constitution__c" variant="label-stacked"
+                                value={ocrCustomerWrapper.constitution} data-name="selfcon" required="true">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <lightning-input-field field-name="Income_Considered__c" variant="label-stacked"
+                                value={ocrCustomerWrapper.incCon} data-name="selfcon" required="true">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+
+                        <template if:true={isRelogin}>
+                            <!-- Relogin Update Customer Case -->
+                            <template if:true={accountId}>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-input-field field-name="KYC_ID_Type_1__c" variant="label-stacked"
+                                        data-name="selfresetkyc" required="true" disabled={isRelogin}
+                                        onchange={handleSelfKYC1} value={ocrCustomerWrapper.kycType1}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <label style="font-size: 0.75rem;">
+                                        <span style="color: red;">*&nbsp;</span>KYC ID 1&nbsp;
+                                        <lightning-helptext content={tooltip}></lightning-helptext>
+                                    </label>
+                                    <lightning-input-field field-name="KYC_Id_1__c" variant="label-hidden"
+                                        onchange={capitalize} data-name="selfresetkyc" required="true"
+                                        disabled={isRelogin} value={ocrCustomerWrapper.kycId1} data-id="incorrectKYC1">
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-input-field field-name="KYC_ID_Type_2__c" variant="label-stacked"
+                                        data-name="selfresetkyc" disabled={isRelogin} onchange={handleSelfKYC2}
+                                        value={ocrCustomerWrapper.kycType2}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <label style="font-size: 0.75rem;">
+                                        KYC ID 2&nbsp;
+                                        <lightning-helptext content={tooltip2}></lightning-helptext>
+                                    </label>
+                                    <lightning-input-field field-name="KYC_Id_2__c" variant="label-hidden"
+                                        data-name="selfresetkyc" data-id="incorrectKYC2" disabled={isRelogin}
+                                        onchange={capitalize} value={ocrCustomerWrapper.kycId2}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                            </template>
+                            <!-- Relogin Add Customer Case-->
+                            <template if:false={accountId}>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-input-field field-name="KYC_ID_Type_1__c" variant="label-stacked"
+                                        data-name="selfresetkyc" required="true" disabled={isRelogin}
+                                        onchange={handleSelfKYC1} value={ocrCustomerWrapper.kycType1}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <label style="font-size: 0.75rem;">
+                                        <span style="color: red;">*&nbsp;</span>KYC ID 1&nbsp;
+                                        <lightning-helptext content={tooltip}></lightning-helptext>
+                                    </label>
+                                    <lightning-input-field field-name="KYC_Id_1__c" variant="label-hidden"
+                                        onchange={capitalize} data-name="selfresetkyc" data-id="incorrectKYC1"
+                                        required="true" value={ocrCustomerWrapper.kycId1}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-input-field field-name="KYC_ID_Type_2__c" variant="label-stacked"
+                                        data-name="selfresetkyc" disabled={isRelogin} onchange={handleSelfKYC2}
+                                        value={ocrCustomerWrapper.kycType2}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <label style="font-size: 0.75rem;">
+                                        KYC ID 2&nbsp;
+                                        <lightning-helptext content={tooltip2}></lightning-helptext>
+                                    </label>
+                                    <lightning-input-field field-name="KYC_Id_2__c" data-id="incorrectKYC2"
+                                        onchange={capitalize} variant="label-hidden" data-name="selfresetkyc"
+                                        value={ocrCustomerWrapper.kycId2}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                            </template>
+                        </template>
+                        <!-- New Login Case -->
+                        <template if:false={isRelogin}>
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <lightning-input-field field-name="KYC_ID_Type_1__c" variant="label-stacked"
+                                    data-name="selfresetkyc" required="true" disabled={isRelogin}
+                                    onchange={handleSelfKYC1} value={ocrCustomerWrapper.kycType1}>
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <label style="font-size: 0.75rem;">
+                                    <span style="color: red;">*&nbsp;</span>KYC ID 1&nbsp;
+                                    <lightning-helptext content={tooltip}></lightning-helptext>
+                                </label>
+                                <lightning-input-field field-name="KYC_Id_1__c" variant="label-hidden"
+                                    onchange={capitalize} data-name="selfresetkyc" required="true"
+                                    data-id="incorrectKYC1" value={ocrCustomerWrapper.kycId1}>
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <lightning-input-field field-name="KYC_ID_Type_2__c" variant="label-stacked"
+                                    data-name="selfresetkyc" disabled={isRelogin} onchange={handleSelfKYC2}
+                                    value={ocrCustomerWrapper.kycType2}>
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <label style="font-size: 0.75rem;">
+                                    KYC ID 2&nbsp;
+                                    <lightning-helptext content={tooltip2}></lightning-helptext>
+                                </label>
+                                <lightning-input-field field-name="KYC_Id_2__c" data-id="incorrectKYC2"
+                                    onchange={capitalize} variant="label-hidden" data-name="selfresetkyc"
+                                    value={ocrCustomerWrapper.kycId2}>
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                        </template>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <lightning-input-field field-name="Applicant_Type__c" variant="label-stacked"
+                                data-name="selfcon" required="true" value={ocrCustomerWrapper.appType}>
+                            </lightning-input-field>
+                        </lightning-layout-item>
+
+                        <!-- Relogin Case -->
+                        <template if:true={isRelogin}>
+                            <!-- Relogin Update Customer Case -->
+                            <template if:true={accountId}>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-combobox name="gender" label="Gender" placeholder="Select"
+                                        value={ocrCustomerWrapper.Gender} options={genderOption} data-name="selfreset"
+                                        required="true" onchange={handleAccRecord}>
+                                    </lightning-combobox>
+                                    <!-- <lightning-input label="Gender" variant="label-stacked"
+									data-name="selfreset" required="true" name="gender" onchange={handleAccRecord}>
+								</lightning-input> -->
+                                </lightning-layout-item>
+                                <!-- <div style="display:none">
+								<lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+									large-device-size="2" padding="around-small">
+									<lightning-input variant="label-stacked" 
+										data-name="selfreset" required="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</div> -->
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-combobox name="Salutation" label="Salutation" placeholder="Salutation"
+                                        options={SalutationOption} onchange={handleSalutation} value={salutation}
+                                        disabled={isRelogin} required="true">
+                                    </lightning-combobox>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-input label="FirstName" variant="label-stacked" required="true"
+                                        disabled={isRelogin} value={ocrCustomerWrapper.firstName} name="firstName"
+                                        pattern="[a-zA-Z]*" message-when-pattern-mismatch="Only Alphabets Allowed"
+                                        onchange={handleAccRecord}>
+                                    </lightning-input>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-input label="LastName" variant="label-stacked" required="true"
+                                        pattern="[a-zA-Z]*" message-when-pattern-mismatch="Only Alphabets Allowed"
+                                        disabled={isRelogin} value={ocrCustomerWrapper.lastName} name="lastName"
+                                        onchange={handleAccRecord}>
+                                    </lightning-input>
+                                </lightning-layout-item>
+                            </template>
+                            <!-- Re-Login Add Customer Case-->
+                            <template if:false={accountId}>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-combobox name="gender" label="Gender" placeholder="Select"
+                                        value={ocrCustomerWrapper.Gender} options={genderOption} data-name="selfreset"
+                                        required="true" onchange={handleAccRecord}>
+                                    </lightning-combobox>
+                                    <!-- <lightning-input label="Gender" variant="label-stacked"
+									data-name="selfreset" required="true" name="gender" onchange={handleAccRecord}>
+								</lightning-input> -->
+                                </lightning-layout-item>
+                                <!-- <div style="display:none">
+								<lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+									large-device-size="2" padding="around-small">
+									<lightning-input label="Salutation" variant="label-stacked"
+										 required="true">
+									</lightning-input>
+								</lightning-layout-item>
+							</div> -->
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-combobox name="Salutation" label="Salutation" placeholder="Salutation"
+                                        options={SalutationOption} onchange={handleSalutation} value={salutation}
+                                        required="true">
+                                    </lightning-combobox>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-input label="FirstName" variant="label-stacked" required="true"
+                                        value={ocrCustomerWrapper.firstName} name="firstName" pattern="[a-zA-Z]*"
+                                        message-when-pattern-mismatch="Only Alphabets Allowed"
+                                        onchange={handleAccRecord}>
+                                    </lightning-input>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                    large-device-size="2" padding="around-small">
+                                    <lightning-input label="LastName" variant="label-stacked" required="true"
+                                        pattern="[a-zA-Z]*" message-when-pattern-mismatch="Only Alphabets Allowed"
+                                        value={ocrCustomerWrapper.lastName} name="lastName" onchange={handleAccRecord}>
+                                    </lightning-input>
+                                </lightning-layout-item>
+                            </template>
+                        </template>
+                        <!-- New Login Case -->
+                        <template if:false={isRelogin}>
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <lightning-combobox name="gender" label="Gender" placeholder="Select"
+                                    value={ocrCustomerWrapper.Gender} options={genderOption} data-name="selfreset"
+                                    required="true" onchange={handleAccRecord}>
+                                </lightning-combobox>
+                                <!-- <lightning-input label="Gender" variant="label-stacked" data-name="selfreset"
+								required="true" name="gender" onchange={handleAccRecord}>
+							</lightning-input> -->
+                            </lightning-layout-item>
+                            <!-- <div style="display:none">
+							<lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+								large-device-size="2" padding="around-small">
+								<lightning-input label="Salutation" variant="label-stacked"
+									required="true">
+								</lightning-input>
+							</lightning-layout-item>
+						</div> -->
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <lightning-combobox name="Salutation" label="Salutation" placeholder="Salutation"
+                                    options={SalutationOption} onchange={handleSalutation} value={salutation}
+                                    required="true">
+                                </lightning-combobox>
+                            </lightning-layout-item>
+
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <lightning-input label="FirstName" variant="label-stacked" required="true"
+                                    pattern="[a-zA-Z]*" message-when-pattern-mismatch="Only Alphabets Allowed"
+                                    value={ocrCustomerWrapper.firstName} name="firstName" onchange={handleAccRecord}>
+                                </lightning-input>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <lightning-input label="LastName" variant="label-stacked" required="true"
+                                    pattern="[a-zA-Z]*" message-when-pattern-mismatch="Only Alphabets Allowed"
+                                    value={ocrCustomerWrapper.lastName} name="lastName" onchange={handleAccRecord}>
+                                </lightning-input>
+                            </lightning-layout-item>
+                        </template>
+
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <!-- <label style="font-size: 0.75rem;"><span style="color: red;">*&nbsp;</span>Father's
+							Name</label> -->
+                            <lightning-input label="Father's Name" value={ocrCustomerWrapper.FathersName}
+                                pattern="[a-zA-Z]*" message-when-pattern-mismatch="Only Alphabets Allowed"
+                                required="true" name="fatherName" onchange={handleAccRecord}>
+                            </lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;">Mother's Name</label>
+                            <lightning-input variant="label-hidden" value={ocrCustomerWrapper.MothersName}
+                                pattern="[a-zA-Z]*" message-when-pattern-mismatch="Only Alphabets Allowed"
+                                name="motherName" onchange={handleAccRecord}>
+                            </lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;">
+                                <span style="color: red;">*&nbsp;</span>Married?</label>
+                            <lightning-input-field field-name="Married__c" variant="label-hidden" data-name="selfcon"
+                                onchange={handleMarried} required="true" value={ocrCustomerWrapper.married}>
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <template if:true={requiredSpouse}>
+                            <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                                large-device-size="2" padding="around-small">
+                                <label style="font-size: 0.75rem;">
+                                    <template if:true={requiredSpouse}>
+                                        <span style="color: red;">*&nbsp;</span>
+                                    </template>
+                                    Husband / Wife's Name</label>
+                                <!-- Spouse_Name__c -->
+                                <lightning-input-field field-name="Husband_Wife_s_Name__c" variant="label-hidden"
+                                    data-name="selfreset" required={requiredSpouse}
+                                    value={ocrCustomerWrapper.SpouceName}>
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                        </template>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;"><span style="color: red;">*&nbsp;</span>Date of
+                                Birth</label>
+                            <lightning-input type="date" variant="label-hidden" required="true"
+                                value={ocrCustomerWrapper.DOB} name="dob" onchange={handleAccRecord}>
+                            </lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;"><span style="color: red;">*&nbsp;</span>Primary
+                                Number(Mobile)</label>
+                            <!-- PersonMobilePhone -->
+                            <lightning-input-field field-name="Mobile__c" variant="label-hidden"
+                                data-name="selfresetmob" required="true" onchange={editMobileCalled}
+                                value={ocrCustomerWrapper.mobile_1}>
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <template if:true={editMobile}>
+                            <lightning-input-field field-name="Mobile_Verified__c" variant="label-hidden"
+                                data-name="selfreset" style="display: none;">
+                            </lightning-input-field>
+                        </template>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;">Alternative Number</label>
+                            <!-- Phone -->
+                            <lightning-input-field field-name="Phone_Residence__c" variant="label-hidden"
+                                data-name="selfreset" value={ocrCustomerWrapper.mobile_2}>
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="4" padding="around-small">
+                            <label style="font-size: 0.75rem;"><span
+                                    style="color: red;">*&nbsp;</span>Street/Address</label>
+                            <!-- PersonMailingStreet -->
+                            <lightning-input-field field-name="Residence_Address_Line_1__c" variant="label-hidden"
+                                data-name="selfreset" required="true" value={ocrCustomerWrapper.Address}>
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;"><span style="color: red;">*&nbsp;</span>Pincode</label>
+                            <!-- MS_Pincode__c -->
+                            <lightning-input-field field-name="Residence_Pincode__c" variant="label-hidden"
+                                data-name="selfcon" onchange={handlePincode} required="true" placeholder="Enter Pincode"
+                                value={ocrCustomerWrapper.Pincode}>
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;"><span style="color: red;">*&nbsp;</span>City</label>
+                            <!-- PersonMailingCity -->
+                            <lightning-input-field field-name="Residence_City__c" variant="label-hidden"
+                                data-name="selfreset" required="true" value={city} disabled="true">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;">District of
+                                Residence</label>
+                            <!-- District__c -->
+                            <lightning-input-field field-name="Residence_District__c" variant="label-hidden"
+                                data-name="selfreset" value={district}>
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <label style="font-size: 0.75rem;"><span style="color: red;">*&nbsp;</span>State</label>
+                            <!-- PersonMailingState -->
+                            <lightning-input-field field-name="Residence_State__c" variant="label-hidden"
+                                data-name="selfreset" required="true" value={state} disabled="true">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="6" medium-device-size="12"
+                            large-device-size="2" padding="around-small">
+                            <!-- <label style="font-size: 0.75rem;">Pincode</label> -->
+                            <!-- <lightning-input-field field-name="PersonMailingPostalCode" variant="label-hidden"
+							data-name="selfreset" style="display: none;" value={pincode}>
+						</lightning-input-field> -->
+                        </lightning-layout-item>
+                    </lightning-layout>
+                    <div class="slds-text-align_right">
+                        <lightning-button variant="neutral" type="submit" label='Cancel' onclick={onCancel}>
+                        </lightning-button>&nbsp;&nbsp;
+                        <lightning-button variant="brand" type="submit" label={selfSave}>
+                        </lightning-button>
+                    </div>
+
+                </lightning-record-edit-form>
+            </div>
+        </div>
+        <!--Self RESULT-->
+
+        <div style="display : none;">
+            <!-- style="display : none;" -->
+            <lightning-record-edit-form object-api-name="Account" record-id={accountId} data-id="accRecordForm"
+                onsuccess={handleaccsuccess}>
+                <!-- <lightning-messages> </lightning-messages> -->
+                <lightning-input-field field-name="RecordTypeId" variant="label-stacked" value={recTypeId}>
+                </lightning-input-field>
+                <lightning-input-field field-name="Gender__c" variant="label-stacked"
+                    value={accountRecordWrapper.gender}>
+                </lightning-input-field>
+                <lightning-input-field field-name="Salutation" variant="label-stacked" value={salutation}>
+                </lightning-input-field>
+                <lightning-input-field field-name="FirstName" variant="label-stacked" disabled={isRelogin}
+                    value={accountRecordWrapper.firstName}>
+                </lightning-input-field>
+                <lightning-input-field field-name="LastName" variant="label-stacked" disabled={isRelogin}
+                    value={accountRecordWrapper.lastName}>
+                </lightning-input-field>
+                <lightning-input-field field-name="Father_s_Name__c" variant="label-stacked"
+                    value={accountRecordWrapper.fatherName} required="true">
+                </lightning-input-field>
+                <lightning-input-field field-name="PersonBirthdate" variant="label-stacked"
+                    value={accountRecordWrapper.dob} required="true">
+                </lightning-input-field>
+                <lightning-input-field field-name="Mother_s_Name__c" variant="label-stacked"
+                    value={accountRecordWrapper.motherName}>
+                </lightning-input-field>
+            </lightning-record-edit-form>
+        </div>
+
+    </template>
+
+    <!-- List Of Applicants -->
+    <template if:true={isAccDataArrived}>
+        <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+            <h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+                <span class="slds-truncate" title="Section Title">List Of Applicants</span>
+            </h3>
+            <div aria-hidden="false" class="slds-section__content slds-p-left_small">
+                <c-generic-data-table-l-w-c data-id="account" result={accData} btns={accRowAction}
+                    onselected={handleSelectedAccount}>
+                </c-generic-data-table-l-w-c>
+            </div>
+        </div>
+    </template>
+
+    <!-- Delete Record -->
+    <template if:true={isModalOpenDel}>
+        <div class="slds-modal slds-fade-in-open slds-backdrop">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" alternative-text="Close this window" size="large"
+                        variant="border-inverse" onclick={closeModal} class="slds-modal__close">
+                    </lightning-button-icon>
+                    <span>Do You Really Wants To Delete This Record?</span>
+                    <template if:true={hasPropertyAcc}>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-0">
+
+                            <h1>You have following Properties Records they will also be deleted!!
+                            </h1>
+                            <template if:true={isPropDataArrived}>
+                                <div
+                                    class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+                                    <h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+                                        <span class="slds-truncate" title="Section Title">Property
+                                            List</span>
+                                    </h3>
+                                    <div aria-hidden="false" class="slds-section__content slds-p-left_small">
+                                        <c-generic-data-table-l-w-c data-id="property" result={propData}>
+                                        </c-generic-data-table-l-w-c>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+                    </template>
+                </div>
+                <div class="slds-modal__footer">
+                    <div class="slds-align_absolute-center">
+                        <lightning-button label="Delete" variant="destructive" onclick={selectDelete}>
+                        </lightning-button> &nbsp; &nbsp;
+                        <lightning-button variant="brand-outline" type="cancel" label="Cancel" onclick={closeModal}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- OTP Validation -->
+    <template if:true={isModalOpen}>
+        <div class="slds-modal slds-fade-in-open slds-backdrop">
+            <div class="slds-modal__container">
+                <!-- style="max-width: 7rem !important;"-->
+                <div class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" alternative-text="Close this window" size="large"
+                        variant="border-inverse" onclick={closeModal} class=" slds-modal__close">
+                        <!--btnPopup-->
+                    </lightning-button-icon>
+                    <span>Validate OTP</span><!-- class="subhead"-->
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-input type="text" label="Enter OTP" name="otp" onchange={handleOTP}
+                        class="slds-p-top_small">
+                        <!-- style="width: max-content;" -->
+                    </lightning-input>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning-layout>
+                        <lightning-layout-item size="12" small-device-size="9" medium-device-size="3"
+                            large-device-size="12">
+                            <lightning-button label={validate} variant="brand" onclick={validateOTP}>
+                            </lightning-button>&nbsp;
+                        <!-- </lightning-layout-item> -->
+                        <!-- <lightning-layout-item size="12" small-device-size="10" medium-device-size="6" -->
+                            <!-- large-device-size="4"> -->
+                            <lightning-button label="Resend OTP" variant="brand" onclick={resendMobOTP}
+                                data-id="resend">
+                            </lightning-button>&nbsp;
+                        <!-- </lightning-layout-item> -->
+                        <!-- <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" -->
+                            <!-- large-device-size="4"> -->
+                            <lightning-button variant="brand-outline" type="cancel" label="Cancel" onclick={closeModal}>
+                            </lightning-button>
+                        </lightning-layout-item>
+                        <!-- <div class="slds-align_absolute-center">
+                             &nbsp; &nbsp;
+                             &nbsp; &nbsp;
+                            
+                        </div> -->
+                    </lightning-layout>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</template>

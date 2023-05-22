@@ -1,0 +1,1869 @@
+<template>
+	<template if:true={showDeleteModal}>
+		<section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="modal-heading-01"
+			aria-modal="true">
+			<div class="slds-modal__container" style="width:8rem;">
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Delete Record</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium slds-text-align--center" id="modal-content-id-2">
+					Are you sure you want to delete this record?
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-button variant="brand" label="Yes" title="Yes" onclick={handleDelete}>
+					</lightning-button>
+					<lightning-button label="No" class="slds-m-left--medium" title="No" onclick={handleDelete}>
+					</lightning-button>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+	<c-fs-spinner if:true={showLoader}></c-fs-spinner>
+	<div class="slds-box slds-box_xx-small">
+		<lightning-record-edit-form object-api-name="Capability__c" if:true={showForm} record-id={capabilityRecordId}
+			onsuccess={handleCapabiltySuccess} onsubmit={handleCapabiltySubmit} record-type-id={fivCRecordType}>
+			<lightning-layout multiple-rows>
+				<lightning-layout-item size="12" style="display:none;">
+					<lightning-input-field field-name="Verification__c" value={verificationId} variant="label-stacked">
+					</lightning-input-field>
+				</lightning-layout-item>
+				<lightning-layout-item size="12" style="display:none;">
+					<lightning-input-field field-name="Application__c" value={applicationId} variant="label-stacked">
+					</lightning-input-field>
+				</lightning-layout-item>
+				<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+					medium-device-size="12" large-device-size="3">
+					<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Select Applicant</label>
+					<lightning-input-field field-name="Loan_Applicant__c" value={loanApplicantId}
+						variant="label-stacked" style="display:none;">
+					</lightning-input-field>
+					<lightning-combobox name="Customer_Information__c" value={loanApplicantId}
+						options={customerList} onchange={handleCustomerSelection} variant="label-hidden">
+					</lightning-combobox>
+				</lightning-layout-item>
+				<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+					medium-device-size="12" large-device-size="3">
+					<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Income Segment</label>
+					<lightning-input-field field-name="Income_segment__c" variant="label-hidden"
+						onchange={handleFormValue} data-id="Income_segment__c">
+					</lightning-input-field>
+				</lightning-layout-item>
+				<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+					medium-device-size="12" large-device-size="3">
+					<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>SubSegment</label>
+					<lightning-input-field field-name="Subsegment__c" variant="label-hidden" onchange={handleFormValue}>
+					</lightning-input-field>
+				</lightning-layout-item>
+				<lightning-layout-item if:true={isEateriesAndOthers} size="12" padding="horizontal-small"
+					small-device-size="12" medium-device-size="12" large-device-size="3">
+					<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Day/Margin Basis</label>
+					<lightning-input-field field-name="Day_Margin_Basis__c" variant="label-hidden"
+						onchange={handleFormValue} data-id="Day_Margin_Basis__c">
+					</lightning-input-field>
+				</lightning-layout-item>
+				<lightning-layout-item if:true={isSelfEmployedOrBusiness} size="12" padding="horizontal-small"
+					small-device-size="12" medium-device-size="12" large-device-size="3">
+					<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Day/Margin Basis</label>
+					<lightning-input-field field-name="Day_Margin_Basis__c" variant="label-hidden"
+						onchange={handleFormValue} data-id="Day_Margin_Basis__c">
+					</lightning-input-field>
+				</lightning-layout-item>
+			</lightning-layout>
+			<hr class="slds-m-vertical--x-small">
+			<lightning-layout multiple-rows>
+				<template if:true={isSalaried}>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Name Of The Employer</label>
+						<lightning-input-field field-name="Name_of_the_Employer__c" variant="label-hidden"
+							style="display: none;" value={employerName}>
+						</lightning-input-field>
+						<lightning-input type="text" variant="label-hidden" name="Name_of_the_Employer__c"
+							max-length="50" value={employerName} onchange={handleFormValue}
+							message-when-range-overflow="Only 50 Characters are allowed.">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Year Of Service With Employer
+						</label>
+						<lightning-input-field field-name="Year_of_Service_With_Employer__c" variant="label-hidden"
+							style="display: none;" value={yearOfServiceWidEmp}>
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={yearOfServiceWidEmp} variant="label-hidden"
+							name="Year_of_Service_With_Employer__c" onchange={handleFormValue}
+							message-when-range-overflow="Year Of Service With Employer should be less than Total Work Experience"
+							max={totalWorkExp} message-when-step-mismatch="Maximum 2 decimal places are allowed.">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Nature Of Job</label>
+						<lightning-input-field field-name="Nature_of_Job__c" variant="label-hidden"
+							onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Total Work Experience
+						</label>
+						<lightning-input-field field-name="Total_Work_Experience__c" variant="label-hidden"
+							style="display: none;" value={totalWorkExp}>
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={totalWorkExp} variant="label-hidden"
+							name="Total_Work_Experience__c" onchange={handleFormValue} min={yearOfServiceWidEmp}
+							message-when-range-overflow="Maximum 2 digits are allowed."
+							message-when-range-underflow="Year Of Service With Employer should be less than Total Work Experience"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99.99">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Monthly Salary
+                        </label>
+						<lightning-input-field value={monthlySalary} field-name="Monthly_Salary__c"
+							variant="label-hidden" style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={monthlySalary} variant="label-hidden"
+							name="Monthly_Salary__c" onchange={handleFormValue} max="99999999.99"
+							message-when-range-overflow="Maximum 8 digits are allowed."
+							message-when-step-mismatch="Maximum 2 decimal places are allowed.">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Mode Of Salary
+                        </label>
+						<lightning-input-field field-name="Mode_of_Salary__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="6" large-device-size="6">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                        </label>
+						<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+							variant="label-hidden" value={percentageOfIncome} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+							name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="6" large-device-size="12">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Overall Remarks
+                        </label>
+						<lightning-input-field field-name="Overall_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Employment Document Proof
+                        </label>
+						<lightning-input-field field-name="Employment_Document_Proof__c" variant="label-hidden"
+							onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr if:true={DocProofRequired} class="slds-required">*</abbr>Nature of Document Proof
+                        </label>
+						<lightning-input-field field-name="Nature_of_Document_Proof__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Other Confirmations
+                        </label>
+						<lightning-input-field field-name="Other_Confirmations__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Business Pincode
+                        </label>
+						<lightning-input-field field-name="IncomePincode__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</template>
+				<template if:true={isRentalMortgage}>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>No. Of Units
+                        </label>
+						<lightning-input-field field-name="No_of_Units__c" variant="label-hidden" value={numberOfUnits}
+							style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" value={numberOfUnits} variant="label-hidden"
+							name="No_of_Units__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 8 digits are allowed."
+							message-when-step-mismatch="Deciaml places are not allowed." max="99999999">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Rental Income
+                        </label>
+						<lightning-input-field field-name="Rental_Income__c" variant="label-hidden" value={rentalIncome}
+							style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={rentalIncome} variant="label-hidden"
+							name="Rental_Income__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99999999.99">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                        </label>
+						<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+							variant="label-hidden" value={percentageOfIncome} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+							name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="12" large-device-size="12">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Remarks
+                        </label>
+						<lightning-input-field field-name="Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</template>
+				<template if:true={isRentalOther}>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Rental Property Owner Name
+                        </label>
+						<lightning-input-field field-name="Rental_Property_Owner_name__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Rental Income Property Address
+                        </label>
+						<lightning-input-field field-name="Rental_income_property_address__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Proof
+                        </label>
+						<lightning-input-field field-name="Proof__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Proof of Ownership
+                        </label>
+						<lightning-input-field field-name="Proof_of_Ownership__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>FC Enquiry With
+                        </label>
+						<lightning-input-field field-name="FC_Enquiry_with__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>No. Of Units
+                        </label>
+						<lightning-input-field field-name="No_of_Units__c" variant="label-hidden" value={numberOfUnits}
+							style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" value={numberOfUnits} variant="label-hidden"
+							name="No_of_Units__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 8 digits are allowed."
+							message-when-step-mismatch="Deciaml places are not allowed." max="99999999">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Rental Income
+                        </label>
+						<lightning-input-field field-name="Rental_Income__c" variant="label-hidden" value={rentalIncome}
+							style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={rentalIncome} variant="standard"
+							name="Rental_Income__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99999999.99">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                        </label>
+						<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+							variant="label-hidden" value={percentageOfIncome} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="standard"
+							name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Remarks
+                        </label>
+						<lightning-input-field field-name="Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</template>
+				<template if:true={isDailyWages}>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Year Of Occupation
+                        </label>
+						<lightning-input-field field-name="Year_of_Occupation__c" variant="label-hidden"
+							style="display: none;" value={yearOfOccupation}>
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={yearOfOccupation} variant="label-hidden"
+							name="Year_of_Occupation__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 3 digits are allowed." max="999.99"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed.">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Proof
+                        </label>
+						<lightning-input-field field-name="Proof__c" value={proof} variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" if:true={isProofRemarkMandatory}>*</abbr>Proof Remarks
+                        </label>
+						<lightning-input-field field-name="Proof_Remarks_Daily_Wages__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Other Confirmations
+                        </label>
+						<lightning-input-field field-name="Other_Confirmations_Daily_Wages__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Income Per Day
+                        </label>
+						<lightning-input-field field-name="Income_per_day__c" variant="label-hidden"
+							data-id="Income_per_day__c" onchange={handleCalculations} value={incomePerDayVal}
+							style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={incomePerDayVal} variant="label-hidden"
+							name="Income_per_day__c" onchange={handleCalculations}
+							message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99999999.99">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Number Of Days
+                        </label>
+						<lightning-input-field field-name="Number_of_days__c" variant="label-hidden"
+							data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+							name="Number_of_days__c" onchange={handleCalculations}
+							message-when-range-overflow="Maximum 31 days are allowed." max="31" max-length="8">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+							value={grossMonthlyIncome}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Assumptions for Income
+                        </label>
+						<lightning-input-field field-name="Assumptions_for_Income__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                        </label>
+						<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+							variant="label-hidden" value={percentageOfIncome} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+							name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Reference Name
+                        </label>
+						<lightning-input-field field-name="Reference_Name__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<lightning-input type="text" variant="label-stacked" name="Reference_Contact_Number__c"
+							label="Reference Contact Number" max-length="10" value={refContactNumber}
+							onchange={handleFormValue} pattern="[0-9]{10}" min-length="10"
+							message-when-too-long="Phone number should be of 10 digits."
+							message-when-too-short="Phone number should be of 10 digits."
+							message-when-pattern-mismatch="Only 10 digits are allowed.">
+						</lightning-input>
+						<lightning-input-field field-name="Reference_Contact_Number__c" value={refContactNumber}
+							variant="label-stacked" style="display: none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Feedback
+                        </label>
+						<lightning-input-field field-name="Feedback__c" onchange={handleFormValue}
+							variant="label-hidden">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Reference Name 2
+                        </label>
+						<lightning-input-field field-name="Reference_Name_2__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<lightning-input type="text" variant="label-stacked" name="Reference_Contact_Number_2__c"
+							label="Reference Contact Number" max-length="10" value={refContactNumber2}
+							onchange={handleFormValue} pattern="[0-9]{10}" min-length="10"
+							message-when-too-long="Phone number should be of 10 digits."
+							message-when-too-short="Phone number should be of 10 digits."
+							message-when-pattern-mismatch="Only 10 digits are allowed.">
+						</lightning-input>
+						<lightning-input-field field-name="Reference_Contact_Number_2__c" value={refContactNumber2}
+							variant="label-stacked" style="display: none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="4">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required">*</abbr>Feedback 2
+                        </label>
+						<lightning-input-field field-name="Feedback_2__c" onchange={handleFormValue}
+							variant="label-hidden">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<label class="slds-form-element__label">
+                            <abbr if:true={isRemarkMandatory} class="slds-required">*</abbr>Remarks
+                        </label>
+						<lightning-input-field field-name="Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</template>
+				<template if:true={isPension}>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Income Per Month
+                        </label>
+						<lightning-input-field field-name="Income_per_month__c" variant="label-hidden"
+							value={incomePerMonth} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={incomePerMonth} variant="label-hidden"
+							name="Income_per_month__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99999999.99">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>% Considered For DBR
+                        </label>
+						<lightning-input-field field-name="considered_for_DBR__c" variant="label-hidden"
+							value={dbrValue} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={dbrValue} variant="label-hidden"
+							name="considered_for_DBR__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr  class="slds-required">*</abbr>Income Per Month Pension
+                        </label>
+						<lightning-input-field field-name="Income_per_month_Pension__c" value={dbrIncomePerMonth}
+							variant="label-hidden" disabled>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Income Remarks
+                        </label>
+						<lightning-input-field field-name="Income_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Spouse Alive
+                        </label>
+						<lightning-input-field field-name="Spouse_alive__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                        </label>
+						<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+							variant="label-hidden" value={percentageOfIncome} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+							name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed."
+							label="% Of Income Transacted Through Bank Account" max="100">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Income Proof Pension
+                        </label>
+						<lightning-input-field field-name="Income_Proof_Pension__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</template>
+				<template if:true={isAbroadIncome}>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Income Per Month
+                        </label>
+						<lightning-input-field field-name="Income_per_month__c" variant="label-hidden"
+							value={incomePerMonth} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={incomePerMonth} variant="standard"
+							name="Income_per_month__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99999999.99">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="8">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Income Remarks
+                        </label>
+						<lightning-input-field field-name="Income_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                        </label>
+						<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+							variant="label-hidden" value={percentageOfIncome} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+							name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed."
+							label="% Of Income Transacted Through Bank Account" max="100">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Proof
+                        </label>
+						<lightning-input-field field-name="Proof__c" value={proof} variant="label-stacked" required onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required" if:true={isProofRemarkMandatory}>*</abbr>Proof Remarks
+                        </label>
+						<lightning-input-field field-name="Proof_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Other Confirmations
+                        </label>
+						<lightning-input-field field-name="Other_Confirmations_Daily_Wages__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Income Reference Name
+                        </label>
+						<lightning-input-field field-name="Income_reference_name__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Income Reference Contact Number
+                        </label>
+						<lightning-input type="text" variant="label-hidden" name="Income_reference_Contact_Number__c"
+							max-length="10" value={incRefContactNumber} onchange={handleFormValue} pattern="[0-9]{10}"
+							min-length="10" message-when-too-long="Phone number should be of 10 digits."
+							message-when-too-short="Phone number should be of 10 digits."
+							message-when-pattern-mismatch="Only 10 digits are allowed.">
+						</lightning-input>
+						<lightning-input-field field-name="Income_reference_Contact_Number__c"
+							value={incRefContactNumber} variant="label-hidden" style="display: none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Feedback
+                        </label>
+						<lightning-input-field field-name="Feedback__c" onchange={handleFormValue}
+							variant="label-hidden">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<label class="slds-form-element__label">
+                            <abbr if:true={isRemarkMandatory} class="slds-required">*</abbr>Remarks
+                        </label>
+						<lightning-input-field field-name="Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</template>
+				<template if:true={isOther}>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<label class="slds-form-element__label">
+                            Income Remarks
+                        </label>
+						<lightning-input-field field-name="Income_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</template>
+				<template if:true={isSelfEmployedOrBusiness}>
+					<template if:true={isDayBasis}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Year Of Occupation
+                            </label>
+							<lightning-input-field field-name="Year_of_Occupation__c" variant="label-hidden"
+								style="display: none;" value={yearOfOccupation}>
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={yearOfOccupation} variant="label-hidden"
+								name="Year_of_Occupation__c" onchange={handleFormValue} label="Year Of Occupation"
+								message-when-range-overflow="Maximum 3 digits are allowed." max="999.99"
+								message-when-step-mismatch="Maximum 2 decimal places are allowed.">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Ownership Document Proof
+                            </label>
+							<lightning-input-field field-name="Ownership_document_proof__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Ownership Document Proof Self Employed
+                            </label>
+							<lightning-input-field field-name="Nature_of_Document_Proof_Self_Employed__c"
+								variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Other Confirmations
+                            </label>
+							<lightning-input-field field-name="Other_Confirmations__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Overall Remarks Regarding Business
+                            </label>
+							<lightning-input-field field-name="Overall_Remarks_Regarding_Business__c"
+								variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Income Per Day
+                            </label>
+							<lightning-input-field field-name="Income_per_day__c" variant="label-hidden"
+								data-id="Income_per_day__c" value={incomePerDayVal}
+								style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={incomePerDayVal} variant="label-hidden"
+								name="Income_per_day__c" onchange={handleCalculations}
+								message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+								message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99999999.99">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Number Of Days
+                            </label>
+							<lightning-input-field field-name="Number_of_days__c"
+								data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+								name="Number_of_days__c" onchange={handleCalculations}
+								message-when-range-overflow="Maximum 31 days are allowed." max="31"
+								max-length="8">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+								value={grossMonthlyIncome}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                            </label>
+							<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+								variant="label-hidden" value={percentageOfIncome} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+								name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+								message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+								message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Assumptions For Income
+                            </label>
+							<lightning-input-field field-name="Assumptions_for_Income__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Business Reference Name
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Name__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Business Reference Contact Number
+                            </label>
+							<lightning-input type="text" variant="label-hidden"
+								name="Business_Reference_Contact_Number__c" label="Business Reference Contact Number"
+								max-length="10" value={busRefContactNumber} onchange={handleFormValue}
+								pattern="[0-9]{10}" min-length="10"
+								message-when-too-long="Phone number should be of 10 digits."
+								message-when-too-short="Phone number should be of 10 digits."
+								message-when-pattern-mismatch="Only 10 digits are allowed.">
+							</lightning-input>
+							<lightning-input-field field-name="Business_Reference_Contact_Number__c"
+								value={busRefContactNumber} variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Feedback
+                            </label>
+							<lightning-input-field field-name="Feedback__c" variant="label-hidden"
+								onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Business Reference Name 2
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Name_2__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Business Reference Contact Number 2
+                            </label>
+							<lightning-input type="text" variant="label-hidden"
+								name="Business_Reference_Contact_Number_2__c" max-length="10"
+								value={busRefContactNumber2} onchange={handleFormValue} pattern="[0-9]{10}"
+								min-length="10" message-when-too-long="Phone number should be of 10 digits."
+								message-when-too-short="Phone number should be of 10 digits."
+								message-when-pattern-mismatch="Only 10 digits are allowed.">
+							</lightning-input>
+							<lightning-input-field field-name="Business_Reference_Contact_Number_2__c"
+								value={busRefContactNumber2} variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Feedback 2
+                            </label>
+							<lightning-input-field field-name="Feedback_2__c" onchange={handleFormValue}
+								variant="label-hidden">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<label class="slds-form-element__label">
+                                <abbr if:true={isRemarkMandatory} class="slds-required">*</abbr>Business Reference Remarks
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+					<template if:true={isMarginBasis}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Year Of Occupation
+                            </label>
+							<lightning-input-field field-name="Year_of_Occupation__c" variant="label-hidden"
+								style="display: none;" value={yearOfOccupation}>
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={yearOfOccupation} variant="label-hidden"
+								name="Year_of_Occupation__c" onchange={handleFormValue} label="Year Of Occupation"
+								message-when-range-overflow="Maximum 3 digits are allowed." max="999.99"
+								message-when-step-mismatch="Maximum 2 decimal places are allowed.">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Ownership Document Proof
+                            </label>
+							<lightning-input-field field-name="Ownership_document_proof__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Nature of Document Proof Self Employed
+                            </label>
+							<lightning-input-field field-name="Nature_of_Document_Proof_Self_Employed__c"
+								variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Other Confirmations
+                            </label>
+							<lightning-input-field field-name="Other_Confirmations__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Overall Remarks Regarding Business
+                            </label>
+							<lightning-input-field field-name="Overall_Remarks_Regarding_Business__c"
+								variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Sales Per Day
+                            </label>
+							<lightning-input-field field-name="Sales_per_day__c" variant="label-hidden"
+								data-id="Sales_per_day__c" onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Number Of Days
+                            </label>
+							<lightning-input-field field-name="Number_of_days__c" variant="label-hidden"
+								data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+								name="Number_of_days__c" onchange={handleCalculations}
+								message-when-range-overflow="Maximum 31 days are allowed." max="31"
+								max-length="8">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Sales Per Month
+                            </label>
+							<lightning-input-field field-name="Sales_per_month__c" variant="label-hidden"
+								value={salesPerMonth} onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Margin
+                            </label>
+							<lightning-input-field field-name="Margin__c" variant="label-hidden" data-id="Margin__c"
+								onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Margin In Amount
+                            </label>
+							<lightning-input-field field-name="Margin_in_amount__c" variant="label-hidden"
+								value={salesPerMonth} onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Electricity
+                            </label>
+							<lightning-input-field field-name="Electricity__c" variant="label-hidden"
+								data-id="Electricity__c" onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Salary
+                            </label>
+							<lightning-input-field field-name="Salary__c" variant="label-hidden" data-id="Salary__c"
+								onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Rent
+                            </label>
+							<lightning-input-field field-name="Rent__c" variant="label-hidden" data-id="Rent__c"
+								onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Others
+                            </label>
+							<lightning-input-field field-name="Others__c" variant="label-hidden" data-id="Others__c"
+								onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Gross Monthly Income
+                            </label>
+							<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-hidden"
+								value={grossMonthlyIncome}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                            </label>
+							<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+								variant="label-hidden" value={percentageOfIncome} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+								name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+								message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+								message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Assumptions For Income
+                            </label>
+							<lightning-input-field field-name="Assumptions_for_Income__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Business Reference Name
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Name__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Business Reference Contact Number
+                            </label>
+							<lightning-input type="text" variant="label-hidden"
+								name="Business_Reference_Contact_Number__c" max-length="10" value={busRefContactNumber}
+								onchange={handleFormValue} pattern="[0-9]{10}" min-length="10"
+								message-when-too-long="Phone number should be of 10 digits."
+								message-when-too-short="Phone number should be of 10 digits."
+								message-when-pattern-mismatch="Only 10 digits are allowed.">
+							</lightning-input>
+							<lightning-input-field field-name="Business_Reference_Contact_Number__c"
+								value={busRefContactNumber} variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Feedback
+                            </label>
+							<lightning-input-field field-name="Feedback__c" variant="label-hidden"
+								onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Business Reference Name 2
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Name_2__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Business Reference Contact Number
+                            </label>
+							<lightning-input type="text" variant="label-hidden"
+								name="Business_Reference_Contact_Number_2__c" max-length="10"
+								value={busRefContactNumber2} onchange={handleFormValue} pattern="[0-9]{10}"
+								min-length="10" message-when-too-long="Phone number should be of 10 digits."
+								message-when-too-short="Phone number should be of 10 digits."
+								message-when-pattern-mismatch="Only 10 digits are allowed.">
+							</lightning-input>
+							<lightning-input-field field-name="Business_Reference_Contact_Number_2__c"
+								value={busRefContactNumber2} variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required">*</abbr>Feedback 2
+                            </label>
+							<lightning-input-field field-name="Feedback_2__c" onchange={handleFormValue}
+								variant="label-hidden">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<label if:true={isRemarkMandatory} class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Business Reference Remarks
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+				</template>
+				<template if:true={isEateriesAndOthers}>
+					<template if:true={isDayBasis}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Business Name
+                            </label>
+							<lightning-input-field field-name="Business_name__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Business Nature
+                            </label>
+							<lightning-input-field field-name="Business_Nature__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Year Of Business
+                            </label>
+							<lightning-input-field field-name="Year_of_Business__c" value={yearOfBusiness}
+								variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={yearOfBusiness} variant="label-hidden"
+								name="Year_of_Business__c" onchange={handleFormValue} max={totalExpInBusiness}
+								message-when-range-overflow="Year Of Business should be less than Total Experience In This Business."
+								message-when-step-mismatch="Maximum 2 decimal places are allowed.">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Total Experience In This Business(yrs)
+                            </label>
+							<lightning-input-field field-name="Total_experience_in_this_business_yrs__c"
+								variant="label-hidden" value={totalExpInBusiness} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={totalExpInBusiness} variant="label-hidden"
+								name="Total_experience_in_this_business_yrs__c" onchange={handleFormValue}
+								message-when-range-overflow="Maximum 2 digits are allowed." min={yearOfBusiness}
+								message-when-range-underflow="Total Experience should be greater than Year Of Business."
+								message-when-step-mismatch="Maximum 2 decimal places are allowed."
+								label="Total Experience In This Business(yrs)" max="99">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Nature Of Ownership
+                            </label>
+							<lightning-input-field field-name="Nature_of_Ownership__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Ownership Proof Available
+                            </label>
+							<lightning-input-field field-name="Ownership_Proof_available__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Ownership Proof
+                            </label>
+							<lightning-input-field field-name="Ownership_proof__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Regular Business Activity
+                            </label>
+							<lightning-input-field field-name="regular_business_activity__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Income Per Day
+                            </label>
+							<lightning-input-field field-name="Income_per_day__c" variant="label-hidden"
+								data-id="Income_per_day__c" onchange={handleCalculations} value={incomePerDayVal}
+								style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={incomePerDayVal} variant="label-hidden"
+								name="Income_per_day__c" onchange={handleCalculations}
+								message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+								message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99999999.99">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Number Of Days
+                            </label>
+							<lightning-input-field field-name="Number_of_days__c" variant="label-hidden"
+								data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+								name="Number_of_days__c" onchange={handleCalculations}
+								message-when-range-overflow="Maximum 31 days are allowed." max="31"
+								max-length="8">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>Gross Monthly Income
+                            </label>
+							<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-hidden"
+								value={grossMonthlyIncome}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="3">
+							<label  class="slds-form-element__label">
+								<abbr class="slds-required">*</abbr>% Of Income Transacted Through Bank Account
+                            </label>
+							<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+								variant="label-hidden" value={percentageOfIncome} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+								name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+								message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+								message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="3">
+							<label class="slds-form-element__label" >
+                                <abbr class="slds-required" >*</abbr>Business Pincode
+                            </label>
+							<lightning-input-field field-name="IncomePincode__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="9">
+							<label class="slds-form-element__label" >
+                                <abbr class="slds-required" >*</abbr>Assumptions For Income
+                            </label>
+							<lightning-input-field field-name="Assumptions_for_Income__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Reference Name
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Name__c" variant="label-hidden"
+								onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Reference Contact Number
+                            </label>
+							<lightning-input type="text" variant="label-hidden"
+								name="Business_Reference_Contact_Number__c" max-length="10" value={busRefContactNumber}
+								onchange={handleFormValue} pattern="[0-9]{10}" min-length="10"
+								message-when-too-long="Phone number should be of 10 digits."
+								message-when-too-short="Phone number should be of 10 digits."
+								message-when-pattern-mismatch="Only 10 digits are allowed.">
+							</lightning-input>
+							<lightning-input-field field-name="Business_Reference_Contact_Number__c"
+								value={busRefContactNumber} variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Feedback
+                            </label>
+							<lightning-input-field field-name="Feedback__c" variant="label-hidden"
+								onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Reference Name
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Name_2__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Reference Contact Number
+                            </label>
+							<lightning-input type="text" variant="label-hidden"
+								name="Business_Reference_Contact_Number_2__c" max-length="10"
+								value={busRefContactNumber2} onchange={handleFormValue} pattern="[0-9]{10}"
+								min-length="10" message-when-too-long="Phone number should be of 10 digits."
+								message-when-too-short="Phone number should be of 10 digits."
+								message-when-pattern-mismatch="Only 10 digits are allowed.">
+							</lightning-input>
+							<lightning-input-field field-name="Business_Reference_Contact_Number_2__c"
+								value={busRefContactNumber2} variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Feedback
+                            </label>
+							<lightning-input-field field-name="Feedback_2__c" variant="label-hidden"
+								onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<label class="slds-form-element__label">
+                                <abbr if:true={isRemarkMandatory} class="slds-required" >*</abbr>Business Reference Remarks
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+					<template if:true={isMarginBasis}>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Name
+                            </label>
+							<lightning-input-field field-name="Business_name__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Nature
+                            </label>
+							<lightning-input-field field-name="Business_Nature__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Year Of Business
+                            </label>
+							<lightning-input-field field-name="Year_of_Business__c" value={yearOfBusiness}
+								variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={yearOfBusiness} variant="label-hidden"
+								name="Year_of_Business__c" onchange={handleFormValue}
+								message-when-range-overflow="Year Of Business should be less than Total Experience In This Business."
+								message-when-step-mismatch="Maximum 2 decimal places are allowed." max={totalExpInBusiness}>
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Total Experience In This Business(yrs)
+                            </label>
+							<lightning-input-field field-name="Total_experience_in_this_business_yrs__c"
+								variant="label-hidden" value={totalExpInBusiness} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={totalExpInBusiness} variant="label-hidden"
+								name="Total_experience_in_this_business_yrs__c" onchange={handleFormValue}
+								message-when-range-overflow="Maximum 3 digits are allowed." min={yearOfBusiness}
+								message-when-range-underflow="Total Experience should be greater than Year Of Business."
+								message-when-step-mismatch="Maximum 2 decimal places are allowed." max="99">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Nature Of Ownership
+                            </label>
+							<lightning-input-field field-name="Nature_of_Ownership__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr  class="slds-required" >*</abbr>Ownership Proof Available
+                            </label>
+							<lightning-input-field field-name="Ownership_Proof_available__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Ownership Proof
+                            </label>
+							<lightning-input-field field-name="Ownership_proof__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Regular Business Activity
+                            </label>
+							<lightning-input-field field-name="regular_business_activity__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Sales Per Day
+                            </label>
+							<lightning-input-field field-name="Sales_per_day__c" variant="label-hidden"
+								data-id="Sales_per_day__c" onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Number Of Days
+                            </label>
+							<lightning-input-field field-name="Number_of_days__c" variant="label-hidden"
+								data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+								name="Number_of_days__c" onchange={handleCalculations}
+								message-when-range-overflow="Maximum 31 days are allowed." max="31"
+								max-length="8">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Sales Per Month
+                            </label>
+							<lightning-input-field field-name="Sales_per_month__c" variant="label-hidden"
+								value={salesPerMonth}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Margin
+                            </label>
+							<lightning-input-field field-name="Margin__c" variant="label-hidden" data-id="Margin__c"
+								onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Margin In Amount
+                            </label>
+							<lightning-input-field field-name="Margin_in_amount__c" variant="label-hidden"
+								value={marginInAmount}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Electricity
+                            </label>
+							<lightning-input-field field-name="Electricity__c" variant="label-hidden"
+								data-id="Electricity__c" onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Salary
+                            </label>
+							<lightning-input-field field-name="Salary__c" variant="label-hidden" data-id="Salary__c"
+								onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Rent
+                            </label>
+							<lightning-input-field field-name="Rent__c" variant="label-hidden" data-id="Rent__c"
+								onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Others
+                            </label>
+							<lightning-input-field field-name="Others__c" variant="label-hidden" data-id="Others__c"
+								onchange={handleCalculations}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Gross Monthly Income
+                            </label>
+							<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-hidden"
+								value={grossMonthlyIncome}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>% Of Income Transacted Through Bank Account
+                            </label>
+							<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+								variant="label-hidden" value={percentageOfIncome} style="display: none;">
+							</lightning-input-field>
+							<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+								name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+								message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+								message-when-step-mismatch="Maximum 2 decimal places are allowed." max="100">
+							</lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="4" large-device-size="4">
+							<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required">*</abbr>Business Pincode
+                            </label>
+							<lightning-input-field field-name="IncomePincode__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Assumptions for Income
+                            </label>
+							<lightning-input-field field-name="Assumptions_for_Income__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Reference Name
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Name__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Reference Contact Number
+                            </label>
+							<lightning-input type="text" variant="label-hidden"
+								name="Business_Reference_Contact_Number__c" max-length="10" value={busRefContactNumber}
+								onchange={handleFormValue} pattern="[0-9]{10}" min-length="10"
+								message-when-too-long="Phone number should be of 10 digits."
+								message-when-too-short="Phone number should be of 10 digits."
+								message-when-pattern-mismatch="Only 10 digits are allowed.">
+							</lightning-input>
+							<lightning-input-field field-name="Business_Reference_Contact_Number__c"
+								value={busRefContactNumber} variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Feedback
+                            </label>
+							<lightning-input-field field-name="Feedback__c" variant="label-hidden"
+								onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Reference Name 2
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Name_2__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Business Reference Contact Number 2
+                            </label>
+							<lightning-input type="text" variant="label-hidden"
+								name="Business_Reference_Contact_Number_2__c" max-length="10"
+								value={busRefContactNumber2} onchange={handleFormValue} pattern="[0-9]{10}"
+								min-length="10" message-when-too-long="Phone number should be of 10 digits."
+								message-when-too-short="Phone number should be of 10 digits."
+								message-when-pattern-mismatch="Only 10 digits are allowed.">
+							</lightning-input>
+							<lightning-input-field field-name="Business_Reference_Contact_Number_2__c"
+								value={busRefContactNumber2} variant="label-hidden" style="display: none;">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="4">
+							<label class="slds-form-element__label">
+                                <abbr class="slds-required" >*</abbr>Feedback 2
+                            </label>
+							<lightning-input-field field-name="Feedback_2__c" variant="label-hidden"
+								onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<label class="slds-form-element__label">
+                                <abbr if:true={isRemarkMandatory}  class="slds-required" >*</abbr>Business Reference Remarks
+                            </label>
+							<lightning-input-field field-name="Business_Reference_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+							</lightning-input-field>
+						</lightning-layout-item>
+					</template>
+				</template>
+				<template if:true={isTransport}>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Business Name
+						</label>
+						<lightning-input-field field-name="Business_name__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Total Experience In This Business(yrs)
+						</label>
+						<lightning-input-field field-name="Total_experience_in_this_business_yrs__c"
+							variant="label-hidden" value={totalExpInBusiness} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={totalExpInBusiness} variant="label-hidden"
+							name="Total_experience_in_this_business_yrs__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 3 digits are allowed."
+							message-when-step-mismatch="Maximum 2 decimal places are allowed."
+							label="Total Experience In This Business(yrs)" max="999">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Nature of Ownership Transport
+						</label>
+						<lightning-input-field field-name="Nature_of_Ownership_Transport__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Ownership Proof Available
+						</label>
+						<lightning-input-field field-name="Ownership_Proof_available__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Nature of Ownership Proof
+                        </label>
+						<lightning-input-field field-name="Nature_of_Ownership_Proof__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="8">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Remarks
+                        </label>
+						<lightning-input-field field-name="Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Income Per Day
+                        </label>
+						<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+							data-id="Income_per_day__c" onchange={handleCalculations} value={incomePerDayVal}
+							style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={incomePerDayVal} variant="label-hidden"
+							name="Income_per_day__c" onchange={handleCalculations}
+							message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed." label="Income Per Day"
+							max="99999999.99">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Number Of Days
+                        </label>
+						<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+							data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+							name="Number_of_days__c" onchange={handleCalculations}
+							message-when-range-overflow="Maximum 31 days are allowed." label="Number Of Days"
+							max="31" max-length="8">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+							value={grossMonthlyIncome}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>% Of Income Transacted Through Bank Account
+                        </label>
+						<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+							variant="label-hidden" value={percentageOfIncome} style="display: none;">
+						</lightning-input-field>
+						<lightning-input type="number" step="0.01" value={percentageOfIncome} variant="label-hidden"
+							name="of_income_transacted_through_bank_acco__c" onchange={handleFormValue}
+							message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+							message-when-step-mismatch="Maximum 2 decimal places are allowed."
+							label="% Of Income Transacted Through Bank Account" max="100">
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Assumptions for Income
+                        </label>
+						<lightning-input-field field-name="Assumptions_for_Income__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+							<abbr class="slds-required" >*</abbr>Other Confirmations
+                        </label>
+						<lightning-input-field field-name="Other_Confirmations__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+						medium-device-size="4" large-device-size="3">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Business Pincode
+                        </label>
+						<lightning-input-field field-name="IncomePincode__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="6">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Overall Remarks
+                        </label>
+						<lightning-input-field field-name="Overall_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Business Reference Name
+                        </label>
+						<lightning-input-field field-name="Business_Reference_Name__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Business Reference Contact Number
+                        </label>
+						<lightning-input type="text" variant="label-hidden" name="Business_Reference_Contact_Number__c"
+							label="Business Reference Contact Number" max-length="10" value={busRefContactNumber}
+							onchange={handleFormValue} pattern="[0-9]{10}" min-length="10"
+							message-when-too-long="Phone number should be of 10 digits."
+							message-when-too-short="Phone number should be of 10 digits."
+							message-when-pattern-mismatch="Only 10 digits are allowed.">
+						</lightning-input>
+						<lightning-input-field field-name="Business_Reference_Contact_Number__c"
+							value={busRefContactNumber} variant="label-stacked" required style="display: none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Feedback
+                        </label>
+						<lightning-input-field field-name="Feedback__c" variant="label-hidden"
+							onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Business Reference Name
+                        </label>
+						<lightning-input-field field-name="Business_Reference_Name_2__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Business Reference Contact Number
+                        </label>
+						<lightning-input type="text" variant="label-hidden"
+							name="Business_Reference_Contact_Number_2__c" label="Business Reference Contact Number"
+							max-length="10" value={busRefContactNumber2} onchange={handleFormValue} pattern="[0-9]{10}"
+							min-length="10" message-when-too-long="Phone number should be of 10 digits."
+							message-when-too-short="Phone number should be of 10 digits."
+							message-when-pattern-mismatch="Only 10 digits are allowed.">
+						</lightning-input>
+						<lightning-input-field field-name="Business_Reference_Contact_Number_2__c"
+							value={busRefContactNumber2} variant="label-stacked" required style="display: none;">
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="4">
+						<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Feedback
+                        </label>
+						<lightning-input-field field-name="Feedback_2__c" variant="label-stacked"
+							onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+						medium-device-size="12" large-device-size="12">
+						<label class="slds-form-element__label">
+                            <abbr if:true={isRemarkMandatory} class="slds-required">*</abbr>Business Reference Remarks
+                        </label>
+						<lightning-input-field field-name="Business_Reference_Remarks__c" variant="label-hidden" onchange={handleFormValue}>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</template>
+				<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+					medium-device-size="12" large-device-size="12">
+					<div class="slds-var-m-top_medium slds-float_right">
+						<lightning-button class="slds-m-right--small" variant="neutral" type="submit" label='Cancel'
+							onclick={onCancel}>
+						</lightning-button>
+						<lightning-button variant="brand" type="submit" label="Save" id="capability-btn">
+						</lightning-button>
+					</div>
+				</lightning-layout-item>
+			</lightning-layout>
+		</lightning-record-edit-form>
+	</div>
+	<template if:true={capabilityTableData}>
+		<div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+			<h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+				<span class="slds-truncate">List of Capabilities</span>
+			</h3>
+			<div aria-hidden="false" class="slds-section__content slds-p-left_small">
+				<c-generic-data-table-l-w-c result={capabilityTableData} btns={rowAction}
+					onselected={handleSelectedCapability}></c-generic-data-table-l-w-c>
+			</div>
+		</div>
+	</template>
+</template>
