@@ -1,0 +1,177 @@
+<template>
+	<lightning-spinner alternative-text="Loading" size="large" if:true={showSpinner}></lightning-spinner>
+	<!-- <div if:true={allContentVersionRecord}>
+		<lightning-card variant="Narrow" title="List Of Documents">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-p-top_xx-small"
+				aria-labelledby="element-with-table-label other-element-with-table-label">
+				<thead>
+					<tr class="slds-line-height_reset">
+						<th class="widthapplicantcss" scope="col">
+							<div class="slds-truncate" title="Name">Document Name</div>
+						</th>
+						<th class="widthapplicantcss" scope="col">
+							<div class="slds-truncate" title="DOC_Type">Document Type</div>
+						</th>
+						<th class="widthapplicantcss" scope="col">
+							<div class="slds-truncate" title="DOC_No">Document Number</div>
+						</th>
+						<th class="widthapplicantcss" scope="col">
+							<div class="slds-truncate" title="DOC_Date">Document Date</div>
+						</th>
+						<th class="widthapplicantcss" scope="col">
+							<div class="slds-truncate" title="PAGE_NO">Number of Pages</div>
+						</th>
+						<th class="widthapplicantcss" scope="col">
+							<div class="slds-truncate" title="DOC_CON">Document Condition</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template for:each={allContentVersionRecord} for:item="data" for:index="index">
+						<tr class="slds-hint-parent" key={data.cv.Id}>
+							<th data-label="Name" scope="row">
+								<div class="slds-truncate" title="Name">
+									{data.cv.Document_Name__c}
+								</div>
+							</th>
+							<td data-label="Stage">
+								<div class="slds-truncate" title="Type" style="overflow: initial;">
+									{data.cv.Agreement_Document_Type__c}
+								</div>
+							</td>
+							<td data-label="DOC_NO">
+								<div class="slds-truncate" title="DOC_NO">
+									{data.cv.Document_Number__c}
+								</div>
+							</td>
+							<td data-label="DOC_DATE">
+								<div class="slds-truncate" title="DOC_DATE">
+									<lightning-formatted-date-time value={data.cv.CreatedDate}>
+									</lightning-formatted-date-time>
+								</div>
+							</td>
+							<td data-label="PAGE_NO">
+								<div class="slds-truncate" title="PAGE_NO">
+									{data.cv.Number_of_Pages__c}
+								</div>
+							</td>
+							<td data-label="DOC_CON">
+								<div class="slds-truncate" title="DOC_CON" style="overflow: initial;">
+									{data.cv.Document_Condition__c}
+								</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+			<div slot="footer">
+			<button class="slds-button slds-button_brand" onclick={generateDocument} title="Generate Acknowledgement Slip">Generate Acknowledgement Slip</button>
+			</div>
+		</lightning-card>
+	</div> -->
+	<lightning-card variant="Narrow">
+		<lightning-button-icon variant='brand' title="Add Additional Row" icon-name="utility:add" onclick={addNewRow}
+			slot="actions"></lightning-button-icon>
+		<table class="slds-table slds-table_bordered slds-no-row-hover slds-table_cell-buffer" role="grid">
+			<thead>
+				<tr>
+					<th scope="col" height="22" style="width: 3rem">Sr.</th>
+					<th scope="col" height="22">Document Name</th>
+					<th scope="col" height="22">Document Type</th>
+					<th scope="col" height="22">Document Number</th>
+					<th scope="col" height="22">Document Date</th>
+					<th scope="col" height="22">Number Of Pages</th>
+					<th scope="col" height="22">Document Condition</th>
+					<th scope="col" height="22" style="width: 3rem"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<template for:each={listOfDocs} for:item="rec">
+					<tr key={rec} class="slds-hint-parent">
+						<td style="font-weight: bold">
+							<lightning-formatted-number value={rec.index}></lightning-formatted-number>.
+						</td>
+						<td>
+							<template if:false={rec.isNewRow}>
+								{rec.docName}
+							</template>
+							<template if:true={rec.isNewRow}>
+								<lightning-input type="text" variant="label-hidden" label="" data-id={rec.index}
+									name="Name" value={rec.Name} onchange={handleInputChange} required></lightning-input>
+							</template>
+						</td>
+
+						<td>
+							<template if:false={rec.isNewRow}>
+								{rec.docType}
+							</template>
+							<template if:true={rec.isNewRow}>
+								<lightning-combobox options={docTypeList} dropdown-alignment="auto" data-id={rec.index}
+									name="Document_Type__c" value={rec.Document_Type__c} onchange={handleInputChange}
+									variant="label-hidden" required>
+								</lightning-combobox>
+							</template>
+						</td>
+
+						<td>
+							<template if:false={rec.isNewRow}>
+								{rec.docNumber}
+							</template>
+							<template if:true={rec.isNewRow}>
+								<lightning-input type="text" variant="label-hidden" label="" data-id={rec.index}
+									name="Document_Number__c" value={rec.Document_Number__c}
+									onchange={handleInputChange} required></lightning-input>
+							</template>
+						</td>
+
+						<td>
+							<template if:false={rec.isNewRow}>
+								<lightning-formatted-date-time value={rec.docDate}>
+								</lightning-formatted-date-time>
+							</template>
+							<template if:true={rec.isNewRow}>
+								<lightning-input type="date" variant="label-hidden" label="" data-id={rec.index}
+									name="Document_Date__c" value={rec.Document_Date__c} onchange={handleInputChange} max={maxDate} required>
+								</lightning-input>
+							</template>
+						</td>
+
+						<td>
+							<template if:false={rec.isNewRow}>
+								{rec.noOfPages}
+							</template>
+							<template if:true={rec.isNewRow}>
+								<lightning-input type="Number" variant="label-hidden" label="" data-id={rec.index}
+									name="Number_Of_Pages__c" value={rec.Number_Of_Pages__c}
+									onchange={handleInputChange} required></lightning-input>
+							</template>
+						</td>
+
+						<td>
+							<template if:false={rec.isNewRow}>
+								{rec.docCondition}
+							</template>
+							<template if:true={rec.isNewRow}>
+								<lightning-combobox options={docConList} dropdown-alignment="auto" data-id={rec.index}
+									name="Document_Condition__c" value={rec.Document_Condition__c}
+									onchange={handleInputChange} variant="label-hidden" required>
+								</lightning-combobox>
+							</template>
+						</td>
+
+						<td>
+							<lightning-button-icon icon-name="utility:delete" alternative-text="Remove" title="Remove" name={rec.index} data-saved={rec.isNewRow}
+							    data-id ={rec.recId} onclick={removeRow}></lightning-button-icon>
+						</td>
+					</tr>
+				</template>
+			</tbody>
+		</table>
+		<div slot="footer">
+			<lightning-button variant="brand" label="Save" title="Save" onclick={createAcknowledgementSlipRecords} disabled={enableSave}>
+			</lightning-button>&nbsp;&nbsp;
+			<lightning-button variant="brand" label="Generate Acknowledgement Slip"
+				title="Generate Acknowledgement Slip" onclick={generateDocument} disabled={isSave}></lightning-button>
+		</div>
+	</lightning-card>
+</template>

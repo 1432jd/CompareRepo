@@ -1,0 +1,21 @@
+<template>
+    <!-- <lightning-spinner alternative-text="Loading" size="medium" if:true={showSpinner}></lightning-spinner> -->
+    
+    <!--PAGE HEADER-->
+    <c-fs-page-container-l-w-c if:true={lastLoginDate} headericon="standard:action_list_component" stagename="Document Generation"
+		appno={applicationName} businessdate={todaysDate} lastlogindate={lastLoginDate} btns={button}
+		onrowselectionevent={rowselectionevent}>
+	</c-fs-page-container-l-w-c>
+    <!--PAGE HEADER-->
+
+
+    <!-- <lightning-tabset variant="scoped" active-tab-value={tabName}>
+        <lightning-tab label="Document Generation" value="Doc_Gen" onactive={handleActive}> -->
+            <!-- <div class="slds-scrollable_y" style="max-height:400px;"> -->
+                <c-fs-agreement-execution-d-g application-id={recordId} app-name={applicationName}>
+                </c-fs-agreement-execution-d-g>
+            <!-- </div> -->
+        <!-- </lightning-tab>
+    </lightning-tabset> -->
+    
+</template>

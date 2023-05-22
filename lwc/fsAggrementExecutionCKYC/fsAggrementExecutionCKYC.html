@@ -1,0 +1,54 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+	<lightning-card variant="Narrow" if:true={showApplicants} title="Select Applicant">
+		<!-- <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open" if:true={showApplicants}> -->
+		<lightning-layout>
+			<lightning-layout-item size="3" padding="horizontal-small">
+				<lightning-combobox name="applicant_list" label="Select Applicant" value={applicantValue}
+					placeholder="Select Value" options={applicantOptions} onchange={handleSelectedApplicant}
+					class="slds-m-bottom_medium mycombobox" variant="label-hidden">
+				</lightning-combobox>
+			</lightning-layout-item>
+		</lightning-layout>
+	</lightning-card>
+	<!-- </div> -->
+	<template if:true={showCkyc}>
+		<!-- <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+			<div aria-hidden="false" class="slds-section__content slds-p-left_small"> -->
+		<template if:true={fieldsContent}>
+			<div class="slds-m-top_small">
+			</div>
+			<lightning-card variant="Narrow" title="Enter CKYC Details">
+				<c-generic-edit-pages-l-w-c fields-content={fieldsContent} onchanged={handleValueChange}>
+				</c-generic-edit-pages-l-w-c><br/>
+				<div slot="footer">
+					<lightning-button variant="brand" label="Save" title="Save" onclick={handleSave}>
+					</lightning-button>
+					<lightning-button label="Cancel" title="Cancel" onclick={handleCancel} class="slds-m-left_x-small">
+					</lightning-button>
+				</div>
+			</lightning-card>
+		</template>
+		<!-- </div>
+		</div> -->
+	</template>
+	<template if:true={isCkycDataArrived}>
+		<div class="slds-m-top_small">
+		</div>
+		<lightning-card  variant="Narrow" title="List Of CKYC Details">
+		<!-- <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open"> -->
+			<!-- <c-fs-title-section title="List Of Ckyc Details"></c-fs-title-section> -->
+			<c-generic-data-table-l-w-c data-id="Agreement" result={tableData} btns={rowAction}
+				onselected={handleSelectedLoanApplicant}></c-generic-data-table-l-w-c>
+		<!-- </div> -->
+		</lightning-card>
+	</template>
+	<!-- Delete Popup -->
+	<template if:true={showDeletePopup}>
+		<c-fs-delete-l-w-c delete-from="CKYC" object-api-name="Loan_Applicant__c" show-modal={showDeletePopup}
+			rec-id={loanAppId} onmodaldelete={handlemodalactions} onmodalcancel={handlemodalactions}>
+		</c-fs-delete-l-w-c>
+	</template>
+</template>

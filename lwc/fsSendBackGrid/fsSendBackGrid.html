@@ -1,0 +1,35 @@
+<template>
+	<template if:true={notes}>
+		<lightning-card  variant="Narrow">
+		<!-- <div class="slds-box slds-theme_default"> -->
+			<template if:true={isSendBackAvailable}>
+				<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+					<thead>
+						<th>Module(From) - Module(To)</th>
+						<th>Type</th>
+						<th>Send Back / Retrigger Remarks</th>
+						<th>Send Back / Retrigger Date</th>
+					</thead>
+					<tbody>
+						<template for:each={notes} for:item="note">
+							<tr key={note.noteObj.Id}>
+								<td data-label="Title" scope="row">{note.noteObj.Title}</td>
+								<td data-label="Title" scope="row">{note.sourceType}</td>
+								<td class="slds-cell-wrap" data-label="Body" scope="row">{note.noteObj.Body}</td>
+								<td data-label="Date" scope="row">
+									<lightning-formatted-date-time value={note.noteObj.CreatedDate}></lightning-formatted-date-time>
+								</td>
+							</tr>
+						</template>
+					</tbody>
+				</table>
+			</template>
+			<template if:true={isNotesAvailable}>
+			<template if:false={isSendBackAvailable}>
+				<div class="slds-align_absolute-center"><span><b>No Retrigger/Send Back available till now</b></span></div>
+			</template>
+			</template>
+		<!-- </div> -->
+		</lightning-card>
+	</template>
+</template>

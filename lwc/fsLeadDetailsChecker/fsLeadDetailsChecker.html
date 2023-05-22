@@ -1,0 +1,268 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+	<!--PAGE HEADER-->
+	<template if:true={showPendingReason}>
+		<section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-modal="true">
+			<div class="slds-modal__container">
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-05" class="slds-modal__title slds-hyphenate">Pending Reason</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-5">
+					<c-fs-pending-reason-grid if:true={recordId} stage-name="Lead Detail Checker"
+						application-id={recordId}></c-fs-pending-reason-grid>
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-button variant="netural" label="Cancel" title="Cancel"
+						onclick={showHidePendingReasonGrid} class="slds-m-left_x-small"></lightning-button>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+	<c-fs-page-container-l-w-c if:true={applicationName} headericon="standard:asset_audit"
+		stagename="Lead Details Checker" appno={applicationName} businessdate={todaysDate} lastlogindate={lastLoginDate}
+		btns={btns} onrowselectionevent={rowselectionevent}>
+	</c-fs-page-container-l-w-c>
+	<template if:true={openSendBack}>
+		<c-fs-send-back show-modal={openSendBack} stage-from="Lead Detail Checker" application-id={recordId}
+			oncloseclick={handleSendBackClose} onsubmitclick={handleSendBackSubmit}></c-fs-send-back>
+	</template>
+	<lightning-tabset variant="scoped" active-tab-value={activeError}>
+		<lightning-tab label="Application Information" value="step-1" title="Application Information">
+			<!---<div class="slds-scrollable_y">-->
+			<lightning-tabset variant="scoped">
+				<lightning-tab onactive={handleActive} value="Application Type" label="Application Type"
+					title="Application Type">
+					<!---<div class="slds-scrollable_y">-->
+					<c-fs-lead-details-application-type-checker application-id={recordId}
+						onhandletabvaluechange={handleTabValueChange}>
+					</c-fs-lead-details-application-type-checker>
+					<!---</div>-->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Application_Information" label="Applicant Information"
+					title="Applicant Information">
+					<!--<div class="slds-scrollable_y">-->
+					<c-fs-lead-details-personal-information-checker if:true={allLoanApplicant}
+						all-loan-applicant={allLoanApplicant} row-action={rowAction} application-id={recordId}
+						onshowtoastmessage={showToastMessage} oncheckpersonalinfo={checkPersonalInfo}
+						onhandletabvaluechange={handleTabValueChange}>
+					</c-fs-lead-details-personal-information-checker>
+					<!--</div>-->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Education" label="Education" title="Education">
+					<!--<div class="slds-scrollable_y">-->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-education-checker if:true={allApplicantData}
+							all-loan-applicant={allLoanApplicant} all-applicant-data={allApplicantData}
+							row-action={rowAction} onshowtoastmessage={showToastMessage}
+							onhandletabvaluechange={handleTabValueChange} onhandletabvalueremove={handleTabValueRemove}>
+						</c-fs-lead-details-education-checker>
+					</template>
+					<!--</div>-->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Family" label="Family" title="Family">
+					<!--<div class="slds-scrollable_y">-->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-family-checker all-loan-applicant={allLoanApplicant}
+							if:true={allApplicantData} all-applicant-data={allApplicantData} row-action={rowAction}
+							onshowtoastmessage={showToastMessage} onhandletabvaluechange={handleTabValueChange}
+							onhandletabvalueremove={handleTabValueRemove}></c-fs-lead-details-family-checker>
+					</template>
+					<!--</div>-->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Employment Details" label="Employment Details"
+					title="Employment Details">
+					<!--<div class="slds-scrollable_y">-->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-employment-details-checker all-loan-applicant={allLoanApplicant}
+							if:true={allApplicantData} all-applicant-data={allApplicantData} row-action={rowAction}
+							application-id={recordId} onshowtoastmessage={showToastMessage}
+							oncheckempdetailinfo={checkEmpTabDetails} onhandletabvaluechange={handleTabValueChange}
+							onhandletabvalueremove={handleTabValueRemove}>
+						</c-fs-lead-details-employment-details-checker>
+					</template>
+					<!--</div>-->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Income Details" label="Income Details"
+					title="Income Details">
+					<!--<div class="slds-scrollable_y">-->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-income-details-checker all-loan-applicant={allLoanApplicant}
+							if:true={allApplicantData} all-applicant-data={allApplicantData} row-action={rowAction}
+							onshowtoastmessage={showToastMessage} onhandletabvaluechange={handleTabValueChange}
+							onhandletabvalueremove={handleTabValueRemove}></c-fs-lead-details-income-details-checker>
+					</template>
+					<!--</div>-->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Bank Details" label="Bank Details" title="Bank Details">
+					<!--<div class="slds-scrollable_y">-->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-bank-details-checker all-loan-applicant={allLoanApplicant}
+							if:true={allApplicantData} all-applicant-data={allApplicantData} row-action={rowAction}
+							onhandletabvaluechange={handleTabValueChange} onshowtoastmessage={showToastMessage}
+							oncheckbankdetailinfo={checkBankTab} onhandletabvalueremove={handleTabValueRemove}>
+						</c-fs-lead-details-bank-details-checker>
+					</template>
+					<!--</div>-->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Reference Details" label="Reference Details"
+					title="Reference Details">
+					<!--<div class="slds-scrollable_y">-->
+					<c-fs-lead-details-reference-details-checker record-id={recordId}
+						onhandletabvaluechange={handleTabValueChange}>
+					</c-fs-lead-details-reference-details-checker>
+					<!--</div>-->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Receipt Details" label="Fee Details"
+					title="Receipt Details">
+					<c-fee-creation-parent record-id={recordId} pre-log-in-id={preLogin} app-name={applicationName}
+						primary-applicant-name={primaryApplicantName} stage-name="Lead Detail"></c-fee-creation-parent>
+				</lightning-tab>
+			</lightning-tabset>
+			<!---</div>-->
+		</lightning-tab>
+		<lightning-tab label="Loan Details" title="Loan Details" value="step-2">
+			<!--<div class="slds-scrollable_y">-->
+			<lightning-tabset variant="scoped">
+				<lightning-tab onactive={handleActive} label="Loan Type" value="loan-type" title="Loan Type">
+					<div class="slds-scrollable_y">
+						<c-fs-lead-details-loan-type-checker record-id={recordId}
+							oncheckloantypeinfo={checkloantypeinfo} onhandletabvaluechange={handleTabValueChange}>
+						</c-fs-lead-details-loan-type-checker>
+					</div>
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Property Details" label="Property Details"
+					title="Property Details">
+					<!-- <div class="slds-scrollable_y"> -->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-property-details-checker all-loan-applicant={allLoanApplicant}
+							application-id={recordId} all-applicant-data={allApplicantData} if:true={allApplicantData}
+							onshowtoastmessage={showToastMessage} ongetallleaddetailpropertydata={handlePropertyData}
+							oncheckpropertyvalidation={checkpropertyvalidation}
+							onhandletabvaluechange={handleTabValueChange}>
+						</c-fs-lead-details-property-details-checker>
+					</template>
+					<!-- </div> -->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Property Boundaries" label="Property Boundaries"
+					title="Property Boundaries">
+					<!-- <div class="slds-scrollable_y"> -->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-property-boundaries-checker all-loan-applicant={allLoanApplicant}
+							if:true={allApplicantData} all-applicant-data={allApplicantData}
+							onshowtoastmessage={showToastMessage} application-id={recordId}
+							onhandletabvaluechange={handleTabValueChange}>
+						</c-fs-lead-details-property-boundaries-checker>
+					</template>
+					<!-- </div> -->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Property Measurement" label="Property Measurement"
+					title="Property Measurement">
+					<!-- <div class="slds-scrollable_y"> -->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-property-measurement-checker all-loan-applicant={allLoanApplicant}
+							if:true={allApplicantData} all-applicant-data={allApplicantData}
+							onshowtoastmessage={showToastMessage} application-id={recordId}
+							onhandletabvaluechange={handleTabValueChange}>
+						</c-fs-lead-details-property-measurement-checker>
+					</template>
+					<!-- </div> -->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Property Address" label="Property Address"
+					title="Property Address">
+					<!-- <div class="slds-scrollable_y"> -->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-property-address-checker all-loan-applicant={allLoanApplicant}
+							if:true={allApplicantData} all-applicant-data={allApplicantData}
+							onshowtoastmessage={showToastMessage} ongetallleaddetailpropertydata={handlePropertyData}
+							application-id={recordId} onhandletabvaluechange={handleTabValueChange}>
+						</c-fs-lead-details-property-address-checker>
+					</template>
+					<!-- </div> -->
+				</lightning-tab>
+				<lightning-tab onactive={handleActive} value="Ownership Details" label="Ownership Details"
+					title="Ownership Details">
+					<!-- <div class="slds-scrollable_y"> -->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-ownership-details-checker all-loan-applicant={allLoanApplicant}
+							if:true={allApplicantData} all-applicant-data={allApplicantData}
+							onshowtoastmessage={showToastMessage} application-id={recordId}
+							ongetallleaddetailpropertydata={handlePropertyData}
+							onhandletabvaluechange={handleTabValueChange}>
+						</c-fs-lead-details-ownership-details-checker>
+					</template>
+					<!-- </div> -->
+				</lightning-tab>
+			</lightning-tabset>
+			<!---</div>-->
+		</lightning-tab>
+		<lightning-tab label="Sourcing Details" title="Sourcing Details">
+			<!---<div class="slds-scrollable_y">-->
+			<lightning-tabset variant="scoped">
+				<lightning-tab onactive={handleActive} value="Application Details" label="Application Details"
+					title="Application Details">
+					<!---<div class="slds-scrollable_y">--->
+					<template if:true={allLoanApplicant}>
+						<c-fs-lead-details-application-details-checker all-loan-applicant={allLoanApplicant}
+							application-id={recordId} onshowtoastmessage={showToastMessage}
+							ongetallleaddetailapplicationdata={handlePropertyData}
+							onhandletabvaluechange={handleTabValueChange}>
+						</c-fs-lead-details-application-details-checker>
+					</template>
+					<!--</div>-->
+				</lightning-tab>
+			</lightning-tabset>
+			<!---</div>-->
+		</lightning-tab>
+		<!-- Document Upload Screen -->
+		<lightning-tab label="Document Upload" value="DocumentUpload">
+			<div class="slds-scrollable_y" style="max-height:400px;">
+				<c-fs-generic-upload-documents if:true={recordTypeId} stage-name="Lead Detail" application-id={recordId}
+					record-type-id={recordTypeId} onrequireddocument={handleRequiredDocument}>
+				</c-fs-generic-upload-documents>
+			</div>
+		</lightning-tab>
+
+
+		<!-- Dedupe Tab-->
+		<lightning-tab label="Dedupe Details" value="Dedupe" onactive={handleActive}>
+			<c-fsdedupe-details-lwc if:true={recordId} record-id={recordId} source="Lead Details"
+				onfetchdedupedetails={getdedupedetails}>
+			</c-fsdedupe-details-lwc>
+		</lightning-tab>
+		<!-- Error Tab-->
+		<lightning-tab onactive={handleActive} label="Error" value="Error" show-error-indicator if:true={showErrorTab}
+			style="--sds-c-tabs-scoped-color-text-active: red">
+			<ul class="slds-list_dotted">
+				<template for:each={errorMsgs} for:item="err">
+					<li key={err} class="slds-text-color_destructive">{err}</li>
+				</template>
+			</ul>
+		</lightning-tab>
+		<lightning-tab label="Decision" value="Decision" if:true={showDecisionTab}
+			style="--slds-c-tabs-scoped-color-text-active: red">
+			<lightning-record-edit-form record-id={recordId} object-api-name="Application__c"
+				onsuccess={handleDecisionSuccess}>
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="6" padding="horizontal-small" small-device-size="12"
+						medium-device-size="6" large-device-size="6" style="overflow: initial;">
+						<lightning-input-field field-name="Lead_Detail_Checker_Decision__c" required>
+						</lightning-input-field>
+					</lightning-layout-item>
+					<lightning-layout-item size="6" padding="horizontal-small" small-device-size="12"
+						medium-device-size="6" large-device-size="6">
+						<lightning-input-field field-name="Lead_Detail_Checker_Remarks__c" required>
+						</lightning-input-field>
+					</lightning-layout-item>
+				</lightning-layout>
+				<div class="slds-var-m-top_medium slds-align_absolute-center">
+					<lightning-button variant="brand" type="submit" label="Save">
+					</lightning-button>
+				</div>
+			</lightning-record-edit-form>
+		</lightning-tab>
+	</lightning-tabset>
+	<div class="slds-p-vertical_large"></div>
+</template>

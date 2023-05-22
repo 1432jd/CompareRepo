@@ -1,0 +1,26 @@
+<template>
+	<template if:true={isSpinnerActive}>
+        <c-fs-spinner></c-fs-spinner>
+    </template>
+	<template if:true={fieldsContent}>
+		<lightning-card variant="Narrow" title="Enter Summary Details">
+			<c-generic-edit-pages-l-w-c fields-content={fieldsContent} onchanged={changedFromChild}>
+				<div slot="additionalFieldFirst"
+					class="slds-col slds-size_12-of-12 slds-large-size_3-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+					<label class="slds-form-element__label" >
+									<span style="color: red;">*&nbsp;</span>
+										Sourcing Officer
+									</label>
+					<c-l-w-c-lookup object-api-name="HRMS__c" field-api-name="Name" sub-field-api-name="Employee_Number__c"
+						object-label="Officer" variant="label-hidden" onselect={handleSelectedEMPId}
+						seleted-record-id={fieldOfficerEMPId} application-id={applicationId} criteria="NAME_EMP" required>
+					</c-l-w-c-lookup>
+				</div>
+			</c-generic-edit-pages-l-w-c><br/>
+			<div class="slds-align_absolute-center slds-m-around_x-small" slot="footer">
+				<lightning-button variant="brand" label="Update" title="Update" onclick={handleSave}
+					disabled={verificationStatus}></lightning-button>
+			</div>
+		</lightning-card>
+	</template>
+</template>

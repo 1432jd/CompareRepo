@@ -1,0 +1,55 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+
+	<!-- OCR -->
+	<c-fs-o-c-r prelogin-id={preloginId} onocrevent={handleOCREvent} onchangecustomertype={handleCustomerType} ongetapplicationid={handleApplicationId}
+	    ongetpreloginid={handlePreloginId}
+		onverificationevent={handleVerificationValue} ongetocrtable={handleOCRTable} ongetocrdoc={getOCRDocs}>
+	</c-fs-o-c-r>
+
+	<div class="slds-m-top_small">
+	</div>
+
+	<!-- Form -->
+	<div if:true={showCustomerInfoForm}>
+		<c-fs-loan-applicant-information ongetapplicationid={handleApplicationId} ongetpreloginid={handlePreloginId}
+			onhideocrtable={hideOCRTable} ongetappname={getAppName} oncallocrtable={refreshOCR}
+			application-id={applicationId} prelogin-id={preloginId} loan-data={loanData}
+			customer-type-value={customerTypeValue} verification-type-value={verificationTypeValue}>
+		</c-fs-loan-applicant-information>
+	</div>
+
+	<div class="slds-m-top_small">
+	</div>
+
+	<!-- List Of Applicants -->
+	<template if:true={isAccDataArrived}>
+		<lightning-card variant="Narrow" title="List Of Applicants">
+			<lightning-button variant="Brand" label="BM Verification" onclick={handleClickOnBMVerification} class="slds-float_right" slot="actions"></lightning-button>
+			<c-generic-data-table-l-w-c data-id="acc" result={accData} btns={accRowAction}
+				onselected={handleSelectedApplicant}>
+			</c-generic-data-table-l-w-c>
+		</lightning-card>
+	</template>
+
+	<!-- Delete Popup -->
+	<template if:true={showDeletePopup}>
+		<c-fs-delete-l-w-c delete-from="Loan Applicant Screen" object-api-name="Loan_Applicant__c"
+			show-modal={showDeletePopup} rec-id={loanAppId} onmodaldelete={handlemodalactions}
+			onmodalcancel={handlemodalactions}>
+		</c-fs-delete-l-w-c>
+	</template>
+
+	<!--Mobile Verification -->
+	<template if:true={showMobileVerification}>
+		<c-fs-mobile-verification-l-w-c onreloaddatatable={reloadDataTable} onhidemobilepopup={hideMobilePopup} stage='Login' loan-applicant-id={loanAppId} mobile-number={loanAppMobile}></c-fs-mobile-verification-l-w-c>
+	</template>
+
+	<!-- Display KYC Docs -->
+	<template if:true={showKYCDocsPopup}>
+		<c-fs-display-k-y-c-docs onclosekycpopup={closeKYCPopup} img-links={imageLinks}></c-fs-display-k-y-c-docs>
+	</template>
+
+</template>

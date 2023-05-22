@@ -1,0 +1,560 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+	<!-- <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open"
+		if:true={showApplicants}>
+		<lightning-layout>
+			<lightning-layout-item size="3" padding="horizontal-small">
+				<lightning-combobox name="applicant_list" label="Select Applicant" value={applicantValue}
+					placeholder="Select Value" options={applicantOptions} onchange={handleSelectedApplicant}
+					class="slds-m-bottom_medium mycombobox">
+				</lightning-combobox>
+			</lightning-layout-item>
+		</lightning-layout>
+	</div> -->
+	<lightning-tabset variant="scoped" active-tab-value={tabName}>
+		<!--Schedule A Tab -->
+		<lightning-tab label="Schedule A" value="Agreement_DG_Schedule_A" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} onchanged={handleFormValueChange}
+						class="Agreement_DG_Schedule_A">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--DPN Tab -->
+		<lightning-tab label="DPN" value="Agreement_DG_DPN" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} class="Agreement_DG_DPN">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Form 60 Tab -->
+		<lightning-tab label="Form 60" value="Agreement_DG_Form_60" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} class="Agreement_DG_Form_60">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Select Applicant
+							</label>
+							<lightning-combobox name="applicant_list" label="Select Applicant" value={applicantValue}
+								placeholder="Select Value" options={applicantOptions} onchange={handleSelectedApplicant}
+								class="slds-m-bottom_medium mycombobox" required="true" variant="label-hidden">
+							</lightning-combobox>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+						small-device-size="12" medium-device-size="12" large-device-size="3">
+						<div class="slds-form-element">
+							<lightning-input type="text" label="Applicant Name" value={loanApplicantName} disabled>
+							</lightning-input>
+						</div>
+					</lightning-layout-item> -->
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Vernacular / LTI Declaration Tab -->
+		<lightning-tab label="Vernacular / LTI Declaration" value="Agreement_DG_Vernacular_LTI_Declaratio"
+			onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} onchanged={handleFormValueChange}
+						class="Agreement_DG_Vernacular_LTI_Declaratio">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Select Borrower
+							</label>
+							<lightning-combobox name="applicant_list" label="Select Borrower" value={applicantValue}
+								placeholder="Select Value" options={applicantOptions} onchange={handleSelectedApplicant}
+								class="slds-m-bottom_medium mycombobox" required="true" variant="label-hidden">
+							</lightning-combobox>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Select Witness
+							</label>
+							<lightning-combobox name="applicant_list" label="Select Witness" placeholder="Select Value"
+								options={witnessOption} onchange={handleSelectedWitness} value={witnessValue}
+								class="slds-m-bottom_medium mycombobox" required="true" variant="label-hidden">
+							</lightning-combobox>
+						<!-- </lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Aadhar Consent Form Tab -->
+		<lightning-tab label="Aadhaar Consent Form" value="Agreement_DG_Aadhar_Consent_Form" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} class="Agreement_DG_Aadhar_Consent_Form">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Select Applicant
+							</label>
+							<lightning-combobox name="applicant_list" label="Select Applicant" value={applicantValue}
+								placeholder="Select Value" options={applicantOptions} onchange={handleSelectedApplicant}
+								class="slds-m-bottom_medium mycombobox" required="true" variant="label-hidden">
+							</lightning-combobox>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+						small-device-size="12" medium-device-size="12" large-device-size="3">
+						<div class="slds-form-element">
+							<lightning-input type="text" label="Applicant Name" value={loanApplicantName} disabled>
+							</lightning-input>
+						</div>
+					</lightning-layout-item> -->
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--MSME Letter Tab -->
+		<lightning-tab label="End Use Declaration" value="Agreement_DG_MSME_Letter" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} class="Agreement_DG_MSME_Letter">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Insurance Undertaking Letter Tab -->
+		<lightning-tab label="Insurance Undertaking Letter" value="Agreement_DG_Insurance_Undertaking_Lette"
+			onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent}
+						class="Agreement_DG_Insurance_Undertaking_Lette">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Insured Person
+							</label>
+								<lightning-input type="text" label="Insured Person" value={insuredPersonName}
+									disabled variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Original Title Deed - BM/OO Declaration -->
+		<lightning-tab label="Original Title Deed - BM/OO Declaration" value="Agreement_DG_Original_Title_Deed_BM_OO"
+			onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent}
+						class="Agreement_DG_Original_Title_Deed_BM_OO">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Signature Mismatch Letter-->
+		<lightning-tab label="Signature Mismatch Letter" value="Agreement_DG_Signature_Mismatch_Letter"
+			onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent}
+						class="Agreement_DG_Signature_Mismatch_Letter" onchanged={handleFormValueChange}>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Select Applicant
+							</label>
+							<lightning-combobox name="applicant_list" label="Select Applicant" value={applicantValue}
+								placeholder="Select Value" options={applicantOptions} onchange={handleSelectedApplicant}
+								class="slds-m-bottom_medium mycombobox" required="true" variant="label-hidden">
+							</lightning-combobox>
+						<!-- </lightning-layout-item> -->
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+						small-device-size="12" medium-device-size="12" large-device-size="3">
+						<div class="slds-form-element">
+							<lightning-input type="text" label="Applicant Name" value={loanApplicantName} disabled>
+							</lightning-input>
+						</div>
+					</lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--MOD amount difference letter-->
+		<lightning-tab label="MOD amount difference letter" value="Agreement_DG_MOD_amount_difference_lette"
+			onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent}
+						class="Agreement_DG_MOD_amount_difference_lette">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Property Schedule mismatch letter-->
+		<lightning-tab label="Property Schedule mismatch letter" value="Agreement_DG_Property_Schedule_mismatch"
+			onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent}
+						class="Agreement_DG_Property_Schedule_mismatch">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						<!-- </lightning-layout-item> -->
+						</div>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+						<!-- <lightning-layout-item slot="additionalFieldFirst" padding="around-small" size="12"
+							small-device-size="12" medium-device-size="12" large-device-size="3"> -->
+							<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Select Property
+							</label>
+							<lightning-combobox name="applicant_list" label="Select Property" placeholder="Select Value"
+								options={propertyOptions} onchange={handleSelectedProperty}
+								class="slds-m-bottom_medium mycombobox" required="true" variant="label-hidden">
+							</lightning-combobox>
+						<!-- </lightning-layout-item> -->
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Property Identification Undertaking Letter-->
+		<lightning-tab label="Property Identification Undertaking Letter" value="Agreement_DG_Property_Identification"
+			onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent}
+						class="Agreement_DG_Property_Identification">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						</div>
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+							<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Select Property
+							</label>
+							<lightning-combobox name="applicant_list" label="Select Property" placeholder="Select Value"
+								options={propertyOptions} onchange={handleSelectedProperty}
+								class="slds-m-bottom_medium mycombobox" required="true" variant="label-hidden">
+							</lightning-combobox>
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--RC Adjustment Letter-->
+		<lightning-tab label="RC Adjustment Letter" value="Agreement_DG_RC_Adjustment" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} class="Agreement_DG_RC_Adjustment">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Loan Reduction Letter-->
+		<lightning-tab label="Loan Reduction Letter" value="Agreement_DG_Loan_Reduction" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} class="Agreement_DG_Loan_Reduction">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--Insurance Waiver Request Letter-->
+		<lightning-tab label="Insurance Waiver Request Letter" value="Agreement_DG_Insurance_Wavier_Request" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} class="Agreement_DG_Insurance_Wavier_Request">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+		<!--No Objection Certificate TO SRO-->
+		<lightning-tab label="No Objection Certificate To SRO" value="Agreement_DG_No_Objection_Certificate" onactive={handleActiveTab}>
+			<div style="overflow: initial;" if:true={showEditPage}>
+				<lightning-card variant="Narrow">
+					<c-generic-edit-pages-l-w-c fields-content={fieldsContent} class="Agreement_DG_No_Objection_Certificate">
+						<div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+							<div class="slds-form-element">
+								<label class="slds-form-element__label">
+								<span style="color: red;">*&nbsp;</span>
+								Application
+							</label>
+								<lightning-input type="text" label="Application" value={appName} disabled
+									variant="label-hidden">
+								</lightning-input>
+							</div>
+						</div>
+					</c-generic-edit-pages-l-w-c><br />
+				</lightning-card>
+			</div>
+		</lightning-tab>
+	</lightning-tabset>
+	<div class="slds-m-top_small">
+	</div>
+	<footer class="slds-modal__footer">
+		<!-- <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button> -->
+		<button class="slds-button slds-button_brand" onclick={handleSave} title="Save">Save</button>
+		<button class="slds-button slds-button_brand" onclick={generateAGDocument} title="Generate Document" disabled={saveDG}>Generate Document</button>
+	</footer>
+	<!-- <div if:true={showDocGeneration}>
+	</div> -->
+	<template if:true={isDataArrived}>
+		<div class="slds-m-top_small">
+		</div>
+		<lightning-card variant="Narrow" title="List Of Document Generation Details">
+			<!-- <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+			<c-fs-title-section title="List Of Document Generation Details"></c-fs-title-section> -->
+			<c-generic-data-table-l-w-c data-id="DG" result={tableData} btns={rowAction} onselected={handleSelectedDoc}>
+			</c-generic-data-table-l-w-c>
+			<!-- </div> -->
+		</lightning-card>
+	</template>
+	<!-- Delete Popup -->
+	<template if:true={showDeletePopup}>
+		<c-fs-delete-l-w-c delete-from="Doc_Gen" object-api-name="Agreement_Execution_Document_Generation__c"
+			show-modal={showDeletePopup} rec-id={dgId} onmodaldelete={handlemodalactions}
+			onmodalcancel={handlemodalactions}>
+		</c-fs-delete-l-w-c>
+	</template>
+</template>

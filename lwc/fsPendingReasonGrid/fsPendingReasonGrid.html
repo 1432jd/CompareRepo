@@ -1,0 +1,145 @@
+<template>
+	<lightning-spinner alternative-text="Loading" size="medium" if:true={showSpinner}></lightning-spinner>
+	<lightning-card variant="Narrow" title="Current Stage Pending Reason">
+	  <lightning-button-icon icon-name="utility:add" variant="brand" alternative-text="Show More" slot="actions" onclick={pushRecord} class="slds-m-right--small"></lightning-button-icon>
+		<div class="slds-scrollable" style="height:128px;padding:1rem;">
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-label="Example table of Opportunities with vertical borders">
+		  <thead>
+			<tr class="slds-line-height_reset">
+			  <th class="" scope="col">
+				<div class="slds-truncate" title="Pending Reason">Pending Reason</div>
+			  </th>
+			  <th class="" scope="col">
+				<div class="slds-truncate" title="Pending Remarks">Pending Remarks</div>
+			  </th>
+			  <th class="" scope="col">
+				<div class="slds-truncate" title="Pending Status">Pending Status</div>
+			  </th>
+			  <th class="" scope="col">
+				<div class="slds-truncate" title="Query Raised Date">Query Raised Date</div>
+			  </th>
+			  <th class="" scope="col">
+				<div class="slds-truncate" title="Pending Stage">Pending Stage</div>
+			  </th>
+			  <th class="" scope="col" style="min-width: 240px;">
+				<div class="slds-truncate" title="Created Date">Created Date</div>
+			  </th>
+			  <th class="" scope="col">
+				<div class="slds-truncate" title="Created By">Created By</div>
+			  </th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<template if:true={recordList} for:each={recordList} for:item="item" for:index="index">
+			  <tr class="slds-hint-parent" key={item}>
+				<th data-label="Pending Reason">
+				  <lightning-combobox data-index={index} name="Pending_Reason__c" label="Pending Reason" value={item.Pending_Reason__c} options={pendingReasonOptions} onchange={handleFormValues} required variant="label-hidden" disabled={item.Id}></lightning-combobox>
+				</th>
+				<td data-label="Pending Remarks">
+				  <lightning-textarea data-index={index} name="Pending_Remarks__c" label="Pending Remarks" variant="label-hidden" value={item.Pending_Remarks__c} onchange={handleFormValues} required disabled={item.Id}></lightning-textarea>
+				</td>
+				<td data-label="Pending Status">
+				  <lightning-combobox data-index={index} name="Pending_Status__c" label="Pending Status" value={item.Pending_Status__c} options={pendingStatusOptions} onchange={handleFormValues} required variant="label-hidden"></lightning-combobox>
+				</td>
+				<td data-label="Query Raised Date">
+				  <lightning-input data-index={index} type="date" value={item.Query_Raised_Date__c} onchange={handleFormValues} variant="label-hidden" name="Query_Raised_Date__c" label="Query Raised Date" required disabled={item.Id}></lightning-input>
+				</td>
+				<td data-label="Pending Stage">
+				  <lightning-input data-index={index} type="text" value={item.Pending_Stage__c} variant="label-hidden" name="Pending_Stage__c" label="Pending Stage" disabled></lightning-input>
+				</td>
+				<td data-label="Created Date" if:true={item.Id}>
+				  <lightning-input data-index={index} type="datetime" value={item.CreatedDate__c} title={item.CreatedDate__c} variant="label-hidden" name="CreatedDate__c" label="Created Date" disabled></lightning-input>
+				</td>
+				<td data-label="Created Date" if:false={item.Id}>
+				  <lightning-input data-index={index} type="datetime" value={todayDate} title={todayDate} variant="label-hidden" name="CreatedDate__c" label="Created Date" disabled></lightning-input>
+				</td>
+				<td data-label="Created By" if:true={item.Id}>
+				  <lightning-input data-index={index} type="text" value={item.CreatedBy.Name} title={item.CreatedBy.Name} variant="label-hidden" name="CreatedById" label="Created By" disabled></lightning-input>
+				</td>
+				<td data-label="Created By" if:false={item.Id}>
+				  <lightning-input data-index={index} type="text" value={currentUserName} title={currentUserName} variant="label-hidden" name="CreatedById" label="Created By" disabled></lightning-input>
+				</td>
+			  </tr>
+			</template>
+		  </tbody>
+		</table>
+		</div>
+		<div class="slds-form-element buttons slds-text-align_center" slot="footer">
+		  <lightning-button variant="brand" label="Save" title="Save" onclick={handleSave}></lightning-button>
+		</div>
+		
+	</lightning-card>
+	<!-- ---------------------------------------READ ONLY Table-------------------------------------------------------- -->
+	<!-- @12 May 2023 : it will display the read-only data on Pending Reason Button on FIV-B, FIV-C on application  -->
+	<lightning-card variant="Narrow" title="Other Stage Pending Reason">
+		<div class="slds-scrollable" style="height:128px;padding:1rem;">
+	  <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-label="Example table of Opportunities with vertical borders">
+		<thead>
+		  <tr class="slds-line-height_reset">
+			<th class="" scope="col">
+			  <div class="slds-truncate" title="Pending Reason">Pending Reason</div>
+			</th>
+			<th class="" scope="col">
+			  <div class="slds-truncate" title="Pending Remarks">Pending Remarks</div>
+			</th>
+			<th class="" scope="col">
+			  <div class="slds-truncate" title="Pending Status">Pending Status</div>
+			</th>
+			<th class="" scope="col">
+			  <div class="slds-truncate" title="Query Raised Date">Query Raised Date</div>
+			</th>
+			<th class="" scope="col">
+			  <div class="slds-truncate" title="Pending Stage">Pending Stage</div>
+			</th>
+			<th class="" scope="col" style="min-width: 240px;">
+			  <div class="slds-truncate" title="Created Date">Created Date</div>
+			</th>
+			<th class="" scope="col">
+			  <div class="slds-truncate" title="Created By">Created By</div>
+			</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <template if:true={getPendingReasonList} for:each={getPendingReasonList} for:item="item" for:index="index">
+			<tr class="slds-hint-parent" key={item}>
+			  <!-- {item}
+							  <th data-label="Pending Reason"><lightning-output-field  field-name={item.Pending_Reason__c}></lightning-output-field> -->
+			  <!-- <lightning-combobox data-index={index} name="Pending_Reason__c" label="Pending Reason"
+									  value={item.Pending_Reason__c} options={pendingReasonOptions}
+									  onchange={handleFormValues} required variant="label-hidden" disabled=true></lightning-combobox> -->
+			  <!-- </th> -->
+			  <td data-label="Pending Reason">
+				<lightning-input data-index={index} type="test" value={item.Pending_Reason__c} onchange={handleFormValues} variant="label-hidden" name="Pending_Reason__c" label="Pending Reason" required disabled={item.Id}></lightning-input>
+			  </td>
+			  <td data-label="Pending Remarks">
+				<lightning-textarea data-index={index} name="Pending_Remarks__c" label="Pending Remarks" variant="label-hidden" value={item.Pending_Remarks__c} onchange={handleFormValues} required disabled={item.Id}></lightning-textarea>
+			  </td>
+			  <td data-label="Pending Status">
+				<lightning-combobox data-index={index} name="Pending_Status__c" label="Pending Status" value={item.Pending_Status__c} options={pendingStatusOptions} onchange={handleFormValues} required variant="label-hidden" disabled></lightning-combobox>
+			  </td>
+			  <td data-label="Query Raised Date">
+				<lightning-input data-index={index} type="date" value={item.Query_Raised_Date__c} onchange={handleFormValues} variant="label-hidden" name="Query_Raised_Date__c" label="Query Raised Date" required disabled={item.Id}></lightning-input>
+			  </td>
+			  <td data-label="Pending Stage">
+				<lightning-input data-index={index} type="text" value={item.Pending_Stage__c} variant="label-hidden" name="Pending_Stage__c" label="Pending Stage" disabled></lightning-input>
+			  </td>
+			  <td data-label="Created Date" if:true={item.Id}>
+				<lightning-input data-index={index} type="datetime" value={item.CreatedDate__c} title={item.CreatedDate__c} variant="label-hidden" name="CreatedDate__c" label="Created Date" disabled></lightning-input>
+			  </td>
+			  <td data-label="Created Date" if:false={item.Id}>
+				<lightning-input data-index={index} type="datetime" value={todayDate} title={todayDate} variant="label-hidden" name="CreatedDate__c" label="Created Date" disabled></lightning-input>
+			  </td>
+			  <td data-label="Created By" if:true={item.Id}>
+				<lightning-input data-index={index} type="text" value={item.CreatedBy.Name} title={item.CreatedBy.Name} variant="label-hidden" name="CreatedById" label="Created By" disabled></lightning-input>
+			  </td>
+			  <td data-label="Created By" if:false={item.Id}>
+				<lightning-input data-index={index} type="text" value={currentUserName} title={currentUserName} variant="label-hidden" name="CreatedById" label="Created By" disabled></lightning-input>
+			  </td>
+			</tr>
+		  </template>
+		</tbody>
+	  </table>
+		</div>
+	</lightning-card>
+	
+  </template>

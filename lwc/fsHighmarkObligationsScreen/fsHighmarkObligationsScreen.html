@@ -1,0 +1,591 @@
+<template>
+	<lightning-spinner alternative-text="Loading" size="small" if:true={highmarkSpinner}></lightning-spinner>
+	<lightning-card variant="Narrow" title={title}>
+		<lightning-button label="Add Row" slot="actions" variant="brand" onclick={handleaddRow}>
+		</lightning-button>
+		<div class="slds-m-around_x-small  slds-scrollable">
+			<table
+				class="slds-table slds-table_cell-buffer slds-table_bordered slds-table--header-fixed slds-table_col-bordered  ">
+				<thead>
+					<tr class="th" style="height:40px;">
+						<th scope="col" style=" position: sticky; left: 0;z-index: 1;background-color:#F3F3F3; ">
+							<div  class="slds-cell-wrap slds-m-right_small" title="Sr No">Sr No.</div>
+						</th>
+						<th scope="col"  style=" position: sticky; left: 58px;z-index: 1;background-color:#F3F3F3;  ">
+							<div style="width:200px;" class="slds-cell-wrap slds-m-left_x-small" title="Applicant Name">
+								Applicant Name</div>
+						</th>
+						<th scope="col">
+							<div style="width:100px" class="slds-cell-wrap slds-m-left_x-small" title="Type of Loan">
+								Type of Loan</div>
+						</th>
+						<th scope="col">
+							<div style="width:80px" class="slds-cell-wrap slds-m-left_x-small" title="Highmark Score">
+								Highmark Score</div>
+						</th>
+						<th scope="col">
+							<div style="width:50px" class="slds-cell-wrap slds-m-left_x-small" title="Type"> Type
+							</div>
+						</th>
+						<th scope="col">
+							<div style="width:100px" class="slds-cell-wrap slds-m-left_x-small" title="Ownership">
+								Ownership</div>
+						</th>
+						<th scope="col">
+							<div style="width:100px" class="slds-cell-wrap slds-m-left_x-small" title="Loan Amount">
+								Loan
+								Amount</div>
+						</th>
+						<th scope="col">
+							<div style="width:100px" class="slds-cell-wrap slds-m-left_x-small" title="Applicable For">
+								O/S</div>
+						</th>
+						<th scope="col">
+							<div style="width:100px" class="slds-cell-wrap slds-m-left_x-small" title="Overdue Amount">
+								Overdue Amount
+							</div>
+						</th>
+						<th scope="col">
+							<div style="width:100px" class="slds-cell-wrap slds-m-left_x-small" title="Obligations">
+								Obligations</div>
+						</th>
+						<th scope="col">
+							<div style="width:135px" class="slds-cell-wrap slds-m-left_x-small"
+								title="To Be Considered for DBR">To Be Considered for DBR
+							</div>
+						</th>
+						<th scope="col">
+							<div style="width:100px" class="slds-cell-wrap slds-m-left_x-small" title="Current DPD">
+								Current DPD</div>
+						</th>
+						<th scope="col">
+							<div style="width:100px" class="slds-cell-wrap slds-m-left_x-small" title="Max DPD">Max
+								DPD
+							</div>
+						</th>
+						<th scope="col">
+							<div style="width:150px" class="slds-cell-wrap slds-m-left_x-small" title="Remarks">
+								Repayment Behaviour Remarks
+							</div>
+						</th>
+						<th scope="col">
+							<div style="width:50px" class="slds-cell-wrap slds-m-left_x-small" title="Action">Action
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+
+					<template iterator:it={highmarkpcTableData}>
+						<template if:false={it.value.IsSelfType}>
+							<tr key={it.value.id} id={it.value.id} class="slds-hint-parent">
+								<td data-id="1" style=" position: sticky; left: 0;z-index: 1;background-color:white;  ">
+									<div class="slds-cell-wrap">{it.value.srNo}</div>
+								</td>
+								<td data-id="2" style=" position: sticky; left: 58px;z-index: 1; background-color:white; ">
+									<div style="width:200px" class="slds-cell-wrap">{it.value.applicantName} </div>
+								</td>
+								<td data-id="3">
+									<div class="td-currency">{it.value.typeofloan} </div>
+								</td>
+								<td data-id="5">
+									<div class="td-currency">{it.value.highmarkScore} </div>
+								</td>
+								<td data-id="5">
+									<div class="td-currency">{it.value.type} </div>
+								</td>
+								<td data-id="5">
+									<div class="td-currency">{it.value.ownership} </div>
+								</td>
+								<!--<td data-id="6">
+									<div class="td-currency">₹{it.value.loanAmt} </div>
+								</td>
+								<td data-id="7">
+									<div class="td-currency">₹{it.value.osAmt} </div>c
+								</td>
+								<td data-id="8">
+									<div class="td-currency">₹{it.value.overdueAmount} </div>c
+								</td>
+								<td data-id="9">
+									<div class="td-currency">₹{it.value.obligations} </div> c
+								</td>-->
+								<td data-id="6">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="Loan Amount" name="loanAmt"
+											onchange={handleChange} data-index={it.index} value={it.value.loanAmt}
+											formatter="currency" type="number" max-length="8">
+										</lightning-input>
+									</div>
+								</td>
+
+								<td data-id="7">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="O/s" name="osAmt"
+											onchange={handleChange} data-index={it.index} value={it.value.osAmt}
+											formatter="currency" type="number" max-length="8"></lightning-input>
+									</div>
+								</td>
+								<td data-id="8">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="overdueAmount" name="overdueAmt"
+											onchange={handleChange} data-index={it.index} value={it.value.overdueAmount}
+											formatter="currency" type="number" max-length="8">
+										</lightning-input>
+									</div>
+								</td>
+								<td data-id="9">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="Obligations" name="obligation"
+											data-index={it.index} type="number" value={it.value.obligations}
+											onchange={handleChange} formatter="currency" max-length="8">
+										</lightning-input>
+									</div>
+								</td>
+
+								<td data-id="10">
+									<div class="td-currency">
+										<!-- <template if:true={isSingleRecord}> -->
+
+											<select class="slds-select" id={it.index} required
+                                                            data-index={it.index} 
+                                                            onchange={handleChange} name="consider-Type">
+
+                                                            <template if:false={it.value.tobeconsiderValue}>
+                                                            <option value="" selected disabled hidden>Select an
+                                                                option
+                                                            </option>
+															</template>
+															<template if:true={it.value.tobeconsiderValue}>
+																  <option value={it.value.tobeconsiderValue} selected disabled hidden>{it.value.tobeconsiderValue}
+                                                            </option>
+															</template>
+                                                            <template for:each={considertypeoptions}
+                                                                for:item="listViewItem">
+                                                                <option key={listViewItem.label}
+                                                                    value={listViewItem.value}>
+                                                                    {listViewItem.label}
+                                                                </option>
+                                                            </template>
+                                                        </select>
+											<!-- <lightning-combobox variant="label-hidden" name="consider-Type"
+												class="consider" label="To be Considered for DBR"
+												dropdown-alignment="auto" value={it.value.tobeconsiderValue}
+												options={considertypeoptions} onchange={handleChange}
+												data-index={it.index} required="true">
+											</lightning-combobox> -->
+										<!-- </template> -->
+										<!-- <template if:false={isSingleRecord}>
+											<template if:false={it.last}>
+												<select class="slds-select" id={it.index}
+                                                            data-row-index={it.index}
+                                                            onchange={handleChange}>
+
+                                                            <template if:false={it.value.tobeconsiderValue}>
+                                                            <option value=none selected disabled hidden>Select an
+                                                                option
+                                                            </option>
+															</template>
+															<template if:true={it.value.tobeconsiderValue}>
+																  <option value={it.value.tobeconsiderValue} selected disabled hidden>{it.value.tobeconsiderValue}
+                                                            </option>
+															</template>
+                                                            <template for:each={considertypeoptions}
+                                                                for:item="listViewItem">
+                                                                <option key={listViewItem.label}
+                                                                    value={listViewItem.value}>
+                                                                    {listViewItem.label}
+                                                                </option>
+                                                            </template>
+                                                        </select> -->
+												<!-- <lightning-combobox variant="label-hidden" name="consider-Type"
+													class="consider" label="To be Considered for DBR"
+													dropdown-alignment="auto" value={it.value.tobeconsiderValue}
+													options={considertypeoptions} onchange={handleChange}
+													data-index={it.index} required="true">
+												</lightning-combobox> -->
+											<!-- </template>
+										</template>
+										<template if:false={isSingleRecord}>
+											<template if:true={it.last}>
+												<select class="slds-select" id={it.index}
+                                                            data-row-index={it.index}
+                                                            onchange={handleChange}>
+
+                                                           <template if:false={it.value.tobeconsiderValue}>
+                                                            <option value=none selected disabled hidden>Select an
+                                                                option
+                                                            </option>
+															</template>
+															<template if:true={it.value.tobeconsiderValue}>
+																  <option value={it.value.tobeconsiderValue} selected disabled hidden>{it.value.tobeconsiderValue}
+                                                            </option>
+															</template>
+                                                            <template for:each={considertypeoptions}
+                                                                for:item="listViewItem">
+                                                                <option key={listViewItem.label}
+                                                                    value={listViewItem.value}>
+                                                                    {listViewItem.label}
+                                                                </option>
+                                                            </template>
+                                                        </select> -->
+												<!-- <lightning-combobox variant="label-hidden" name="consider-Type"
+													class="consider" label="To be Considered for DBR"
+													dropdown-alignment="auto" value={it.value.tobeconsiderValue}
+													options={considertypeoptions} onchange={handleChange}
+													data-index={it.index} required="true">
+												</lightning-combobox> -->
+											<!-- </template>
+										</template> -->
+									</div>
+								</td>
+								<td data-id="11">
+									<div class="td-currency">{it.value.currentDPD} </div>
+								</td>
+								<td data-id="12">
+									<div class="td-currency">{it.value.maxdpd} </div>
+								</td>
+								<td data-id="13">
+									<div class="td-currency">
+										<lightning-textarea label="Remarks" name="remarks" variant="label-hidden"
+											data-index={it.index} value={it.value.remarks} onchange={handleChange}
+											max-length="1000">
+										</lightning-textarea>
+									</div>
+								</td>
+								<td data-id="14">
+									<!-- <template if:true={it.last}>
+											<div class="td-currency">
+												<lightning-button-icon icon-name="utility:add" variant="brand"
+													alternative-text="Update" onclick={handleaddRow}
+													class="slds-m-right_small" data-index={it.value.srNo}>
+												</lightning-button-icon>
+
+											</div>
+										</template> -->
+									<!-- <template if:false={it.first}>
+										<template if:false={isSingleRecord}> -->
+									<template if:true={it.value.IsSelfType}>
+										<lightning-button-icon icon-name="utility:delete" variant="brand"
+											alternative-text="Delete" onclick={handledeleteRow} data-id={it.value.id}
+											data-index={it.value.srNo}>
+										</lightning-button-icon>
+									</template>
+									<!-- </template>
+									</template> -->
+								</td>
+							</tr>
+						</template>
+
+						<template if:true={it.value.IsSelfType}>
+							<tr key={it.value.id} id={it.value.id} class="slds-hint-parent">
+								<td data-id="1" style=" position: sticky; left: 0; z-index:1;background-color:white; ">
+									<div class="slds-cell-wrap">{it.value.srNo}</div>
+								</td>
+								<td data-id="2" style=" position: sticky; left: 58px;z-index:1;background-color:white;">
+									<div class="td-currency" style="width:200px;">
+										<select class="slds-select" id={it.index}
+                                                            data-index={it.index}
+                                                            onchange={handleChange} name="Applicant Name" required>
+
+                                                           <template if:false={it.value.loanApplicantId}>
+                                                            <option value="" selected disabled hidden>Select an
+                                                                option
+                                                            </option>
+															</template>
+															<template if:true={it.value.loanApplicantId}>
+																  <option value={it.value.loanApplicantId} selected disabled hidden>{it.value.applicantName}
+                                                            </option>
+															</template>
+                                                            <template for:each={customerOptions}
+                                                                for:item="listViewItem">
+                                                                <option key={listViewItem.label}
+                                                                    value={listViewItem.value}>
+                                                                    {listViewItem.label}
+                                                                </option>
+                                                            </template>
+                                                        </select>
+
+										<!--<template if:true={isSingleRecord}>
+											<lightning-combobox variant="label-hidden" name="Applicant Name"
+												label="Select Applicant" value={it.value.loanApplicantId}
+												dropdown-alignment="auto" options={customerOptions}
+												onchange={handleChange} data-index={it.index} required="true">
+											</lightning-combobox>
+										</template>
+										<template if:false={isSingleRecord}>
+											<template if:false={it.last}>
+												<lightning-combobox variant="label-hidden" name="Applicant Name"
+													label="Select Applicant" value={it.value.loanApplicantId}
+													dropdown-alignment="auto" options={customerOptions}
+													onchange={handleChange} data-index={it.index} required="true">
+												</lightning-combobox>
+											</template>
+										</template>
+										<template if:false={isSingleRecord}>
+											<template if:true={it.last}>
+												<lightning-combobox variant="label-hidden" name="Applicant Name"
+													dropdown-alignment="auto" label="Select Applicant"
+													value={it.value.loanApplicantId} options={customerOptions}
+													onchange={handleChange} data-index={it.index} required="true">
+												</lightning-combobox>
+											</template>
+										</template>-->
+									</div>
+								</td>
+								<td data-id="3">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="Type Of Loan" name="typeOfloan"
+											type="text" value={it.value.typeofloan} max-length="15"
+											onchange={handleChange} pattern="^[a-z  A-Z]*$" data-index={it.index}
+											message-when-pattern-mismatch="Only alphabets are allowed.">
+										</lightning-input>
+									</div>
+								</td>
+								<td data-id="5">
+									<div class="td-currency">{it.value.highmarkScore} </div>
+								</td>
+								<td data-id="5">
+									<div class="td-currency">{it.value.type} </div>
+								</td>
+								<td data-id="5">
+									<div class="td-currency">
+										<lightning-input type="text" variant="label-hidden" name="Ownership__c"
+											value={it.value.ownership} label="Ownership" max-length="15"
+											data-index={it.index} pattern="^[a-z  A-Z]*$" onchange={handleChange}
+											message-when-pattern-mismatch="Only alphabets are allowed.">
+										</lightning-input>
+									</div>
+								</td>
+								<td data-id="6">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="Loan Amount" name="loanAmt"
+											onchange={handleChange} data-index={it.index} value={it.value.loanAmt}
+											formatter="currency" type="number" max-length="8">
+										</lightning-input>
+									</div>
+								</td>
+
+								<td data-id="7">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="O/s" name="osAmt"
+											onchange={handleChange} data-index={it.index} value={it.value.osAmt}
+											formatter="currency" type="number" max-length="8"></lightning-input>
+									</div>
+								</td>
+								<td data-id="8">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="overdueAmount" name="overdueAmt"
+											onchange={handleChange} data-index={it.index} value={it.value.overdueAmount}
+											formatter="currency" type="number" max-length="8">
+										</lightning-input>
+									</div>
+								</td>
+								<td data-id="9">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="Obligations" name="obligation"
+											data-index={it.index} type="number" value={it.value.obligations}
+											onchange={handleChange} formatter="currency" max-length="8">
+										</lightning-input>
+									</div>
+								</td>
+
+								<td data-id="10">
+									<div class="td-currency">
+										<!-- <template if:true={isSingleRecord}> -->
+											<select class="slds-select" id={it.index}
+                                                            data-index={it.index}
+                                                            onchange={handleChange} name="consider-Type" required>
+
+                                                           <template if:false={it.value.tobeconsiderValue}>
+                                                            <option value="" selected disabled hidden>Select an
+                                                                option
+                                                            </option>
+															</template>
+															<template if:true={it.value.tobeconsiderValue}>
+																  <option value={it.value.tobeconsiderValue} selected disabled hidden>{it.value.tobeconsiderValue}
+                                                            </option>
+															</template>
+                                                            <template for:each={considertypeoptions}
+                                                                for:item="listViewItem">
+                                                                <option key={listViewItem.label}
+                                                                    value={listViewItem.value}>
+                                                                    {listViewItem.label}
+                                                                </option>
+                                                            </template>
+                                                        </select>
+											<!-- <lightning-combobox variant="label-hidden" name="consider-Type"
+												class="consider" label="To be Considered for DBR"
+												dropdown-alignment="auto" value={it.value.tobeconsiderValue}
+												options={considertypeoptions} onchange={handleChange}
+												data-index={it.index} required="true">
+											</lightning-combobox> -->
+										<!-- </template>
+										<template if:false={isSingleRecord}>
+											<template if:false={it.last}>
+												<select class="slds-select" id={it.index}
+                                                            data-row-index={it.index}
+                                                            onchange={handleChange}>
+
+                                                          <template if:false={it.value.tobeconsiderValue}>
+                                                            <option value=none selected disabled hidden>Select an
+                                                                option
+                                                            </option>
+															</template>
+															<template if:true={it.value.tobeconsiderValue}>
+																  <option value={it.value.tobeconsiderValue} selected disabled hidden>{it.value.tobeconsiderValue}
+                                                            </option>
+															</template>
+                                                            <template for:each={considertypeoptions}
+                                                                for:item="listViewItem">
+                                                                <option key={listViewItem.label}
+                                                                    value={listViewItem.value}>
+                                                                    {listViewItem.label}
+                                                                </option>
+                                                            </template>
+                                                        </select> -->
+												<!-- <lightning-combobox variant="label-hidden" name="consider-Type"
+													class="consider" label="To be Considered for DBR"
+													dropdown-alignment="auto" value={it.value.tobeconsiderValue}
+													options={considertypeoptions} onchange={handleChange}
+													data-index={it.index} required="true">
+												</lightning-combobox> -->
+											<!-- </template>
+										</template>
+										<template if:false={isSingleRecord}>
+											<template if:true={it.last}>
+												<select class="slds-select" id={it.index}
+                                                            data-row-index={it.index}
+                                                            onchange={handleChange}>
+															<template if:false={it.value.tobeconsiderValue}>
+                                                            <option value=none selected disabled hidden>Select an
+                                                                option
+                                                            </option>
+															</template>
+															<template if:true={it.value.tobeconsiderValue}>
+																  <option value={it.value.tobeconsiderValue} selected disabled hidden>{it.value.tobeconsiderValue}
+                                                            </option>
+															</template>
+                                                            <template for:each={considertypeoptions}
+                                                                for:item="listViewItem">
+                                                                <option key={listViewItem.label}
+                                                                    value={listViewItem.value}>
+                                                                    {listViewItem.label}
+                                                                </option>
+                                                            </template>
+                                                        </select> -->
+												<!-- <lightning-combobox variant="label-hidden" name="consider-Type"
+													class="consider" dropdown-alignment="auto"
+													label="To be Considered for DBR" value={it.value.tobeconsiderValue}
+													options={considertypeoptions} onchange={handleChange}
+													data-index={it.index} required="true">
+												</lightning-combobox> -->
+											<!-- </template>
+										</template> -->
+									</div>
+								</td>
+								<td data-id="11">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="Current DPD" name="currentDPD"
+											onchange={handleChange} value={it.value.currentDPD} data-index={it.index}
+											type="number" max-length="3"></lightning-input>
+									</div>
+								</td>
+								<td data-id="12">
+									<div class="td-currency">
+										<lightning-input variant="label-hidden" label="Max DPD" name="maxDPD"
+											onchange={handleChange} value={it.value.maxdpd} type="number"
+											data-index={it.index} max-length="3"></lightning-input>
+									</div>
+								</td>
+								<td data-id="13">
+									<div class="td-currency">
+										<lightning-textarea label="Remarks" name="remarks" variant="label-hidden"
+											data-index={it.index} value={it.value.remarks} onchange={handleChange}
+											max-length="1000">
+										</lightning-textarea>
+									</div>
+								</td>
+								<td data-id="14">
+									<div class="td-currency">
+										<!-- <template if:true={it.last}>
+												<lightning-button-icon icon-name="utility:add" variant="brand"
+													alternative-text="Update" onclick={handleaddRow}
+													class="slds-m-right_small" data-index={it.value.srNo}>
+												</lightning-button-icon>
+											</template> -->
+										<!-- <template if:false={it.first}>
+											<template if:false={isSingleRecord}> -->
+										<template if:true={it.value.IsSelfType}>
+											<lightning-button-icon icon-name="utility:delete" variant="brand"
+												alternative-text="Delete" onclick={handledeleteRow}
+												data-id={it.value.id} data-index={it.value.srNo}>
+											</lightning-button-icon>
+										</template>
+										<!-- </template>
+										</template> -->
+									</div>
+								</td>
+							</tr>
+						</template>
+					</template></tbody>
+			</table>
+		</div>
+
+		<p slot="footer">
+			<lightning-button variant="brand" type="submit" value="Submit" label="Save" id="Highmark-btn" onclick={handleHighmark}
+				disabled={isDisabled}>
+			</lightning-button>
+		</p>
+	</lightning-card>
+
+	<!-- Overall Remarks form only for PC/AC Screen-->
+	<template if:true={showoverallRemarks}>
+		<!-- <div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+			<h3 class="slds-section__title slds-p-left_x-small slds-theme_shade">
+				<span class="slds-cell-wrap" title="Section Title">&nbsp;&nbsp; {stageName} </span>
+			</h3>
+			<div aria-hidden="false" class="slds-section__content slds-p-left_small"> -->
+		<div class="slds-m-top_small">
+			<lightning-card variant="Narrow" title={stageName}>
+				<lightning-record-edit-form id="recordViewForm" record-id={repaymentRecordId}
+					record-type-id={characterRecordTypeId} object-api-name="Character__c"
+					onsubmit={handlecharacterSubmit} onsuccess={handleCharacterSuccess}>
+					<lightning-layout multiple-rows>
+						<div style="display:none;">
+							<lightning-input-field field-name="Application__c" variant="label-stacked"
+								value={applicationId}>
+							</lightning-input-field>
+						</div>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="6" large-device-size="6" style="display:none;">
+							<lightning-input-field field-name="Section_Type__c" variant="label-stacked"
+								value="Repayment Behaviour Detail">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+							medium-device-size="6" large-device-size="6" style="display:none;">
+							<lightning-input-field field-name="Verification__c" variant="label-stacked"
+								value={verificationId}>
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="4"
+							medium-device-size="4" large-device-size="4">
+							<lightning-input-field field-name="Overall_Remarks_Highmark_Obligations__c"
+								variant="label-stacked" required class="highmark">
+							</lightning-input-field>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<div class="slds-align_absolute-center">
+								<lightning-button variant="brand" type="submit" label={buttonLabel} id="character-btn">
+								</lightning-button>
+							</div>
+						</lightning-layout-item>
+					</lightning-layout>
+				</lightning-record-edit-form>
+				<!-- </div>
+		</div> -->
+			</lightning-card>
+		</div>
+	</template>
+</template>

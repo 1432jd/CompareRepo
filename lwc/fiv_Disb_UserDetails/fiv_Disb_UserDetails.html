@@ -1,0 +1,32 @@
+<!--
+  @author            : Karan Singh Soni
+  @group             : TechMatrix Consulting
+  @description       : Parent Component - fiv_Disb_Lwc
+  @created on        : 20-07-2022
+  @last modified on  : 20-07-2022
+  @last modified by  : Karan Singh Soni
+-->
+<template>
+  <lightning-spinner alternative-text="Loading" size="small" if:true={showLoader}></lightning-spinner>
+  <div class="slds-box slds-box_xx-small" if:true={objUserDetails}>
+    <template if:true={applicationBranch}>
+      <c-generic-edit-pages-l-w-c fields-content={objUserDetails} onchanged={handleFieldChanges}>
+        <div slot="additionalFieldFirst"
+          class="slds-col slds-size_12-of-12 slds-large-size_2-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+          <label class="slds-form-element__label">
+            <span style="color: red;">*&nbsp;</span>
+            Disbursal Author ID
+          </label>
+          <c-l-w-c-lookup object-api-name="User" field-api-name="EmployeeNumber" sub-field-api-name="Name"
+            object-label="User" variant="label-hidden" onselect={handleSelectedEMPId}
+            seleted-record-id={fieldOfficerEMPId} criteria={criteria} read-only>
+          </c-l-w-c-lookup>
+        </div>
+      </c-generic-edit-pages-l-w-c>
+    </template>
+    <div class="slds-align_absolute-center slds-m-around_x-small slds-p-bottom_large">
+      <lightning-button variant="brand" label="Save" title="Sace" onclick={handleSave}>
+      </lightning-button>
+    </div>
+  </div>
+</template>

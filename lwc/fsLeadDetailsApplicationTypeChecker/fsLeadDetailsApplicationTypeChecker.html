@@ -1,0 +1,62 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+	<lightning-card variant="Narrow">
+		<div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+			<div aria-hidden="false" class="slds-section__content slds-p-left_small">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="3"
+						padding="around-small">
+						<lightning-input type="text" label="Application Type" value={data.applicationType} disabled
+							onchange={handleChange}>
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="3"
+						padding="around-small">
+						<lightning-input type="text" name='Old_Application_Number__c' label="Old Application Number"
+							value={data.oldApplicationNo} disabled onchange={handleChange}>
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="3"
+						padding="around-small">
+						<lightning-input type="text" label="Employee ID" name='Employee_ID__c' value={employeeNumber}
+							onchange={handleChange} disabled></lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="3"
+						padding="around-small">
+						<lightning-input type="text" label="Customer Type" name='Customer_Type__c'
+							value={data.customerType} onchange={handleChange} disabled></lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="3"
+						padding="around-small">
+						<lightning-input type="text" class="validate" name="applicantFirstName"
+							label="Applicant First Name" value={data.applicantFirstName} disabled
+							onchange={handleChange}></lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="3"
+						padding="around-small">
+						<lightning-input type="text" class="validate" name="applicantLastName"
+							label="Applicant Last Name" value={data.applicantLastName} disabled onchange={handleChange}>
+						</lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="12" small-device-size="6" medium-device-size="12" large-device-size="3"
+						padding="around-small">
+						<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Constitution
+                            </label>
+						<lightning-combobox name="Constitution__c" class="validate" variant="label-hidden"
+							value={constitution} placeholder="Select an option" options={constitutionOption}
+							onchange={handleChange} required>
+						</lightning-combobox>
+					</lightning-layout-item>
+				</lightning-layout>
+			</div>
+			<div class="slds-align_absolute-center slds-m-around_x-small">
+				<lightning-button variant="brand" label="Save" title="Save" onclick={handleSave}></lightning-button>
+				<!-- <lightning-button label="Cancel" title="Cancel" onclick={handleCancel} class="slds-m-left_x-small"></lightning-button> -->
+			</div>
+		</div>
+	</lightning-card>
+</template>

@@ -1,0 +1,88 @@
+<template>
+	<template if:true={isSpinnerActive}>
+		<c-fs-spinner></c-fs-spinner>
+
+	</template>
+
+	<template if:true={showPendingReason}>
+		<section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-modal="true">
+			<div class="slds-modal__container">
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-05" class="slds-modal__title slds-hyphenate">Pending Reason</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-5">
+					<c-fs-pending-reason-grid if:true={applicationId} stage-name="Online EC"
+						application-id={applicationId}></c-fs-pending-reason-grid>
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-button variant="netural" label="Cancel" title="Cancel"
+						onclick={showHidePendingReasonGrid} class="slds-m-left_x-small"></lightning-button>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+
+	<!--PAGE HEADER-->
+	<c-fs-page-container-l-w-c if:true={applicationName} headericon="standard:asset_audit" stagename="Online EC"
+		appno={applicationName} businessdate={todaysDate} lastlogindate={lastLoginDate} btns={button}
+		onrowselectionevent={headerButtonClick}>
+	</c-fs-page-container-l-w-c>
+	<!--PAGE HEADER-->
+
+	<!--CONTENT-->
+
+	<lightning-tabset variant="scoped" active-tab-value={tabName}>
+		<lightning-tab label="Collateral Details" title="Collateral Details" value="Collateral" onactive={handleActive}>
+			<div>
+				<c-fs-online-ec-collateral-l-w-c application-id={applicationId} row-action={rowAction}>
+				</c-fs-online-ec-collateral-l-w-c>
+			</div>
+		</lightning-tab>
+		<lightning-tab label="Upload Document" title="Upload Document" value="Upload Document" onactive={handleActive}>
+			<div>
+				<c-fs-generic-document-upload-l-w-c if:true={recordTypeId} stage-name="Online EC"
+					record-type-id={recordTypeId} application-id={applicationId}
+					onrequireddocument={handleRequiredDocument}>
+				</c-fs-generic-document-upload-l-w-c>
+			</div>
+		</lightning-tab>
+		<!-- Error Tab-->
+		<lightning-tab label="Retrigger Grid" title="Retrigger Grid" value="RetriggerGrid" onactive={handleActive}>
+			<div>
+				<c-fs-send-back-grid application-id={applicationId}></c-fs-send-back-grid>
+			</div>
+		</lightning-tab>
+		<lightning-tab label="Error Info" value="Error" show-error-indicator if:true={showErrorTab}
+			onactive={handleActive} style="--sds-c-tabs-scoped-color-text-active: red">
+			<div>
+				<ul class="slds-list_dotted">
+					<template for:each={errorMsgs} for:item="err">
+						<li key={err} class="slds-text-color_destructive">{err}</li>
+					</template>
+				</ul>
+			</div>
+		</lightning-tab>
+	</lightning-tabset>
+	<!-- <article class="slds-card">
+		<div class="slds-card__body slds-card__body_inner">
+			
+
+		</div>
+		
+	</article> -->
+
+	<!--CONTENT-->
+
+	<!--FOOTER-->
+	<!-- <div class="slds-docked-form-footer">
+		<div class="slds-align_absolute-center slds-m-around_x-small">
+			<lightning-button variant="neutral" label="Cancel" title="Cancel" onclick={handleCancel}></lightning-button>
+		</div>
+		<div class="slds-align_absolute-center slds-m-around_x-small">
+			<lightning-button variant="brand" label="Submit" title="Submit" onclick={handleSubmit} disabled={isSubmitDisable}></lightning-button>
+		</div>
+	</div> -->
+	<!--FOOTER-->
+	<!---<lightning-button variant="brand" label="Submit" title="Submit" onclick={handleOnlineECSubmit} disabled={isSubmitDisable}></lightning-button>--->
+</template>

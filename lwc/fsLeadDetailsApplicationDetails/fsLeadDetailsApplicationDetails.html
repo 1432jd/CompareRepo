@@ -1,0 +1,69 @@
+<template>
+    <template if:true={isSpinnerActive}>
+        <c-fs-spinner></c-fs-spinner>
+    </template>
+    <!--<div class="slds-box slds-box_xx-small slds-section slds-border_right slds-border_left slds-is-open">
+        <div aria-hidden="false" class="slds-section__content slds-p-left_small">-->
+        <template if:true={fieldsContent}>
+            <lightning-card variant="Narrow">
+            <c-generic-edit-pages-l-w-c fields-content={fieldsContent} onchanged={changedFromChild}>
+				<div slot="additionalFieldFirst"
+					class="slds-col slds-size_12-of-12 slds-large-size_3-of-12 slds-medium-size_12-of-12 slds-small-size_12-of-12">
+					<label class="slds-form-element__label" >
+																						<span style="color: red;">*&nbsp;</span>
+																						Sourcing Officer
+																					</label>
+					<c-l-w-c-lookup object-api-name="HRMS__c" field-api-name="Name" sub-field-api-name="Employee_Number__c"
+						object-label="Officer" variant="label-hidden" onselect={handleSelectedEMPId}
+						seleted-record-id={fieldOfficerEMPId} application-id={applicationId} criteria="NAME_EMP" required>
+					</c-l-w-c-lookup>
+				</div>
+				<!-- <div slot="additionalFieldFirst"
+						class="slds-col slds-size_12-of-12 slds-large-size_3-of-12 slds-medium-size_6-of-12 slds-small-size_3-of-12">
+						 <label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Field Officer Employee Id
+                            </label>
+						<c-l-w-c-lookup object-api-name="User" name='Field_Officer_Emp_Id__c' field-api-name="EmployeeNumber" sub-field-api-name="Name" object-label="User"
+							variant="label-hidden" onselect={handleSelectedEMPId} seleted-record-id={fieldOfficerEMPId}  criteria="NAME_EMP">
+						</c-l-w-c-lookup>
+					</div> -->
+					
+					 <template if:true={isBroker}>
+                    <div slot="additionalFieldSecond"
+						class="slds-col slds-size_12-of-12 slds-large-size_3-of-12 slds-medium-size_6-of-12 slds-small-size_3-of-12">
+						<label class="slds-form-element__label" >
+												
+													Broker Code
+												</label>
+						<c-l-w-c-lookup object-api-name="Account" name='Broker_Code__c' field-api-name="Enrollment_Id__c" sub-field-api-name="Name" object-label="Account"
+							variant="label-hidden"  onselect={handleSelecteBrokerCode} seleted-record-id={brokerCode}  criteria="Account-Broker"
+							>
+						</c-l-w-c-lookup>
+						
+					</div>
+					                  <div slot="additionalFieldSecond"
+						class="slds-col slds-size_12-of-12 slds-large-size_3-of-12 slds-medium-size_6-of-12 slds-small-size_3-of-12">
+						
+							<label class="slds-form-element__label" >
+													
+													Broker Name
+												</label>
+							<lightning-input variant="label-hidden" label="Broker Name" name="Broker_Name__c" onchanged={changedFromChild} field-api-name="Broker_Name__c"
+											type="text" value={brokerName} max-length="15" disabled = "true">
+							</lightning-input>
+					                  </div>
+					            </template>
+                </c-generic-edit-pages-l-w-c><br/>
+
+            <div slot="footer" class="slds-align_absolute-center slds-m-around_x-small">
+                <lightning-button variant="brand" label="Update" title="Update" onclick={handleSave}></lightning-button>
+                <!-- <lightning-button label="Cancel" title="Cancel" onclick={handleCancel} class="slds-m-left_x-small"></lightning-button> -->
+            </div>
+            </lightning-card>
+        </template>
+        <!--<c-fs-title-section title="List Of Applicants"></c-fs-title-section>
+        <c-generic-data-table-l-w-c data-id="cashflow" result={tableData} btns={rowAction} onselected={handleSelectedApplication}></c-generic-data-table-l-w-c>-->
+        <!--</div>
+    </div>-->
+</template>

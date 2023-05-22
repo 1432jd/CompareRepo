@@ -1,0 +1,17 @@
+<template>
+	
+	<template if:true={isLoading}>
+		<lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+	</template>
+	
+	<template if:true={feeList}>
+		<c-fee-creation-screen-2 record-id={recordId} stage-name={stageName} ongetfeechangeevent={getRecFeeCodeChange}
+			ongetrefreshfee={refreshFee}></c-fee-creation-screen-2>
+		<!-- <c-fee-creation-type-insurance-new record-id={recordId} stage-name={stageName} ongetinsfeechangeevent={getRecFeeCodeChange}></c-fee-creation-type-insurance-new>-->
+		<c-fee-type-insurance-creation record-id={recordId} stage-name={stageName}
+			ongetinsfeechangeevent={getRecFeeCodeChange}></c-fee-type-insurance-creation>
+		<c-prelogin-receipt-screen application-id={recordId} pre-log-in-id={preLogInId} app-name={appName}
+			primary-applicant-name={primaryApplicantName} stage-name={stageName}
+			ongetreceiptevent={getReceiptPendingList} ></c-prelogin-receipt-screen>
+	</template>
+</template>

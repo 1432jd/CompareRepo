@@ -1,0 +1,134 @@
+<template>
+	<lightning-spinner alternative-text="Loading" size="medium" if:true={showSpinner}></lightning-spinner>
+	<template if:true={showDeleteModal}>
+		<section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="modal-heading-01"
+			aria-modal="true">
+			<div class="slds-modal__container" style="width:8rem;">
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Delete Record</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium slds-text-align--center" id="modal-content-id-2">
+					Are you sure you want to delete this record?
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-button variant="brand" label="Yes" title="Yes" onclick={handleDelete}>
+					</lightning-button>
+					<lightning-button label="No" class="slds-m-left--medium" title="No" onclick={handleDelete}>
+					</lightning-button>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+	<lightning-card variant="Narrow" title="Floor Details">
+		<lightning-button-icon icon-name="utility:add" variant="brand" alternative-text="Show More" slot="actions"
+			onclick={pushRecord} class="slds-m-right--small"></lightning-button-icon>
+		<div style="max-width: 100%;overflow-x: auto;">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+				aria-label="Example table of Opportunities with vertical borders">
+				<thead>
+					<tr class="slds-line-height_reset">
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Floor">Floor</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Length (ft)">Length (ft)</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Width (ft)">Width (ft)</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Area Extent (Sq ft)">Area Extent (Sq ft)</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Value per Sq ft">Value per Sq ft</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Total Value">Total Value</div>
+						</th>
+						<th class="" scope="col">
+							<div class="slds-truncate" title="Total Value">Delete</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template if:true={recordList} for:each={recordList} for:item="item" for:index="index">
+						<tr class="slds-hint-parent" key={item}>
+							<th data-label="Floor">
+								<!-- <lightning-input data-index={index} type="number" value={item.Building_Floor__c}
+                                variant="label-hidden" name="Building_Floor__c"
+                                message-when-range-overflow="Maximum 2 digits are allowed." label="Width(ft)" max="9999"
+                                onchange={handleFormValues} disabled={isVacantProperty}>
+                                </lightning-input> 
+								<lightning-combobox data-index={index} name="Building_Floor__c" label="Status"
+									value={item.Building_Floor__c} placeholder="Floor" options={floorOptions}
+									onchange={handleFormValues} variant="label-hidden">
+								</lightning-combobox> -->
+								<select class="slds-select" data-index={index} onchange={handleFormValues} name="Building_Floor__c">
+								<template if:false={item.Building_Floor__c}>
+									<option value="" selected disabled hidden>Floor</option>
+								</template>
+								<template if:true={item.Building_Floor__c}>
+										<option value={item.Building_Floor__c} selected disabled hidden>{item.Building_Floor__c}
+								         </option>
+								</template>
+								<template for:each={floorOptions} for:item="listViewItem">
+									<option key={listViewItem.label} value={listViewItem.value}>
+										{listViewItem.label}
+									</option>
+								</template>
+                            </select>
+							</th>
+							<td data-label="Length">
+								<lightning-input data-index={index} type="number" value={item.Length_ft__c}
+									variant="label-hidden" name="Length_ft__c" step="0.01"
+									message-when-range-overflow="Maximum 4 digits are allowed."
+									message-when-step-mismatch="Maximum 2 decimal places are allowed." label="Width(ft)"
+									max="9999.99" onchange={handleFormValues} disabled={isVacantProperty} required>
+								</lightning-input>
+							</td>
+							<td data-label="Width">
+								<lightning-input data-index={index} type="number" value={item.Width_ft__c}
+									variant="label-hidden" name="Width_ft__c" step="0.01"
+									message-when-range-overflow="Maximum 4 digits are allowed."
+									message-when-step-mismatch="Maximum 2 decimal places are allowed." label="Width(ft)"
+									max="9999.99" onchange={handleFormValues} disabled={isVacantProperty} required>
+								</lightning-input>
+							</td>
+							<td data-label="Area Extent (Sq ft)">
+								<lightning-input data-index={index} type="number" value={item.Area_Extent_Sq_ft__c}
+									variant="label-hidden" name="Area_Extent_Sq_ft__c" label="Width(ft)" disabled>
+								</lightning-input>
+							</td>
+							<td data-label="Value per Sq ft">
+								<lightning-input data-index={index} type="number" value={item.Value_per_Sq_ft__c}
+									variant="label-hidden" name="Value_per_Sq_ft__c" formatter="currency"
+									message-when-range-overflow="Maximum 8 digits are allowed." label="Width(ft)"
+									max="99999999" onchange={handleFormValues} disabled={isVacantProperty} required>
+								</lightning-input>
+							</td>
+							<td data-label="Total Value">
+								<lightning-input data-index={index} type="number" value={item.Total_Value__c}
+									formatter="currency" variant="label-hidden" name="Total_Value__c"
+									label="Total Value" disabled>
+								</lightning-input>
+							</td>
+							<td data-label="Delete Row">
+								<div class="slds-truncate" title="Delete Row">
+									<lightning-button-icon data-index={index} icon-name="utility:delete"
+										alternative-text="Del" title="Delete Row" onclick={removeRow}
+										disabled={disableDelete}>
+									</lightning-button-icon>
+									<!-- disabled={disableDelete} -->
+								</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+		<!-- <p slot="footer">
+            <lightning-button variant="brand" label="Save" title="Save" onclick={handleSave}></lightning-button>
+        </p> -->
+	</lightning-card>
+</template>

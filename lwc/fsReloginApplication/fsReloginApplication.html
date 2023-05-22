@@ -1,0 +1,41 @@
+<template>
+    <template if:true={isSpinnerActive}>
+        <c-fs-spinner></c-fs-spinner>
+    </template>
+	<lightning-card variant="Narrow" title="Search Application">
+		<lightning-layout multiple-rows="true">
+			<lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+				padding="around-small">
+				<lightning-input type="text" label="Application Number" placeholder="Enter Application No." name="appNo"
+					data-name="reloginApp" value={reloginApp} onchange={handleReloginApp}>
+				</lightning-input>
+			</lightning-layout-item>
+			<h1 style="padding-top: 40px;">--OR--</h1>
+			<lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+				padding="around-small">
+				<lightning-input type="text" label="KYC Number" placeholder="Enter KYC No." value={reloginKYC}
+					data-name="reloginKYC" name="kyc" onchange={handleReloginKYC}>
+				</lightning-input>
+			</lightning-layout-item>
+			<lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="2"
+				padding="around-small">
+				<br>
+				<lightning-button variant="brand" label="Search" title="Search" onclick={searchAllApplication}>
+				</lightning-button>
+			</lightning-layout-item>
+		</lightning-layout>
+	</lightning-card>
+    
+    <!-- List Of Applicants -->
+    <template if:true={isAppDataArrived}>
+        <div class="slds-m-top_small">
+        </div>
+        <lightning-card  variant="Narrow"  title="List Of Applications">
+            <lightning-button variant="brand" label="Next" title="Next" hidden={moveNext}
+                            onclick={handleNext} slot="actions">
+            </lightning-button>
+            <c-generic-data-table-l-w-c data-id="app" result={appResult} onrowselectionevent={handleRadioButton} if:true={appResult}>
+            </c-generic-data-table-l-w-c>
+        </lightning-card>
+    </template>
+</template>

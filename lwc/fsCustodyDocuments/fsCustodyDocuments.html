@@ -1,0 +1,196 @@
+<template>
+	<lightning-tabset variant="scoped">
+		<lightning-tab label="View Documents" title="View Documents" value="View Documents" onactive={handleActive}>
+			<!-- <div class="slds-scrollable_y"> -->
+			<!--
+                    Used For Document View
+                    Start Here
+                -->
+			<lightning-spinner alternative-text="Loading" size="small" if:true={isSpinnerActive}></lightning-spinner>
+			<lightning-card variant="Narrow" title="Required Documents">
+				<lightning-button variant="brand" label="Save" title="Save" onclick={handleSave} slot="actions">
+				</lightning-button>
+				<div class="c-container scrollTable" if:true={uploadedDocData}>
+					<table class="slds-table slds-table_cell-buffer slds-table_bordered table-insurance-detail">
+						<thead>
+							<tr class="th">
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Document Name">Document Name</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Uploaded By">Uploaded By</div>
+								</th>
+								<th class="widthapplicantcss" scope="col">
+									<div class="slds-truncate" title="DOC_No">Document Number</div>
+								</th>
+								<th class="widthapplicantcss" scope="col">
+									<div class="slds-truncate" title="Document Condtion">Document Condtion</div>
+								</th>
+								<th class="widthapplicantcss" scope="col">
+									<div class="slds-truncate" title="DOC_No">Document Type</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Document Family">View Document</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="No Of Pages">No Of Pages</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Remarks">Remarks</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Stage">Stage</div>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<template for:each={uploadedDocData} for:item="item" for:index="indexVar">
+								<tr key={item.key} class="slds-hint-parent">
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="slds-truncate" title="Document Name">{item.Document_Name__c}
+										</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="td-currency" title="Uploaded By">{item.Owner_Name__c}</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="slds-truncate" title="Document Number">{item.Document_Code__c}
+										</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<lightning-combobox name="Document_Condition__c" data-row-index={indexVar}
+											variant="label-hidden" label="" value={item.Document_Condition__c}
+											options={documentConditionPicklistOption}
+											onchange={handleOptionChange} data-document-type="Req-Document">
+										</lightning-combobox>
+										<!-- <div class="slds-truncate" title="Document Name">{item.cv.Document_Condition__c}
+										</div> -->
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<lightning-combobox name="Document_Type__c" data-row-index={indexVar}
+											variant="label-hidden" label="" value={item.Document_Type__c}
+											options={documenrTypePicklistOption} onchange={handleOptionChange}
+											data-document-type="Req-Document">
+										</lightning-combobox>
+										<!-- <div class="slds-truncate" title="Document Name">{item.cv.Agreement_Document_Type__c}
+										</div> -->
+									</td>
+									<td class="slds-size_3-of-10" data-id="2">
+										<div class="td-currency" title="View Document">
+											<lightning-icon style="cursor: pointer;"
+												data-index={item.ContentDocumetId__c} size="xx-small"
+												icon-name="action:preview" alternative-text="Preview" title="Preview"
+												onclick={viewDocument}></lightning-icon>
+										</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="td-currency" title="No Of Pages">{item.No_of_Pages__c}</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="td-currency" title="Remarks">{item.Remarks__c}</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="td-currency" title="Stage">{item.Uploaded_From__c}</div>
+									</td>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+				</div>
+			</lightning-card>
+			<div class="slds-m-top_small">
+			</div>
+			<lightning-card variant="Narrow" title="Additional Documents">
+				<div class="c-container scrollTable" if:true={addtionalDocuments}>
+					<table class="slds-table slds-table_cell-buffer slds-table_bordered table-insurance-detail">
+						<thead>
+							<tr class="th">
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Document Name">Document Name</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Uploaded By">Uploaded By</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Uploaded By">Document Number</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Description">Document Condition</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Description">Document Type</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="View Document">View Document</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Owner">No Of Pages</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Remarks">Remarks</div>
+								</th>
+								<th class="slds-size_3-of-10" scope="col">
+									<div class="slds-truncate" title="Stage">Stage</div>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<template for:each={addtionalDocuments} for:item="item" for:index="indexVar">
+								<tr key={item.key} class="slds-hint-parent">
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="slds-truncate" title=" Name">{item.Title}</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="slds-truncate" title=" Name">{item.Owner.Name}</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="slds-truncate" title=" Name">{item.Document_Number__c}</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<lightning-combobox name="Document_Condition__c" data-row-index={indexVar}
+											variant="label-hidden" label="" value={item.Document_Condition__c}
+											options={documentConditionPicklistOption} required
+											onchange={handleOptionChange} data-document-type="Add-Document">
+										</lightning-combobox>
+										<!-- <div class="td-currency" title="Description">{item.Agreement_Document_Type__c}
+										</div> -->
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<lightning-combobox name="Agreement_Document_Type__c" data-row-index={indexVar}
+											variant="label-hidden" label="" value={item.Agreement_Document_Type__c}
+											options={documenrTypePicklistOption} required onchange={handleOptionChange}
+											data-document-type="Add-Document">
+										</lightning-combobox>
+										<!-- <div class="slds-truncate" title="Document Name">{item.cv.Agreement_Document_Type__c}
+										</div> -->
+									</td>
+									<td class="slds-size_3-of-10" data-id="2">
+										<div class="td-currency" title="View Document">
+											<lightning-icon style="cursor: pointer;" data-index={item.ContentDocumentId}
+												size="xx-small" icon-name="action:preview" alternative-text="Preview"
+												title="Preview" onclick={viewDocument}></lightning-icon>
+										</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="td-currency" title="Description">{item.Number_of_Pages__c}</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="td-currency" title="Description">{item.Remarks__c}</div>
+									</td>
+									<td class="slds-size_3-of-10" data-id="1">
+										<div class="td-currency" title="Description">{item.Uploaded_From__c}</div>
+									</td>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+				</div>
+			</lightning-card>
+			<!--
+                    Used For Document View
+                    End Here
+                -->
+			<!-- </div> -->
+		</lightning-tab>
+	</lightning-tabset>
+</template>

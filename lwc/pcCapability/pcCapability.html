@@ -1,0 +1,2250 @@
+<template>
+	<div class="slds-m-bottom_small">
+		<template if:true={showAcCapabilityForm}>
+			<lightning-card variant="Narrow" title={sectiontitle}>
+				<lightning-record-edit-form object-api-name="Capability__c" record-id={capabilityRecordId}
+					record-type-id={capabilityRecordTypeId} onsuccess={handleCapabiltySuccess}
+					onsubmit={handleCapabiltySubmit}>
+					<template if:false={isFIVC}>
+						<lightning-layout multiple-rows>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+								medium-device-size="2" large-device-size="2" style="display:none">
+								<lightning-input-field field-name="Application__c" value={appId}
+									variant="label-stacked">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+								medium-device-size="2" large-device-size="2" style="display:none">
+								<lightning-input-field field-name="Verification__c" value={verificationId}
+									variant="label-stacked">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<lightning-combobox name="Customer_Information__c" label="Select Applicant"
+									value={loanApplicantId} options={customerList} class="capable"
+									onchange={handleCustomerSelection} variant="label-stacked">
+								</lightning-combobox>
+								<lightning-input-field field-name="Loan_Applicant__c" value={loanApplicantId}
+									variant="label-stacked" style="display:none">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+								medium-device-size="3" large-device-size="3">
+								<lightning-input-field field-name="Income_segment__c" variant="label-stacked"
+									value={segMentValue} onchange={handleFormValue} class="capable"
+									data-id="Income_segment__c" required>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+								medium-device-size="3" large-device-size="3">
+								<lightning-input-field field-name="Subsegment__c" variant="label-stacked" required
+									value={subSegMentValue} class="capable" onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="2"
+								medium-device-size="3" large-device-size="3" if:true={showDayorMarginBasis}>
+								<lightning-input-field field-name="Day_Margin_Basis__c" variant="label-stacked"
+									value={dayOrMaginValue} onchange={handleFormValue} class="capable"
+									data-id="Day_Margin_Basis__c" required>
+								</lightning-input-field>
+							</lightning-layout-item>
+						</lightning-layout>
+						<hr class="slds-m-vertical--x-small">
+					</template>
+					<lightning-layout multiple-rows>
+						<template if:true={isSalaried}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Name Of The Employer</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="Name_of_the_Employer__c" variant="label-stacked"
+										style="display: none;" value={employerName}>
+									</lightning-input-field>
+									<lightning-input type="text" variant="label-hidden" name="Name_of_the_Employer__c"
+										label="Name Of The Employer" max-length="50" value={employerName}
+										pattern="^[a-z  A-Z]*$" onchange={handleFormValue}
+										message-when-pattern-mismatch="Only alphabets are allowed.">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Name_of_the_Employer__c" variant="label-hidden"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Year Of Service With Employer</label>
+
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="Year_of_Service_With_Employer__c"
+										variant="label-stacked" style="display: none;" value={yearOfServiceWidEmp}>
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={yearOfServiceWidEmp}
+										variant="label-hidden" name="Year_of_Service_With_Employer__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Year Of Service With Employer should be less than Total Work Experience"
+										max={totalWorkExp} label="Year Of Service With Employer">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Year_of_Service_With_Employer__c"
+										variant="label-hidden" disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Nature of Job</label>
+								<template if:false={isFIVC}>
+									<lightning-input type="text" variant="label-hidden" name="Nature_of_Job__c"
+										label="Nature of Job" max-length="50" value={natureofJob}
+										pattern="^[a-z  A-Z 0-9]*$" onchange={handleFormValue}
+										message-when-pattern-mismatch="Only alphanumeric Values are allowed.">
+									</lightning-input>
+									<lightning-input-field field-name="Nature_of_Job__c" variant="label-stacked"
+										disabled={isDisabled} value={natureofJob} class="capable" style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Nature_of_Job__c" variant="label-hidden"
+										disabled={isDisabled} value={natureofJob} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<template if:false={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Total Work Experience</label>
+									<lightning-input-field field-name="Total_Work_Experience__c" variant="label-stacked"
+										style="display: none;" value={totalWorkExp}>
+									</lightning-input-field>
+									<lightning-input type="number" value={totalWorkExp} variant="label-hidden"
+										name="Total_Work_Experience__c" onchange={handleFormValue}
+										min={yearOfServiceWidEmp}
+										message-when-range-overflow="Maximum 3 digits are allowed."
+										message-when-range-underflow="Year Of Service With Employer should be less than Total Work Experience"
+										label="Total Work Experience" max-length="3" step="0">
+									</lightning-input>
+								</lightning-layout-item>
+							</template>
+							<template if:true={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Total_Work_Experience__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Monthly_Salary__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+							<template if:false={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Monthly Salary</label>
+									<lightning-input-field value={monthlySalary} field-name="Monthly_Salary__c"
+										variant="label-stacked" style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" value={monthlySalary} variant="label-hidden"
+										name="Monthly_Salary__c" onchange={handleFormValue} max-length="8"
+										message-when-range-overflow="Maximum 8 digits are allowed." step="0"
+										label="Monthly Salary">
+									</lightning-input>
+								</lightning-layout-item>
+							</template>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Mode of Salary</label>
+								<lightning-input-field field-name="Mode_of_Salary__c" variant="label-hidden"
+									disabled={isDisabled} class="capable" onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>% of income transacted through bank account</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} variant="label-hidden" class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="8"
+								medium-device-size="8" large-device-size="3">
+								<template if:false={isFIVC}>
+									<lightning-textarea label="Overall Remarks" name="Overall_Remarks__c"
+										onchange={handleFormValue} max-length="500" variant="label-stacked"
+										data-id="overall-remarks" value={overallRemarks}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Overall_Remarks__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" value={overallRemarks}
+										style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Overall_Remarks__c" variant="label-stacked"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Employment Document Proof</label>
+								<lightning-input-field field-name="Employment_Document_Proof__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Nature of Document Proof"
+										name="Nature_of_Document_Proof__c" value={natureofdocumentProof} disabled="true"
+										variant="label-stacked" onchange={handleFormValue}>
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<lightning-input-field field-name="Nature_of_Document_Proof__c"
+										variant="label-stacked" class="capable" onchange={handleFormValue}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Other Confirmations" name="Other_Confirmations__c"
+										value={otherConfirmation} disabled="true" variant="label-stacked"
+										onchange={handleFormValue}>
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Other Confirmations</label>
+									<lightning-input-field field-name="Other_Confirmations__c" variant="label-hidden"
+										class="capable" onchange={handleFormValue}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Income Pincode</label>
+								<lightning-input-field field-name="IncomePincode__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+						</template>
+						<template if:true={isRentalMortgage}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>No. Of Units</label>
+									<lightning-input-field field-name="No_of_Units__c" variant="label-stacked"
+										value={numberOfUnits} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={numberOfUnits} variant="label-hidden"
+										name="No_of_Units__c" onchange={handleFormValue}
+										message-when-range-overflow="Maximum 8 digits are allowed." label="No. Of Units"
+										max="99999999" max-length="8">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="No_of_Units__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Rental Income</label>
+									<lightning-input-field field-name="Rental_Income__c" variant="label-stacked"
+										value={rentalIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={rentalIncome} variant="label-hidden"
+										name="Rental_Income__c" onchange={handleFormValue}
+										message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+										label="Rental Income" max="99999999" max-length="8">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Rental_Income__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>% of income transacted through bank account</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} class="capable" variant="label-hidden" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Remarks</label>
+								<lightning-input-field field-name="Remarks__c" variant="label-hidden"
+									disabled={isDisabled} class="capable" onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+						</template>
+						<template if:true={isRentalOther}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="4">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Rental Property Owner name</label>
+								<lightning-input-field field-name="Rental_Property_Owner_name__c" variant="label-hidden"
+									disabled={isDisabled} class="capable" onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="4">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Rental Income Property Address</label>
+									<lightning-textarea label="Rental Income Property Address"
+										name="Rental_income_property_address__c" onchange={handleFormValue}
+										max-length="300" variant="label-hidden" data-id="rental-property-address"
+										value={rentalpropertyaddress}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Rental_income_property_address__c"
+										style="display:none" variant="label-stacked" value={rentalpropertyaddress}
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Rental_income_property_address__c"
+										variant="label-stacked" disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="4">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Proof</label>
+								<lightning-input-field field-name="Proof__c" variant="label-hidden"
+									disabled={isDisabled} class="capable" onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="4">
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Proof of Ownership" name="Proof_of_Ownership__c"
+										value={ownershipProof} onchange={handleFormValue} disabled="true"
+										variant="label-stacked">
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Proof of Ownership</label>
+									<lightning-input-field field-name="Proof_of_Ownership__c" variant="label-hidden"
+										disabled={isDisabled} onchange={handleFormValue} class="capable"
+										style="font-weight:unset">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="4">
+								<template if:true={isDisabled}>
+									<lightning-textarea label="FC Enquiry with" name="FC_Enquiry_with__c"
+										value={fcEnquiry} disabled="true" variant="label-stacked">
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>FC Enquiry with</label>
+									<lightning-input-field field-name="FC_Enquiry_with__c" variant="label-hidden"
+										disabled={isDisabled} class="capable" onchange={handleFormValue}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="4">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>No. Of Units</label>
+									<lightning-input-field field-name="No_of_Units__c" variant="label-stacked"
+										value={numberOfUnits} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={numberOfUnits} variant="label-hidden"
+										name="No_of_Units__c" onchange={handleFormValue}
+										message-when-range-overflow="Maximum 8 digits are allowed." label="No. Of Units"
+										max="99999999" max-length="8">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="No_of_Units__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="4">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Rental Income</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="Rental_Income__c" variant="label-stacked"
+										value={rentalIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={rentalIncome} variant="label-hidden"
+										name="Rental_Income__c" onchange={handleFormValue}
+										message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+										label="Rental Income" max="99999999" max-length="8">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Rental_Income__c" variant="label-hidden"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="4">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>% of income transacted through bank account</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} variant="label-hidden" class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+								medium-device-size="4" large-device-size="4">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Remarks</label>
+								<template if:false={isFIVC}>
+									<lightning-textarea label="Remarks" name="Remarks__c" onchange={handleFormValue}
+										max-length="300" variant="label-hidden" data-id="remark" value={remarksValue}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Remarks__c" variant="label-stacked"
+										style="display:none" disabled={isDisabled} class="capable" value={remarksValue}>
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Remarks__c" variant="label-hidden"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+						</template>
+						<template if:true={isDailyWages}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Year Of Occupation</label>
+									<lightning-input-field field-name="Year_of_Occupation__c" variant="label-stacked"
+										style="display: none;" value={yearOfOccupation}>
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={yearOfOccupation}
+										variant="label-hidden" name="Year_of_Occupation__c" onchange={handleFormValue}
+										label="Year Of Occupation" max-length="3"
+										message-when-range-overflow="Maximum 3 digits are allowed." max="999">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Year_of_Occupation__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Proof</label>
+								<lightning-input-field field-name="Proof__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Proof Remarks</label>
+									<lightning-input name="Proof_Remarks_Daily_Wages__c" variant="label-hidden"
+										label="Proof Remarks" type="text" onchange={handleFormValue}
+										data-id="proof-remark" value={proofRemarks} max-length="25">
+									</lightning-input>
+									<lightning-input-field field-name="Proof_Remarks_Daily_Wages__c"
+										value={proofRemarks} variant="label-stacked" class="capable"
+										style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Proof_Remarks_Daily_Wages__c"
+										variant="label-stacked" class="capable" required disabled={isDisabled}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Other Confirmations</label>
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Other Confirmations"
+										name="Other_Confirmations_Daily_Wages__c" value={otherConfirmationsDailyWages}
+										disabled="true" variant="label-hidden">
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<lightning-input-field field-name="Other_Confirmations_Daily_Wages__c"
+										variant="label-hidden" class="capable" onchange={handleFormValue}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Income Per Day</label>
+									<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+										data-id="Income_per_day__c" onchange={handleCalculations}
+										value={incomePerDayVal} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={incomePerDayVal}
+										variant="label-hidden" name="Income_per_day__c" onchange={handleCalculations}
+										message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+										label="Income Per Day" max="99999999" max-length="8">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+										disabled={isDisabled} data-id="Income_per_day__c" onchange={handleCalculations}
+										required class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Number Of Days</label>
+									<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+										data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+										name="Number_of_days__c" onchange={handleCalculations} step="0"
+										message-when-range-overflow="Maximum 8 digits are allowed."
+										label="Number Of Days" max="99" max-length="2">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+										data-id="Number_of_days__c" disabled={isDisabled} onchange={handleCalculations}
+										class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Assumptions for Income
+						</label>
+								<template if:false={isFIVC}>
+									<lightning-textarea label="Assumptions for Income" name="Assumptions_for_Income__c"
+										onchange={handleFormValue} max-length="500" variant="label-hidden"
+										data-id="assumption" value={assumptionRemark}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Assumptions_for_Income__c"
+										value={assumptionRemark} variant="label-stacked" disabled={isDisabled}
+										class="capable" style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Assumptions_for_Income__c" variant="label-hidden"
+										onchange={handleFormValue} disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">Gross Monthly Income</label>
+								<lightning-input type="number" value={grossMonthlyIncome} variant="label-hidden"
+									formatter="currency" name="Gross_Monthly_Income__c" step="0"
+									label="Gross Monthly Income" disabled="true">
+								</lightning-input>
+								<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+									value={grossMonthlyIncome} class="capable" style="display:none;">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>% of income transacted through bank account</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										max-length="3" label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} variant="label-hidden" class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<template if:false={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<lightning-textarea label="Overall Remarks" name="Overall_Remarks__c"
+										onchange={handleFormValue} max-length="500" variant="label-stacked"
+										data-id="overall-remarks" value={overallRemarks}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Overall_Remarks__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" style="display:none">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+							<template if:true={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Reference_Name__c" variant="label-stacked"
+										required disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Reference_Contact_Number__c"
+										variant="label-stacked" disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Feedback__c" variant="label-stacked" required
+										disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Reference_Name_2__c" variant="label-stacked"
+										required disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Reference_Contact_Number_2__c"
+										variant="label-stacked" disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Feedback_2__c" variant="label-stacked" required
+										disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<lightning-input-field field-name="Remarks__c" required="true" disabled="true"
+										variant="label-stacked">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+						</template>
+						<template if:true={isPension}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Income Per Month</label>
+									<lightning-input type="number" step="0" value={incomePerMonth}
+										variant="label-hidden" name="Income_per_month__c" onchange={handleCalculations}
+										message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+										label="Income Per Month" max-length="8">
+									</lightning-input>
+									<lightning-input-field field-name="Income_per_month__c" variant="label-stacked"
+										value={incomePerMonth} style="display: none;">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Income_per_month__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>% Considered for DBR</label>
+									<lightning-input type="number" value={considerforDBrValue} variant="label-hidden"
+										name="considered_for_DBR__c" onchange={handleCalculations}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										label="% Considered for DBR" max-length="3">
+									</lightning-input>
+									<lightning-input-field field-name="considered_for_DBR__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" value={considerforDBrValue}
+										style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="considered_for_DBR__c" variant="label-stacked"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Income per month</label>
+								<lightning-input-field field-name="Income_per_month_Pension__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable"
+									value={incomepermonthXConsiderforDBR}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="8" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Income Remarks</label>
+								<lightning-input-field field-name="Income_Remarks__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Spouse Alive</label>
+								<lightning-input-field field-name="Spouse_alive__c" variant="label-hidden"
+									disabled={isDisabled} class="capable" onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+								medium-device-size="4" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>% of income transacted through bank account</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} class="capable" variant="label-hidden">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+								medium-device-size="12" large-device-size="6">
+								<label class="slds-form-element__label">
+                            <abbr class="slds-required">*</abbr>Income Proof Pension
+                        </label>
+								<lightning-input-field field-name="Income_Proof_Pension__c" variant="label-hidden"
+									onchange={handleFormValue} disabled={isDisabled}>
+								</lightning-input-field>
+							</lightning-layout-item>
+						</template>
+						<template if:true={isAbroadIncome}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Income Per Month</label>
+									<lightning-input-field field-name="Income_per_month__c" variant="label-stacked"
+										value={incomePerMonth} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={incomePerMonth}
+										variant="label-hidden" name="Income_per_month__c" onchange={handleCalculations}
+										message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+										label="Income Per Month" max-length="8">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Income_per_month__c" variant="label-stacked"
+										disabled={isDisabled} required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="9"
+								medium-device-size="9" large-device-size="9">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Income Remarks</label>
+
+									<lightning-textarea label="Income Remarks" name="Income_Remarks__c"
+										onchange={handleFormValue} max-length="500" variant="label-hidden"
+										data-id="income-remark" value={incomeRemarksValue}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Income_Remarks__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" value={incomeRemarksValue}
+										style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Income_Remarks__c" variant="label-stacked"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>% of income transacted through bank account</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										max-length="3" label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} variant="label-hidden" class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Proof</label>
+								<lightning-input-field field-name="Proof__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Proof Remarks" name="Proof_Remarks__c"
+										value={proofRemarks} disabled="true" variant="label-stacked">
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Proof Remarks
+									</label>
+									<lightning-input-field onchange={handleFormValue} field-name="Proof_Remarks__c"
+										variant="label-hidden" class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Other Confirmations"
+										name="Other_Confirmations_Daily_Wages__c" value={otherConfirmationsDailyWages}
+										disabled="true" variant="label-stacked">
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<label class="slds-form-element__label" for="form-element-01"> <abbr class="slds-required" title="required">* </abbr>Other Confirmations</label>
+									<lightning-input-field field-name="Other_Confirmations_Daily_Wages__c"
+										variant="label-hidden" onchange={handleFormValue} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<template if:true={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="4">
+									<lightning-input-field field-name="Income_reference_name__c" variant="label-stacked"
+										required disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="4">
+									<lightning-input-field field-name="Income_reference_Contact_Number__c"
+										disabled="true" variant="label-stacked" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="4">
+									<lightning-input-field field-name="Feedback__c" disabled="true"
+										variant="label-stacked" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="12">
+									<lightning-input-field field-name="Remarks__c" variant="label-stacked"
+										disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+
+						</template>
+						<template if:true={isOther}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+								medium-device-size="12" large-device-size="12">
+								<label class="slds-form-element__label" for="form-element-03">
+                            				Remarks</label>
+								<template if:false={isFIVC}>
+									<lightning-textarea label="Income Remarks" name="Income_Remarks__c"
+										onchange={handleFormValue} max-length="500" variant="label-hidden"
+										data-id="income-remark" value={incomeRemarksValue}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Income_Remarks__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" value={incomeRemarksValue}
+										style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Income_Remarks__c" variant="label-hidden"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+						</template>
+						<template if:true={isSelfEmployedOrBusiness}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Year of Occupation
+						</label>
+									<lightning-input-field field-name="Year_of_Occupation__c" variant="label-stacked"
+										style="display: none;" value={yearOfOccupation}>
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={yearOfOccupation}
+										variant="label-hidden" name="Year_of_Occupation__c" onchange={handleFormValue}
+										label="Year Of Occupation"
+										message-when-range-overflow="Maximum 3 digits are allowed." max="999">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Year_of_Occupation__c" variant="label-stacked"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Ownership Document Proof
+						</label>
+								<lightning-input-field field-name="Ownership_document_proof__c" variant="label-hidden"
+									class="capable" disabled={isDisabled} onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Nature of Document Proof
+						</label>
+									<lightning-input label="Nature of Document Proof" data-id="nature-of-document-proof"
+										name="Nature_of_Document_Proof_Self_Employed__c" value={natureofdocumentProof}
+										variant="label-hidden" max-length="50" onchange={handleFormValue}>
+									</lightning-input>
+									<lightning-input-field field-name="Nature_of_Document_Proof_Self_Employed__c"
+										value={natureofdocumentProof} variant="label-stacked" class="capable"
+										disabled={isDisabled} style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<template if:true={isDayBasis}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Ownership Document Proof Self Employed
+						</label></template>
+									<template if:true={isMarginBasis}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Nature of Document Proof Self Employed
+						</label></template>
+									<lightning-input-field field-name="Nature_of_Document_Proof_Self_Employed__c"
+										variant="label-hidden" class="capable" disabled={isDisabled} required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:true={isFIVC}>
+									<lightning-textarea label="Other Confirmations" name="Other_Confirmations__c"
+										disabled="true" variant="label-stacked" value={otherConfirmation}>
+									</lightning-textarea>
+								</template>
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Other Confirmations
+						</label>
+									<lightning-input-field field-name="Other_Confirmations__c" variant="label-hidden"
+										class="capable" onchange={handleFormValue}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<lightning-textarea label="Overall Remarks Regarding Business"
+										name="Overall_Remarks_Regarding_Business__c" onchange={handleFormValue}
+										max-length="500" variant="label-stacked" data-id="overall-remarks-business"
+										value={overallRemarksRegardingBusiness}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Overall_Remarks_Regarding_Business__c"
+										value={overallRemarksRegardingBusiness} disabled={isDisabled} class="capable"
+										variant="label-stacked" style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Overall Remarks Regarding Business
+						</label>
+									<lightning-input-field field-name="Overall_Remarks_Regarding_Business__c"
+										value={overallRemarksRegardingBusiness} disabled={isDisabled} class="capable"
+										variant="label-hidden">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<template if:true={isDayBasis}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<template if:false={isFIVC}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Income Per Day
+						</label>
+										<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+											data-id="Income_per_day__c" onchange={handleCalculations}
+											value={incomePerDayVal} style="display: none;">
+										</lightning-input-field>
+										<lightning-input type="number" step="0" value={incomePerDayVal}
+											variant="label-hidden" name="Income_per_day__c"
+											onchange={handleCalculations}
+											message-when-range-overflow="Maximum 5 digits are allowed."
+											formatter="currency" label="Income Per Day" max="99999">
+										</lightning-input>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+											data-id="Income_per_day__c" onchange={handleCalculations} class="capable"
+											disabled={isDisabled} required>
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<template if:false={isFIVC}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Number Of Days
+						</label>
+										<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+											data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+										</lightning-input-field>
+										<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+											name="Number_of_days__c" onchange={handleCalculations}
+											message-when-range-overflow="Maximum 2 digits are allowed."
+											label="Number Of Days" max="99">
+										</lightning-input>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+											onchange={handleCalculations} data-id="Number_of_days__c" class="capable"
+											disabled={isDisabled} required>
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Gross Monthly Income
+						</label>
+									<lightning-input type="number" value={grossMonthlyIncome} variant="label-hidden"
+										formatter="currency" name="Gross_Monthly_Income__c" step="0"
+										label="Gross Monthly Income" disabled="true">
+									</lightning-input>
+									<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+										value={grossMonthlyIncome} class="capable" style="display:none;">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+							<template if:true={isMarginBasis}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Sales / Income per day
+						</label>
+									<template if:false={isFIVC}>
+										<lightning-input type="number" value={salesPerDay} variant="label-hidden"
+											step="0" name="Sales_per_day__c" onchange={handleCalculations}
+											formatter="currency"
+											message-when-range-overflow="Maximum 5 digits are allowed."
+											label="Sales / Income per day" max="99999">
+										</lightning-input>
+										<lightning-input-field field-name="Sales_per_day__c" data-id="Sales_per_day__c"
+											variant="label-hidden" onchange={handleCalculations} disabled={isDisabled}
+											class="capable" value={salesPerDay} style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Sales_per_day__c" data-id="Sales_per_day__c"
+											variant="label-hidden" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<template if:false={isFIVC}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Number Of Days
+						</label>
+										<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+											data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+										</lightning-input-field>
+										<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+											name="Number_of_days__c" onchange={handleCalculations}
+											message-when-range-overflow="Maximum 2 digits are allowed."
+											label="Number Of Days" max="99">
+										</lightning-input>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+											data-id="Number_of_days__c" onchange={handleCalculations}
+											disabled={isDisabled} class="capable" required>
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>Sales / Income per Month</label>
+									<lightning-input-field field-name="Sales_per_month__c" variant="label-hidden"
+										value={salesPerMonth} class="capable" onchange={handleFormValue}>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Margin %
+						</label>
+									<lightning-input-field field-name="Margin__c" variant="label-hidden"
+										data-id="Margin__c" onchange={handleCalculations} disabled={isDisabled}
+										class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Margin In Amount
+						</label>
+									<lightning-input-field field-name="Margin_in_amount__c" variant="label-hidden"
+										class="capable" value={marginInAmount} onchange={handleFormValue}>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<template if:false={isFIVC}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Electricity
+						</label>
+										<lightning-input type="number" value={electricity} variant="label-hidden"
+											step="0" name="Electricity__c" onchange={handleCalculations}
+											formatter="currency"
+											message-when-range-overflow="Maximum 8 digits are allowed."
+											label="Electricity" max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Electricity__c" variant="label-hidden"
+											value={electricity} data-id="Electricity__c" onchange={handleCalculations}
+											disabled={isDisabled} class="capable" style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Electricity__c" variant="label-stacked"
+											data-id="Electricity__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<template if:false={isFIVC}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Salary
+						</label>
+										<lightning-input type="number" value={salary} variant="label-hidden" step="0"
+											name="Salary__c" onchange={handleCalculations} formatter="currency"
+											message-when-range-overflow="Maximum 8 digits are allowed." label="Salary"
+											max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Salary__c" variant="label-stacked"
+											data-id="Salary__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable" value={salary} style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Salary__c" variant="label-stacked"
+											data-id="Salary__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<template if:false={isFIVC}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Rent
+						</label>
+										<lightning-input type="number" value={rent} variant="label-hidden"
+											name="Rent__c" onchange={handleCalculations} formatter="currency" step="0"
+											message-when-range-overflow="Maximum 8 digits are allowed." label="Rent"
+											max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Rent__c" variant="label-stacked"
+											data-id="Rent__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable" value={rent} style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Rent__c" variant="label-stacked"
+											data-id="Rent__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<template if:false={isFIVC}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Others
+						</label>
+										<lightning-input type="number" value={others} variant="label-hidden"
+											name="Others__c" onchange={handleCalculations} formatter="currency" step="0"
+											message-when-range-overflow="Maximum 8 digits are allowed." label="Others"
+											max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Others__c" variant="label-stacked"
+											data-id="Others__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable" value={others} style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Others__c" variant="label-stacked"
+											data-id="Others__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Gross Monthly Income
+						</label>
+									<lightning-input type="number" value={grossMonthlyIncome} variant="label-hidden"
+										formatter="currency" name="Gross_Monthly_Income__c" step="0"
+										label="Gross Monthly Income" disabled="true">
+									</lightning-input>
+									<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+										value={grossMonthlyIncome} class="capable" style="display:none;">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Assumptions for Income
+						</label>
+								<template if:false={isFIVC}>
+									<lightning-textarea label="Assumptions for Income" name="Assumptions_for_Income__c"
+										onchange={handleFormValue} max-length="500" variant="label-hidden"
+										data-id="assumption" value={assumptionRemark}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Assumptions_for_Income__c"
+										value={assumptionRemark} variant="label-stacked" disabled={isDisabled}
+										class="capable" style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Assumptions_for_Income__c" required
+										variant="label-hidden" disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>% of income transacted through bank account</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} variant="label-hidden" class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<template if:true={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<lightning-input-field field-name="Business_Reference_Name__c"
+										variant="label-stacked" disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<lightning-input-field field-name="Business_Reference_Contact_Number__c"
+										disabled={isDisabled} variant="label-stacked" class="capable" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<lightning-input-field field-name="Feedback__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<lightning-input-field field-name="Business_Reference_Name_2__c"
+										variant="label-stacked" required disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<lightning-input-field field-name="Business_Reference_Contact_Number_2__c"
+										variant="label-stacked" required disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<lightning-input-field field-name="Feedback_2__c" variant="label-stacked" required
+										disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="12">
+									<lightning-input-field field-name="Business_Reference_Remarks__c"
+										variant="label-stacked" required="true" disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+						</template>
+						<template if:true={isTransportBusiness}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Business Name</label>
+								<lightning-input-field field-name="Business_name__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<template if:true={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Total Experience In This Business(yrs)</label>
+									<lightning-input-field field-name="Total_experience_in_this_business_yrs__c"
+										variant="label-hidden" disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+							<template if:false={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Total Experience In This Business(yrs)</label>
+									<lightning-input-field field-name="Total_experience_in_this_business_yrs__c"
+										variant="label-hidden" value={totalExpInBusiness} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0.01" value={totalExpInBusiness}
+										variant="label-hidden" name="Total_experience_in_this_business_yrs__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 3 digits are allowed."
+										message-when-step-mismatch="Maximum 2 decimal places are allowed."
+										label="Total Experience In This Business(yrs)" max="999">
+									</lightning-input>
+								</lightning-layout-item>
+							</template>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Nature of Ownership</label>
+								<lightning-input-field field-name="Nature_of_Ownership_Transport__c"
+									variant="label-hidden" onchange={handleFormValue} disabled={isDisabled}
+									class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Ownership Proof Available</label>
+								<lightning-input-field field-name="Ownership_Proof_available__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Nature of Ownership Proof"
+										name="Nature_of_Ownership_Proof__c" value={natureOfOwnershipProof}
+										disabled="true" variant="label-stacked">
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Nature of Ownership Proof</label>
+									<lightning-input-field field-name="Nature_of_Ownership_Proof__c"
+										variant="label-hidden" disabled={isDisabled} onchange={handleFormValue}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Remarks</label>
+									<lightning-textarea label="Remarks" name="Remarks__c" onchange={handleFormValue}
+										max-length="300" variant="label-hidden" data-id="remark" value={remarksValue}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Remarks__c" variant="label-stacked"
+										style="display:none" disabled={isDisabled} class="capable" value={remarksValue}>
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Remarks__c" variant="label-stacked"
+										disabled={isDisabled}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Income Per Day</label>
+									<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+										data-id="Income_per_day__c" onchange={handleCalculations}
+										value={incomePerDayVal} required style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={incomePerDayVal}
+										variant="label-hidden" name="Income_per_day__c" onchange={handleCalculations}
+										message-when-range-overflow="Maximum 8 digits are allowed." formatter="currency"
+										label="Income Per Day" max="99999999">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+										onchange={handleCalculations} data-id="Income_per_day__c" disabled={isDisabled}
+										class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+
+
+
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isFIVC}>
+									<label class="slds-form-element__label" for="form-element-01">
+								 <abbr class="slds-required" title="required">* </abbr>Number Of Days</label>
+									<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+										data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+										name="Number_of_days__c" onchange={handleCalculations}
+										message-when-range-overflow="Maximum 2 digits are allowed."
+										label="Number Of Days" max="99" max-length="2">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+										onchange={handleCalculations} data-id="Number_of_days__c" disabled={isDisabled}
+										class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+
+
+
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Gross Monthly Income
+						</label>
+								<lightning-input type="number" value={grossMonthlyIncome} variant="label-hidden"
+									formatter="currency" name="Gross_Monthly_Income__c" step="0"
+									label="Gross Monthly Income" disabled="true">
+								</lightning-input>
+								<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+									value={grossMonthlyIncome} class="capable" style="display:none;">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Assumptions for Income
+						</label>
+								<template if:false={isFIVC}>
+									<lightning-textarea label="Assumptions for Income" name="Assumptions_for_Income__c"
+										onchange={handleFormValue} max-length="500" variant="label-hidden"
+										data-id="assumption" value={assumptionRemark}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Assumptions_for_Income__c"
+										value={assumptionRemark} variant="label-stacked" disabled={isDisabled}
+										class="capable" style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Assumptions_for_Income__c" variant="label-hidden"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>
+								% of income transacted through bank account</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} variant="label-hidden" class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Other Confirmations" name="Other_Confirmations__c"
+										value={otherConfirmation} disabled="true" variant="label-stacked">
+									</lightning-textarea>
+								</template>
+								<template if:false={isDisabled}>
+									<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>
+								Other Confirmations</label>
+									<lightning-input-field field-name="Other_Confirmations__c" variant="label-hidden"
+										disabled={isDisabled} onchange={handleFormValue} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+								<abbr class="slds-required" title="required">*</abbr>
+								Business Pincode
+							</label>
+								<template if:true={isDisabled}>
+									<lightning-input-field field-name="IncomePincode__c" variant="label-hidden"
+										disabled="true">
+									</lightning-input-field>
+								</template>
+								<template if:false={isDisabled}>
+									<lightning-input-field field-name="BusinessPincode__c" variant="label-hidden"
+										disabled={isDisabled} class="capable" onchange={handleFormValue}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+								<abbr class="slds-required" title="required">*</abbr>
+								Overall Remarks
+							</label>
+								<template if:false={isFIVC}>
+									<lightning-textarea label="Overall Remarks" name="Overall_Remarks__c"
+										onchange={handleFormValue} max-length="500" variant="label-hidden"
+										data-id="overall-remarks" value={overallRemarks}>
+									</lightning-textarea>
+									<lightning-input-field field-name="Overall_Remarks__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" value={overallRemarks}
+										style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Overall_Remarks__c" variant="label-hidden"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<template if:true={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<lightning-input-field field-name="Business_Reference_Name__c"
+										variant="label-stacked" disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<lightning-input-field field-name="Business_Reference_Contact_Number__c"
+										disabled={isDisabled} variant="label-stacked" class="capable" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<lightning-input-field field-name="Feedback__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<lightning-input-field field-name="Business_Reference_Name_2__c"
+										variant="label-stacked" required disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<lightning-input-field field-name="Business_Reference_Contact_Number_2__c"
+										variant="label-stacked" required disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<lightning-input-field field-name="Feedback_2__c" variant="label-stacked" required
+										disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="12">
+									<lightning-input-field field-name="Business_Reference_Remarks__c"
+										variant="label-stacked" required="true" disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+						</template>
+						<template if:true={isEateriesAndOthers}>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Business name
+						</label>
+								<template if:false={isFIVC}>
+									<lightning-input type="text" variant="label-hidden" name="Business_name__c"
+										label="Business name" max-length="50" value={businessName}
+										pattern="^[a-zA-Z0-9 ]*$" onchange={handleFormValue}
+										message-when-pattern-mismatch="Only alphanumeric values are allowed.">
+									</lightning-input>
+									<lightning-input-field field-name="Business_name__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" value={businessName} style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Business_name__c" variant="label-hidden"
+										disabled={isDisabled} class="capable" value={businessName}>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Business Nature
+						</label>
+								<template if:false={isFIVC}>
+									<lightning-input type="text" variant="label-hidden" name="Business_Nature__c"
+										label="Business Nature" max-length="50" value={businessNature}
+										pattern="^[a-zA-Z0-9 ]*$" onchange={handleFormValue}
+										message-when-pattern-mismatch="Only alphanumeric values are allowed.">
+									</lightning-input>
+									<lightning-input-field field-name="Business_Nature__c" variant="label-stacked"
+										disabled={isDisabled} class="capable" value={businessNature}
+										style="display:none">
+									</lightning-input-field>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Business_Nature__c" variant="label-hidden"
+										disabled={isDisabled} class="capable" required>
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Year Of Business
+						</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="Year_of_Business__c" value={yearOfBusiness}
+										variant="label-stacked" style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={yearOfBusiness}
+										variant="label-hidden" name="Year_of_Business__c" onchange={handleFormValue}
+										max={totalExpInBusiness}
+										message-when-range-overflow="Year Of Business should be less than Total Experience In This Business."
+										label="Year Of Business">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Year_of_Business__c" variant="label-hidden"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Total Experience In This Business(yrs)
+						</label>
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="Total_experience_in_this_business_yrs__c"
+										variant="label-stacked" value={totalExpInBusiness} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={totalExpInBusiness}
+										variant="label-hidden" name="Total_experience_in_this_business_yrs__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 2 digits are allowed." min={yearOfBusiness}
+										message-when-range-underflow="Total Experience should be greater than Year Of Business."
+										label="Total Experience In This Business(yrs)" max="99">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="Total_experience_in_this_business_yrs__c"
+										disabled={isDisabled} variant="label-hidden" class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Nature of Ownership
+						</label>
+								<lightning-input-field field-name="Nature_of_Ownership__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Ownership Proof available
+						</label>
+								<lightning-input-field field-name="Ownership_Proof_available__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue}>
+								</lightning-input-field>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<template if:false={isDisabled}>
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Ownership Proof
+						</label>
+									<lightning-input-field field-name="Ownership_proof__c" variant="label-hidden"
+										disabled={isDisabled} onchange={handleFormValue}>
+									</lightning-input-field>
+								</template>
+								<template if:true={isDisabled}>
+									<lightning-textarea label="Ownership proof" name="Ownership_proof__c"
+										value={ownershipproofEateries} disabled="true" variant="label-stacked">
+									</lightning-textarea>
+								</template>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Regular Business Activity
+						</label>
+								<lightning-input-field field-name="regular_business_activity__c" variant="label-hidden"
+									disabled={isDisabled} onchange={handleFormValue} class="capable">
+								</lightning-input-field>
+							</lightning-layout-item>
+							<template if:true={isDayBasis}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<template if:false={isFIVC}>
+										<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Income Per Day
+						</label>
+										<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+											data-id="Income_per_day__c" onchange={handleCalculations}
+											value={incomePerDayVal} style="display: none;">
+										</lightning-input-field>
+										<lightning-input type="number" step="0" value={incomePerDayVal}
+											variant="label-hidden" name="Income_per_day__c"
+											onchange={handleCalculations}
+											message-when-range-overflow="Maximum 8 digits are allowed."
+											formatter="currency" label="Income Per Day" max="99999999">
+										</lightning-input>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Income_per_day__c" variant="label-stacked"
+											onchange={handleCalculations} data-id="Income_per_day__c"
+											disabled={isDisabled} class="capable" required>
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Number Of Days
+						</label>
+									<template if:false={isFIVC}>
+										<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+											data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+										</lightning-input-field>
+										<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+											name="Number_of_days__c" onchange={handleCalculations}
+											message-when-range-overflow="Maximum 2 digits are allowed."
+											label="Number Of Days" max="99">
+										</lightning-input>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Number_of_days__c" variant="label-hidden"
+											onchange={handleCalculations} data-id="Number_of_days__c"
+											disabled={isDisabled} class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Gross Monthly Income
+						</label>
+									<lightning-input type="number" value={grossMonthlyIncome} variant="label-hidden"
+										formatter="currency" name="Gross_Monthly_Income__c" step="0"
+										label="Gross Monthly Income" disabled="true">
+									</lightning-input>
+									<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+										value={grossMonthlyIncome} class="capable" style="display:none;">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Assumptions for Income
+						</label>
+									<template if:false={isFIVC}>
+										<lightning-textarea label="Assumptions for Income"
+											name="Assumptions_for_Income__c" onchange={handleFormValue} max-length="500"
+											variant="label-hidden" data-id="assumption" value={assumptionRemark}>
+										</lightning-textarea>
+										<lightning-input-field field-name="Assumptions_for_Income__c"
+											value={assumptionRemark} variant="label-stacked" disabled={isDisabled}
+											class="capable" style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Assumptions_for_Income__c" required
+											variant="label-hidden" disabled={isDisabled} class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+							</template>
+							<template if:true={isMarginBasis}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>
+								         Sales per day</label>
+									<template if:false={isFIVC}>
+										<lightning-input type="number" value={salesPerDay} variant="label-hidden"
+											step="0" name="Sales_per_day__c" onchange={handleCalculations}
+											formatter="currency"
+											message-when-range-overflow="Maximum 8 digits are allowed."
+											label="Sales per day" max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Sales_per_day__c" data-id="Sales_per_day__c"
+											variant="label-hidden" onchange={handleCalculations} disabled={isDisabled}
+											class="capable" value={salesPerDay} style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Sales_per_day__c" data-id="Sales_per_day__c"
+											variant="label-hidden" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>
+								        Number Of Days</label>
+									<template if:false={isFIVC}>
+										<lightning-input-field field-name="Number_of_days__c" variant="label-stacked"
+											data-id="Number_of_days__c" value={numberOfDays} style="display: none;">
+										</lightning-input-field>
+										<lightning-input type="number" value={numberOfDays} variant="label-hidden"
+											name="Number_of_days__c" onchange={handleCalculations}
+											message-when-range-overflow="Maximum 2 digits are allowed."
+											label="Number Of Days" max="99">
+										</lightning-input>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Number_of_days__c" variant="label-hidden"
+											onchange={handleCalculations} data-id="Number_of_days__c"
+											disabled={isDisabled} class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Sales Per Month
+						</label>
+									<lightning-input-field field-name="Sales_per_month__c" variant="label-hidden"
+										value={salesPerMonth} onchange={handleFormValue} class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Margin %
+						</label>
+									<lightning-input-field field-name="Margin__c" variant="label-hidden"
+										onchange={handleCalculations} data-id="Margin__c" disabled={isDisabled}
+										class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Margin In Amount
+						</label>
+									<lightning-input-field field-name="Margin_in_amount__c" variant="label-hidden"
+										value={marginInAmount} onchange={handleFormValue} class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Electricity
+						</label>
+									<template if:false={isFIVC}>
+										<lightning-input type="number" value={electricity} variant="label-hidden"
+											step="0" name="Electricity__c" onchange={handleCalculations}
+											formatter="currency"
+											message-when-range-overflow="Maximum 8 digits are allowed."
+											label="Electricity" max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Electricity__c" variant="label-stacked"
+											value={electricity} data-id="Electricity__c" onchange={handleCalculations}
+											disabled={isDisabled} class="capable" style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Electricity__c" variant="label-hidden"
+											data-id="Electricity__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Salary
+						</label>
+									<template if:false={isFIVC}>
+										<lightning-input type="number" value={salary} variant="label-hidden" step="0"
+											name="Salary__c" onchange={handleCalculations} formatter="currency"
+											message-when-range-overflow="Maximum 8 digits are allowed." label="Salary"
+											max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Salary__c" variant="label-stacked"
+											data-id="Salary__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable" value={salary} style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Salary__c" variant="label-hidden"
+											data-id="Salary__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Rent
+						</label>
+									<template if:false={isFIVC}>
+										<lightning-input type="number" value={rent} variant="label-hidden"
+											name="Rent__c" onchange={handleCalculations} formatter="currency" step="0"
+											message-when-range-overflow="Maximum 8 digits are allowed." label="Rent"
+											max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Rent__c" variant="label-stacked"
+											data-id="Rent__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable" value={rent} style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Rent__c" variant="label-hidden"
+											data-id="Rent__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Others
+						</label>
+									<template if:false={isFIVC}>
+										<lightning-input type="number" value={others} variant="label-hidden"
+											name="Others__c" onchange={handleCalculations} formatter="currency" step="0"
+											message-when-range-overflow="Maximum 8 digits are allowed." label="Others"
+											max="99999999">
+										</lightning-input>
+										<lightning-input-field field-name="Others__c" variant="label-stacked"
+											data-id="Others__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable" value={others} style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Others__c" variant="label-hidden"
+											data-id="Others__c" onchange={handleCalculations} disabled={isDisabled}
+											class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="2">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Gross Monthly Income
+						</label>
+									<lightning-input type="number" value={grossMonthlyIncome} variant="label-hidden"
+										formatter="currency" name="Gross_Monthly_Income__c" step="0"
+										label="Gross Monthly Income" disabled="true">
+									</lightning-input>
+									<lightning-input-field field-name="Gross_Monthly_Income__c" variant="label-stacked"
+										value={grossMonthlyIncome} class="capable" style="display:none;">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="4">
+									<label class="slds-form-element__label" for="form-element-05">
+							<abbr class="slds-required" title="required">*</abbr>
+							Assumptions for Income
+						</label>
+									<template if:false={isFIVC}>
+										<lightning-textarea label="Assumptions for Income"
+											name="Assumptions_for_Income__c" onchange={handleFormValue} max-length="500"
+											variant="label-hidden" data-id="assumption" value={assumptionRemark}>
+										</lightning-textarea>
+										<lightning-input-field field-name="Assumptions_for_Income__c"
+											value={assumptionRemark} variant="label-stacked" disabled={isDisabled}
+											class="capable" style="display:none">
+										</lightning-input-field>
+									</template>
+									<template if:true={isFIVC}>
+										<lightning-input-field field-name="Assumptions_for_Income__c"
+											variant="label-hidden" disabled={isDisabled} class="capable">
+										</lightning-input-field>
+									</template>
+								</lightning-layout-item>
+							</template>
+							<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+								medium-device-size="3" large-device-size="3">
+								<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>
+								         % of income transacted through bank account</label>
+
+								<template if:false={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										variant="label-hidden" value={percentageOfIncome} style="display: none;">
+									</lightning-input-field>
+									<lightning-input type="number" step="0" value={percentageOfIncome}
+										variant="label-hidden" name="of_income_transacted_through_bank_acco__c"
+										onchange={handleFormValue}
+										message-when-range-overflow="Maximum 100% is allowed." formatter="percent-fixed"
+										label="% Of Income Transacted Through Bank Account" max="100">
+									</lightning-input>
+								</template>
+								<template if:true={isFIVC}>
+									<lightning-input-field field-name="of_income_transacted_through_bank_acco__c"
+										disabled={isDisabled} variant="label-hidden" class="capable">
+									</lightning-input-field>
+								</template>
+							</lightning-layout-item>
+							<template if:false={isFIVC}>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>
+								         Business Pincode</label>
+									<lightning-input-field field-name="BusinessPincode__c" variant="label-hidden"
+										disabled={isDisabled} class="capable" onchange={handleFormValue}>
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="6">
+									<label class="slds-form-element__label" for="form-element-01"><abbr class="slds-required" title="required">* </abbr>
+								         Overall Remarks</label>
+									<lightning-input-field field-name="Overall_Remarks__c" variant="label-hidden"
+										disabled={isDisabled} onchange={handleFormValue} class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+							<template if:true={isFIVC}>
+
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="6"
+									medium-device-size="4" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Business Pincode
+                            </label>
+									<lightning-input-field field-name="IncomePincode__c" variant="label-hidden"
+										disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Business Reference Name
+                            </label>
+									<lightning-input-field field-name="Business_Reference_Name__c"
+										variant="label-hidden" disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                               Business Reference Contact Number
+                            </label>
+									<lightning-input-field field-name="Business_Reference_Contact_Number__c"
+										disabled={isDisabled} variant="label-hidden" class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="3"
+									medium-device-size="3" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                               Feedback
+                            </label>
+									<lightning-input-field field-name="Feedback__c" variant="label-hidden"
+										disabled={isDisabled} class="capable">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                               Business Reference Name
+                            </label>
+									<lightning-input-field field-name="Business_Reference_Name_2__c"
+										variant="label-hidden" disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                               Business Reference Contact Number
+                            </label>
+									<lightning-input-field field-name="Business_Reference_Contact_Number_2__c"
+										variant="label-hidden" disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="3">
+									<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                               Feedback
+                            </label>
+									<lightning-input-field field-name="Feedback_2__c" variant="label-hidden"
+										disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+									medium-device-size="12" large-device-size="12">
+									<label class="slds-form-element__label" for="form-element-05">
+                                <abbr class="slds-required" title="required">*</abbr>
+                              Business Reference Remarks
+                            </label>
+									<lightning-input-field field-name="Business_Reference_Remarks__c"
+										variant="label-hidden" disabled="true">
+									</lightning-input-field>
+								</lightning-layout-item>
+							</template>
+						</template>
+						<lightning-layout-item size="12" padding="horizontal-small" small-device-size="12"
+							medium-device-size="12" large-device-size="12">
+							<div class="slds-align_absolute-center" if:false={isDisabled}>
+								<lightning-button variant="brand" type="submit" label={labelSave} id="capability-btn">
+								</lightning-button>
+								<lightning-button class="slds-m-left_small" variant="neutral" label="Cancel"
+									onclick={handleReset}>
+								</lightning-button>
+							</div>
+						</lightning-layout-item>
+					</lightning-layout>
+				</lightning-record-edit-form>
+			</lightning-card>
+		</template>
+	</div>
+	<!-- Delete Popup -->
+	<template if:true={showDeleteModal}>
+		<c-fs-delete-l-w-c delete-from="Process Credit" object-api-name="Capability__c" rec-id={capRecordId}
+			show-modal={showDeleteModal} onmodaldelete={handlemodalactions} onmodalcancel={handlemodalactions}>
+		</c-fs-delete-l-w-c>
+	</template>
+	<template if:false={isDisabled}>
+		<!-- Capability Table for PC--->
+		<template if:true={capabilitypcTableData}>
+			<lightning-card variant="Narrow" title={tableTitle}>
+				<c-generic-data-table-l-w-c result={capabilitypcTableData} onrowselectionevent={handleSelectedRow}
+					btns={rowAction} onselected={handleSelectedCapabilityMember}>
+				</c-generic-data-table-l-w-c>
+			</lightning-card>
+		</template>
+	</template>
+	<lightning-spinner alternative-text="Loading" size="small" if:true={capabilitychildSpinner}>
+	</lightning-spinner>
+</template>

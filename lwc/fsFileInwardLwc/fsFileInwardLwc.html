@@ -1,0 +1,150 @@
+<template>
+
+    <!--PAGE HEADER-->
+	<c-fs-page-container-l-w-c if:true={lastLoginDate} headericon="standard:asset_audit" stagename="File Inward" appno=""
+    businessdate={todaysDate} lastlogindate={lastLoginDate} btns={btns} onrowselectionevent={rowselectionevent}>
+    </c-fs-page-container-l-w-c>
+    <!--PAGE HEADER-->
+
+
+    <lightning-tabset variant="scoped">
+        <lightning-tab label="File Inward">
+            <lightning-card  variant="Narrow">
+            <lightning-layout multiple-rows="true">
+                
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                    medium-device-size="1" large-device-size="2">
+                    <div class="custom-box">
+                        <lightning-input type="date" variant="standard" name="From Date" label="From Date"
+                        onchange={handleFormValues} >
+                        </lightning-input>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                    medium-device-size="1" large-device-size="2">
+                    <div class="custom-box">
+                        <lightning-input type="date" variant="standard" name="To Date" label="To Date"
+                        onchange={handleFormValues} min={fromDate} message-when-range-underflow="From Date  cannot greater than To Date" >
+                        </lightning-input>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                medium-device-size="1" large-device-size="2">
+                <div class="custom-box">
+                    <lightning-input type="text" variant="standard" name="Application No" label="Application Number"
+                    onchange={handleFormValues}>
+                    </lightning-input>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                medium-device-size="1" large-device-size="2">
+                <div class="custom-box">
+                    <lightning-input type="text" variant="standard" name="Loan Account Number" label="Loan Account Number"
+                    onchange={handleFormValues}>
+                    </lightning-input>
+                </div>
+            </lightning-layout-item>
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                    medium-device-size="1" large-device-size="2">
+                    <div class="custom-box slds-m-top_large">
+                        <lightning-button variant="brand" label="Search" onclick={handleClick}>
+                        </lightning-button>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </lightning-card>
+        </br>
+        
+        <template if:true={isSpinner}>
+            <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+        </template>
+        <template if:false={isSpinner}>
+             <template if:false={hasAppData}>
+            <template if:true={applicationData}>
+                <div class="slds-m-top_small">
+                </div>
+                <lightning-card  variant="Narrow">
+                
+                <div class="slds-scrollable" style="max-height:250px;">
+                    
+                    <table
+                        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                        <thead>
+                            <th>S. No.</th>
+                            <th>Application No</th>
+                            <th>Old Application No</th>
+                            <th>Customer Name</th>
+                            <th>Branch Name</th>
+                            <th>State</th>
+                            <th>Loan Account Number</th>
+                            <th>Application Type</th>
+                            <th>Disbursement Date</th>
+                            <th>Disbursal Type</th>
+                            <th>File Inward Status</th>
+                            <th>Remarks</th>
+                        </thead>
+                        <tbody>
+                            <template for:each={applicationData} for:item="application" for:index="idx">
+                                <tr key={application.Id}>
+                                    <td>{application.serialNumber}</td>
+                                    <!-- //@Description : Ticket-0777 for old application number
+                                    //@dated : 18 Jan 23
+                                    //@Author: Sangeeta Yadav-->
+                                    <td>{application.applicationNo}</td>
+                                    <td>{application.oldApplicationNo}</td>
+                                    <th>{application.customerName}</th>
+                                    <td>{application.sourcingBranchName}</td>
+                                    <td>{application.sourcingBranchState}</td>
+                                    <td>{application.loanNo}</td>
+                                    <td>{application.appType}</td>
+                                    <td>{application.disbursementDate}</td>
+
+                                    <td>
+                                        <lightning-combobox data-index={idx} onchange={handleEditValues}
+									       name="Disbursal Type" value={application.disbursalType} options={disbursalOpts}>
+                                           
+									    </lightning-combobox>
+                                        
+                                    </td>
+                                    <td>
+                                        <lightning-combobox required="required" data-index={idx} onchange={handleEditValues}
+									       name="File Inward Status" value={application.fileInwardStatus} options={fileinwardPicklistValues}>
+                                           
+									    </lightning-combobox>
+                                        <template if:true={application.isError}>
+                                        <div class="slds-has-error">
+                                        <div class="slds-form-element__help" data-help-text="" aria-live="assertive">Complete this field.</div></div>
+                                    </template>
+                                    </td>
+                                    <td>
+                                        <lightning-textarea onchange={handleEditValues} data-index={idx}
+										style="width: 200px;"    name="Remarks"  value={application.remarks} maxlength="255">
+									    </lightning-textarea>
+                                    </td>
+                                </tr>
+                                
+                            </template>
+                            
+                        </tbody>
+                    
+                    </table>
+                <div></br></br></br>
+                    </br></br></div>
+                </div>
+            <div class="slds-clearfix">
+                <div class="slds-float_right slds-m-around_small">
+                        <lightning-button variant="brand" label="Save" title="Save" onclick={saveApplication} disabled={handleDisable}></lightning-button>
+                </div>
+            </div>
+            </lightning-card> 
+            </template>
+             </template>
+            <template if:true={hasAppData}>
+                <lightning-card variant="Narrow">
+                    <p class="slds-p-horizontal_small slds-align_absolute-center">There is no application found for the date you searched. </p>
+                </lightning-card>
+            </template>
+        </template> 
+    </lightning-tab>
+</lightning-tabset>
+</template>

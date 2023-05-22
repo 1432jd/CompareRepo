@@ -1,0 +1,48 @@
+<template>
+    <!-- DISPLAY KYC DOCS -->
+    <template if:false={imgLinks}>
+		<c-fs-spinner></c-fs-spinner>
+	</template>
+    <template if:true={isModalOpen}>
+        <div class="slds-modal slds-fade-in-open slds-backdrop">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" alternative-text="Close this window" size="large"
+                        variant="border-inverse" onclick={closeModal} class=" slds-modal__close">
+                    </lightning-button-icon>
+                    <p><strong>KYC Documents</strong></p>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+					<template for:each={imgLinks} for:item="file">
+						<div key={file.id} class="slds-box">
+							<lightning-layout multiple-rows="true">
+								<lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="4"
+									padding="around-small">
+                                    <p><strong>FileName - </strong>{file.Title}</p>
+                                </lightning-layout-item>
+								<lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="4"
+									padding="around-small">
+                                    <a href={file.link} download>Download</a>
+                                </lightning-layout-item>
+								<lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="4"
+									padding="around-small">
+                                    <lightning-button label="Preview" variant="brand" data-id={file.id} onclick={previewHandler}>
+									</lightning-button>
+                                </lightning-layout-item>
+							</lightning-layout>
+						</div>
+					</template>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning-layout>
+                        <lightning-layout-item size="12" small-device-size="9" medium-device-size="3"
+                            large-device-size="12">
+                            <lightning-button variant="brand-outline" type="cancel" label="Close" onclick={closeModal}>
+                            </lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+            </div>
+        </div>
+    </template>
+</template>

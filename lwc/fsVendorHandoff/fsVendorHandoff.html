@@ -1,0 +1,184 @@
+<template>
+
+    <!--PAGE HEADER-->
+	<c-fs-page-container-l-w-c if:true={lastLoginDate} headericon="standard:asset_audit" stagename="Vendor Handoff" appno=""
+    businessdate={todaysDate} lastlogindate={lastLoginDate} btns={btns} onrowselectionevent={rowselectionevent}>
+    </c-fs-page-container-l-w-c>
+    <!--PAGE HEADER-->
+
+
+    <lightning-tabset variant="scoped">
+        <lightning-tab label="Vendor Handoff">
+            <lightning-card  variant="Narrow">
+            <lightning-layout multiple-rows="true">
+                
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                    medium-device-size="1" large-device-size="2">
+                    <div class="custom-box">
+                        <lightning-input type="date" variant="standard" name="From Date" label="From Date"
+                        onchange={handleFormValues} >
+                        </lightning-input>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                    medium-device-size="1" large-device-size="2">
+                    <div class="custom-box">
+                        <lightning-input type="date" variant="standard" name="To Date" label="To Date"
+                        onchange={handleFormValues} min={fromDate} message-when-range-underflow="From Date  cannot greater than To Date" >
+                        </lightning-input>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                    medium-device-size="1" large-device-size="2">
+                    <div class="custom-box">
+                        <lightning-input type="text" variant="standard" name="Application No" label="Application Number"
+                        onchange={handleFormValues}>
+                        </lightning-input>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                    medium-device-size="1" large-device-size="2">
+                    <div class="custom-box">
+                        <lightning-input type="text" variant="standard" name="Loan Account Number" label="Loan Account Number"
+                        onchange={handleFormValues}>
+                        </lightning-input>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="3" padding="around-small" small-device-size="1"
+                    medium-device-size="1" large-device-size="2">
+                    <div class="custom-box slds-m-top_large">
+                        <lightning-button variant="brand" label="Search" onclick={handleClick}>
+                        </lightning-button>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </lightning-card>
+        </br>
+        
+        <template if:true={isSpinner}>
+            <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+        </template>
+        <template if:false={isSpinner}>
+            <template if:true={applicationData}>
+                <div class="slds-m-top_small">
+                </div>
+                <lightning-card  variant="Narrow">
+                
+                <div class="slds-scrollable" style="max-height:250px;">
+                    
+                    <table
+                        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                        <thead>
+                            <th>S. No.</th>
+                            <th>Application No</th>
+                            <th>Old Application No</th>
+                            <th>Branch Name</th>
+                            <th>HandOff Date</th>
+                            <th>File Bar Code</th>
+                            <th>Box Bar Code</th>
+                            <th>Storage Vendor Name</th>
+                            <th>File Status</th>
+                            <th style="text-align: center;">Welcome Letter</th>
+                            <th style="text-align: center;">Repayment Schedule</th>
+                        </thead>
+                        <tbody>
+                            <template for:each={applicationData} for:item="application" for:index="idx">
+                                <tr key={application.Id}>
+                                    <td>{application.serialNumber}</td>
+                                    <td>{application.applicationNo}</td>
+                                    <td>{application.applicationNo}</td>
+                                    <td>{application.sourcingBranchName}</td>
+                                    
+                                    <td>
+                                        
+                                            <lightning-input variant="label-hidden" data-index={idx} onchange={handleEditValues} value={application.handoffDate}
+                                                   name="Handoff Date" type="Date">
+                                            </lightning-input>
+                                        
+                                        <template if:true={application.handoffDateError}>
+                                            <div class="slds-has-error">
+                                            <div class="slds-form-element__help" data-help-text="" aria-live="assertive"><b>Complete this field.</b></div></div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        
+                                            <lightning-input  data-index={idx} onchange={handleEditValues} value={application.fileBarCode}
+                                                max-length="20" variant="label-hidden"  name="FileBar Code" type="text">
+                                            </lightning-input>
+                                        
+                                        <template if:true={application.fileBarCodeError}>
+                                            <div class="slds-has-error">
+                                            <div class="slds-form-element__help" data-help-text="" aria-live="assertive"><b>Complete this field.</b></div></div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        
+                                            <lightning-input  data-index={idx} onchange={handleEditValues} value={application.boxBarCode}
+                                                max-length="20" variant="label-hidden"  name="BoxBar Code" type="text">
+                                            </lightning-input>
+                                        
+                                        <template if:true={application.boxBarCodeError}>
+                                            <div class="slds-has-error">
+                                            <div class="slds-form-element__help" data-help-text="" aria-live="assertive"><b>Complete this field.</b></div></div>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        
+                                            <lightning-combobox variant="label-hidden" name="Storage Vendor Name"  data-index={idx} onchange={handleEditValues}
+                                                 value={application.storageVendorName} options={storagePicklistValues}>
+                                            </lightning-combobox>
+                                            
+                                        <template if:true={application.storageVendorNameError}>
+                                            <div class="slds-has-error">
+                                            <div class="slds-form-element__help" data-help-text="" aria-live="assertive"><b>Complete this field.</b></div></div>
+                                        </template>
+                                    </td>
+                                    
+                                    <td>
+                                        
+                                            <lightning-combobox variant="label-hidden"  data-index={idx} onchange={handleEditValues}
+                                            name="File Status" value={application.fileStatus} options={fileinwardPicklistValues}>
+                                            </lightning-combobox>
+                                        
+                                        <div  if:true={application.fileStatusError}>
+                                            <template if:true={application.fileStatusError}>
+                                                <div class="slds-has-error">
+                                                <div class="slds-form-element__help" data-help-text="" aria-live="assertive"><b>Complete this field.</b></div></div>
+                                            </template>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <lightning-button onclick={handleletterpdf} data-id={application.Id} class="slds-p-horizontal_xx-large slds-m-right_large" variant="brand" type="submit" label="Welcome Letter">
+                                        </lightning-button>
+                                    </td>
+                                    <td>
+                                        <lightning-button onclick={handlerepaymentpdf} data-id={application.Id} class="slds-p-horizontal_xx-large slds-m-right_xx-large" variant="brand" type="submit"
+                                        label="Repayment Schedule">
+                                        </lightning-button>
+                                    </td>
+                                </tr>
+                                
+                            </template>
+                            
+                        </tbody>
+                    
+                    </table>
+                <div></br></br></br>
+                    </br></br></div>
+                </div>
+            <div class="slds-clearfix">
+                <div class="slds-float_right slds-m-around_small">
+                        <lightning-button variant="brand" label="Save" title="Save" onclick={saveApplication} disabled={handleDisable}></lightning-button>
+                </div>
+            </div>
+            </lightning-card> 
+            </template>
+            <template if:true={hasAppData}>
+                <lightning-card variant="Narrow">
+                    <p class="slds-p-horizontal_small slds-align_absolute-center">No application found. </p>
+                </lightning-card>
+            </template>
+        </template> 
+    </lightning-tab>
+</lightning-tabset>
+</template>
